@@ -1,0 +1,148 @@
+<section class="hero-section" dir="rtl" [@fadeIn]>
+
+  <!-- Background Image Layer -->
+  <div class="hero-background">
+    <div class="background-image-wrapper">
+      <img
+        [src]="'./assets/images/home/banner.webp'"
+        alt="PowerEV - شواحن السيارات الكهربائية"
+        class="background-image"
+        loading="eager"
+        fetchpriority="high"
+      />
+      <!-- Dark Overlay with Gradient -->
+      <div class="background-overlay"></div>
+      <!-- Animated Green Accents -->
+      <div class="accent-line accent-line-1"></div>
+      <div class="accent-line accent-line-2"></div>
+    </div>
+  </div>
+
+  <!-- Content Container -->
+  <div class="hero-content-wrapper">
+    <div class="container">
+      <div class="hero-content" [@fadeInUp]>
+
+        <!-- Main Heading -->
+        <h1 class="hero-title">
+          <span class="title-main">{{ heroContent.title.main }}</span>
+          <span class="title-highlight">{{ heroContent.title.highlight }}</span>
+        </h1>
+
+        <!-- Subtitle/Description -->
+        <p class="hero-subtitle">
+          {{ heroContent.subtitle }}
+        </p>
+
+        <!-- Call-to-Action Buttons -->
+        <div class="hero-actions">
+          <a
+            *ngFor="let button of heroContent.buttons; trackBy: trackByText"
+            [routerLink]="button.link"
+            [class]="'hero-button hero-button-' + button.type"
+            [attr.aria-label]="button.ariaLabel"
+          >
+            <span class="button-text">{{ button.text }}</span>
+            <span class="button-icon" *ngIf="button.type === 'primary'">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </span>
+          </a>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="hero-badges">
+          <div class="badge">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <path d="m9 12 2 2 4-4"></path>
+            </svg>
+            <span>ضمان شامل</span>
+          </div>
+
+          <div class="badge">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 7h-9"></path>
+              <path d="M14 17H5"></path>
+              <circle cx="17" cy="17" r="3"></circle>
+              <circle cx="7" cy="7" r="3"></circle>
+            </svg>
+            <span>تركيب احترافي</span>
+          </div>
+
+          <div class="badge">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>دعم 24/7</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll Indicator -->
+  <div class="scroll-indicator" *ngIf="">
+    <div class="scroll-icon">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <polyline points="19 12 12 19 5 12"></polyline>
+      </svg>
+    </div>
+  </div>
+
+</section>

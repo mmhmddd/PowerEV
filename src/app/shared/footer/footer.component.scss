@@ -1,0 +1,465 @@
+
+$green:          rgb(0, 255, 65);
+$green-light:    rgba(0, 255, 65, 0.10);
+$green-border:   rgba(0, 255, 65, 0.30);
+$green-glow:     rgba(0, 255, 65, 0.15);
+
+$white:          #ffffff;
+$white-dim:      rgba(255, 255, 255, 0.78);
+$white-dimmer:   rgba(255, 255, 255, 0.50);
+$gray-medium:    rgba(255, 255, 255, 0.09);
+$gray-light:     rgba(255, 255, 255, 0.07);
+
+// ── Transitions (shared) ───────────────────────────────
+$transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$transition-fast: all 0.2s ease;
+
+
+.footer-section {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.92) 0%,
+    rgba(26, 34, 56, 0.90) 50%,
+    rgba(15, 23, 44, 0.92) 100%
+  );
+
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+
+  color: $white-dim;
+  padding: 4rem 0 0;
+  border-top: 1px solid $gray-light;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 -10px 40px rgba(0, 0, 0, 0.35),
+    0 -4px 20px rgba(0, 0, 0, 0.2);
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(0, 255, 65, 0.03), transparent 70%);
+    pointer-events: none;
+  }
+
+  &::before {
+    top: -30%;
+    inset-inline-end: -20%;
+  }
+
+  &::after {
+    bottom: -30%;
+    inset-inline-start: -20%;
+  }
+
+  .container {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding-inline: 2rem;
+    position: relative;
+    z-index: 1;
+
+    @media (max-width: 767px) {
+      padding-inline: 1rem;
+    }
+  }
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3rem;
+  padding-bottom: 3rem;
+
+  @media (max-width: 991px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem;
+  }
+
+  @media (max-width: 575px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+// ==========================================
+// Footer Column
+// ==========================================
+.footer-column {
+  display: flex;
+  flex-direction: column;
+
+  &.logo-column {
+    @media (max-width: 991px) {
+      grid-column: 1 / -1;
+      order: -1;
+      align-items: center;
+      text-align: center;
+    }
+  }
+
+  &.contact-column {
+    @media (max-width: 991px) and (min-width: 576px) {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+// ==========================================
+// Titles
+// ==========================================
+.footer-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: $white;
+  position: relative;
+
+  .title-text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .title-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, $green, transparent);
+    border-radius: 2px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset-inline-end: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 6px;
+      background: $green;
+      border-radius: 50%;
+      box-shadow: 0 0 10px $green;
+    }
+  }
+}
+
+// ==========================================
+// Links
+// ==========================================
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  .footer-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: $white-dim;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: $transition-base;
+    padding: 0.5rem 0;
+    position: relative;
+
+    .link-icon {
+      display: flex;
+      align-items: center;
+      color: $green;
+      transition: $transition-fast;
+      flex-shrink: 0;
+
+      svg { transform: rotate(180deg); } // RTL
+    }
+
+    .link-text {
+      position: relative;
+      transition: $transition-fast;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset-inline-end: -0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 2px;
+      background: $green;
+      transition: width $transition-base;
+      border-radius: 2px;
+    }
+
+    &:hover {
+      color: $white;
+      padding-inline-end: 0.5rem;
+
+      &::before { width: 30px; }
+
+      .link-icon {
+        transform: translateX(-3px);
+        filter: drop-shadow(0 0 8px $green);
+      }
+
+      .link-text { transform: translateX(-3px); }
+    }
+
+    &:active { color: $green; }
+  }
+}
+
+// ==========================================
+// Contact Info
+// ==========================================
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  .contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+
+    .contact-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $green;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: $transition-fast;
+    }
+
+    .contact-text {
+      color: $white-dimmer;
+      line-height: 1.7;
+      margin: 0;
+      font-size: 0.95rem;
+      white-space: pre-line;
+    }
+
+    .contact-link {
+      color: $white-dimmer;
+      text-decoration: none;
+      transition: $transition-fast;
+      font-size: 0.95rem;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset-inline-end: 0;
+        bottom: -2px;
+        width: 0;
+        height: 1px;
+        background: $green;
+        transition: width $transition-base;
+      }
+
+      &:hover {
+        color: $green;
+
+        &::after { width: 100%; }
+      }
+    }
+
+    &:hover .contact-icon {
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 8px $green);
+    }
+  }
+}
+
+// ==========================================
+// Brand / Logo Area
+// ==========================================
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+
+  @media (max-width: 991px) {
+    align-items: center;
+    text-align: center;
+  }
+}
+
+.footer-logo {
+  display: inline-block;
+  transition: $transition-fast;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  .logo-img {
+    height: 60px;
+    width: auto;
+    filter: drop-shadow(0 4px 10px rgba(0, 255, 65, 0.2));
+    transition: $transition-fast;
+
+    @media (max-width: 767px) {
+      height: 50px;
+    }
+  }
+
+  &:hover .logo-img {
+    filter: drop-shadow(0 6px 15px rgba(0, 255, 65, 0.35));
+  }
+}
+
+.brand-description {
+  color: $white-dimmer;
+  line-height: 1.8;
+  font-size: 0.95rem;
+  margin: 0;
+  max-width: 280px;
+
+  @media (max-width: 991px) {
+    max-width: 600px;
+  }
+}
+
+// ==========================================
+// Social Icons
+// ==========================================
+.social-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    background: $gray-medium;
+    border: 1px solid $gray-light;
+    border-radius: 12px;
+    color: $white-dim;
+    transition: $transition-base;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 50% auto auto 50%;
+      width: 0;
+      height: 0;
+      background: $green-light;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s ease, height 0.4s ease;
+    }
+
+    svg {
+      position: relative;
+      z-index: 1;
+      transition: $transition-fast;
+    }
+
+    &:hover {
+      background: $green-light;
+      border-color: $green;
+      color: $green;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 20px rgba(0, 255, 65, 0.3);
+
+      &::before {
+        width: 100px;
+        height: 100px;
+      }
+
+      svg {
+        transform: scale(1.1) rotate(5deg);
+      }
+    }
+
+    &:active {
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// ==========================================
+// Bottom Bar
+// ==========================================
+.footer-bottom {
+  padding: 1.5rem 0;
+
+  .footer-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      $gray-light 20%,
+      $gray-light 80%,
+      transparent
+    );
+    margin-bottom: 1.5rem;
+  }
+
+  .copyright {
+    text-align: center;
+
+    .copyright-text {
+      color: $white-dimmer;
+      font-size: 0.9rem;
+      margin: 0;
+      letter-spacing: 0.3px;
+
+      @media (max-width: 575px) {
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
+
+// ==========================================
+// Responsive
+// ==========================================
+@media (max-width: 991px) {
+  .footer-section { padding: 3rem 0 0; }
+  .footer-content { padding-bottom: 2.5rem; }
+  .footer-title {
+    font-size: 1.15rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 575px) {
+  .footer-section { padding: 2.5rem 0 0; }
+  .footer-content {
+    gap: 1.75rem;
+    padding-bottom: 2rem;
+  }
+  .footer-title {
+    font-size: 1.1rem;
+    margin-bottom: 1.25rem;
+  }
+  .social-links { justify-content: center; }
+}
+
+// ==========================================
+// Focus / Accessibility
+// ==========================================
+.footer-link,
+.contact-link,
+.social-link,
+.footer-logo {
+  &:focus-visible {
+    outline: 2px solid $green;
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}

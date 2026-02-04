@@ -1,0 +1,122 @@
+<section class="gallery-section" dir="rtl" lang="ar">
+  <div class="container">
+    <!-- Page Header -->
+    <header class="page-header">
+      <h1 class="page-title">معرض الصور</h1>
+      <p class="page-description">لقطات من تركيباتنا ومنتجاتنا على أرض الواقع</p>
+    </header>
+
+    <!-- Gallery Grid -->
+    <div class="gallery-grid">
+      <article
+        class="gallery-item"
+        *ngFor="let image of galleryImages; let i = index"
+        (click)="openLightbox(image, i)"
+        [attr.aria-label]="'فتح صورة ' + image.alt"
+        role="button"
+        tabindex="0"
+        (keydown.enter)="openLightbox(image, i)"
+        (keydown.space)="openLightbox(image, i)">
+        <div class="image-wrapper">
+          <img
+            [src]="image.src"
+            [alt]="image.alt"
+            class="gallery-image"
+            loading="lazy"
+            width="800"
+            height="800">
+          <div class="image-overlay">
+            <span class="zoom-badge">تكبير الصورة</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div
+    class="lightbox-modal"
+    *ngIf="selectedImage"
+    (click)="onBackdropClick($event)"
+    [@fadeIn]
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'عرض صورة ' + selectedImage.alt">
+
+    <!-- Close Button -->
+    <button
+      class="lightbox-close"
+      (click)="closeLightbox()"
+      aria-label="إغلاق"
+      type="button">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- Previous Button -->
+    <button
+      class="lightbox-nav lightbox-prev"
+      (click)="previousImage()"
+      aria-label="الصورة السابقة"
+      type="button">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+
+    <!-- Next Button -->
+    <button
+      class="lightbox-nav lightbox-next"
+      (click)="nextImage()"
+      aria-label="الصورة التالية"
+      type="button">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+
+    <!-- Image Container -->
+    <div class="lightbox-content" (click)="onBackdropClick($event)">
+      <img
+        [src]="selectedImage.src"
+        [alt]="selectedImage.alt"
+        class="lightbox-image"
+        [@zoomIn]>
+
+      <!-- Image Counter & Title -->
+      <div class="lightbox-info">
+        <p class="image-counter">{{ selectedIndex + 1 }} / {{ galleryImages.length }}</p>
+        <p class="image-title" *ngIf="selectedImage.title">{{ selectedImage.title }}</p>
+      </div>
+    </div>
+  </div>
+</section>

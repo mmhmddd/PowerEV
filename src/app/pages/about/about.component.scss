@@ -1,0 +1,634 @@
+// ==========================================
+// Color Palette
+// ==========================================
+$green: rgb(0, 255, 65);
+$green-dark: #00cc34;
+$green-light: rgba(0, 255, 65, 0.1);
+$green-border: rgba(0, 255, 65, 0.3);
+$green-glow: rgba(0, 255, 65, 0.4);
+
+$dark-blue-black: #0a0e1a;
+$slate: #1a2332;
+$dark-blue: #0f1729;
+$medium-slate: #2a3647;
+
+$gray: #3d4d5c;
+$gray-light: #4a5a6a;
+
+$cyan: #0d3d4d;
+$teal: #1a4d4d;
+$light-teal: #2d6666;
+
+$black: #000;
+$white: #fff;
+$white-dim: rgba(255, 255, 255, 0.7);
+$white-dimmer: rgba(255, 255, 255, 0.5);
+
+// ==========================================
+// CSS Variables for Angular Integration
+// ==========================================
+:host {
+  --brand-green: rgb(0, 255, 65);
+  --brand-black: #0a0e1a;
+  --brand-dark-blue: #0f1729;
+  --brand-gray: #3d4d5c;
+  display: block;
+  direction: rtl;
+}
+
+// ==========================================
+// Utility Classes
+// ==========================================
+.text-brand-green {
+  color: $green !important;
+}
+
+.bg-brand-green {
+  background-color: $green !important;
+}
+
+.bg-brand-black {
+  background-color: $dark-blue-black !important;
+}
+
+.bg-brand-dark-blue {
+  background-color: $dark-blue !important;
+}
+
+.border-brand-green {
+  border-color: $green !important;
+}
+
+.border-brand-gray {
+  border-color: $gray !important;
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+}
+
+.text-glow {
+  text-shadow:
+    0 0 30px rgba(0, 255, 65, 0.6),
+    0 0 60px rgba(0, 255, 65, 0.3);
+}
+
+// ==========================================
+// Background Gradient Card
+// ==========================================
+.bg-gradient-card {
+  background: linear-gradient(
+    135deg,
+    rgba(26, 35, 50, 0.4) 0%,
+    rgba(15, 23, 41, 0.6) 50%,
+    rgba(10, 14, 26, 0.8) 100%
+  );
+}
+
+// ==========================================
+// Layout & Spacing
+// ==========================================
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  max-width: 1320px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+    padding: 2rem;
+
+
+  @media (min-width: 768px) {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+// ==========================================
+// Hero Section
+// ==========================================
+.h-\[500px\] {
+  height: 600px;
+}
+
+@media (min-width: 768px) {
+  .md\:h-\[600px\] {
+    height: 600px;
+  }
+}
+
+// Hero Overlay Gradient - Exact match to design
+.hero-overlay-gradient {
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(10, 14, 26, 0.3) 0%,
+      rgba(10, 14, 26, 0.7) 50%,
+      rgba(10, 14, 26, 0.95) 100%
+    ),
+    linear-gradient(
+      to left,
+      rgba(0, 0, 0, 0.85) 0%,
+      rgba(0, 0, 0, 0.4) 30%,
+      rgba(0, 0, 0, 0.3) 50%,
+      rgba(0, 0, 0, 0.4) 70%,
+      rgba(0, 0, 0, 0.85) 100%
+    );
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+// ==========================================
+// Flexbox & Grid
+// ==========================================
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.gap-6 {
+  gap: 1.5rem;
+}
+
+.gap-8 {
+  gap: 2rem;
+}
+
+.gap-12 {
+  gap: 3rem;
+}
+
+.grid {
+  display: grid;
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+// ==========================================
+// Background & Image Styles
+// ==========================================
+.bg-gradient-to-br {
+  background-image: linear-gradient(to bottom left, var(--tw-gradient-stops)); // RTL
+}
+
+.from-brand-green\/10 {
+  --tw-gradient-from: rgba(0, 255, 65, 0.1);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+
+.to-transparent {
+  --tw-gradient-to: transparent;
+}
+
+.object-cover {
+  object-fit: cover;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.w-1\/2 {
+  width: 50%;
+}
+
+.w-16 {
+  width: 4rem;
+}
+
+.h-16 {
+  height: 4rem;
+}
+
+.w-20 {
+  width: 5rem;
+}
+
+.h-1 {
+  height: 0.25rem;
+}
+
+.w-64 {
+  width: 16rem;
+}
+
+.h-64 {
+  height: 16rem;
+}
+
+// ==========================================
+// Positioning & Layout
+// ==========================================
+.top-0 {
+  top: 0;
+}
+
+.right-0 {
+  right: 0;
+}
+
+.bottom-0 {
+  bottom: 0;
+}
+
+.left-0 {
+  left: 0;
+}
+
+.top-20 {
+  top: 5rem;
+}
+
+.right-20 {
+  right: 5rem;
+}
+
+.z-10 {
+  z-index: 10;
+}
+
+// ==========================================
+// Spacing
+// ==========================================
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.py-16 {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.mb-20 {
+  margin-bottom: 5rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.pr-4 {
+  padding-right: 1rem;
+}
+
+.p-8 {
+  padding: 2rem;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// ==========================================
+// Width Constraints
+// ==========================================
+.max-w-3xl {
+  max-width: 48rem;
+}
+
+.max-w-2xl {
+  max-width: 42rem;
+}
+
+.max-w-xl {
+  max-width: 36rem;
+}
+
+// ==========================================
+// Typography
+// ==========================================
+.text-5xl {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .md\:text-7xl {
+    font-size: 4.5rem;
+    line-height: 1;
+  }
+
+  .md\:text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  .md\:text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.leading-tight {
+  line-height: 1.25;
+}
+
+.leading-relaxed {
+  line-height: 1.625;
+}
+
+.leading-loose {
+  line-height: 2;
+}
+
+.tracking-wider {
+  letter-spacing: 0.05em;
+}
+
+.text-white {
+  color: $white;
+}
+
+.text-gray-300 {
+  color: #d1d5db;
+}
+
+.text-gray-400 {
+  color: #9ca3af;
+}
+
+.text-center {
+  text-align: center;
+}
+
+// ==========================================
+// Borders & Decorations
+// ==========================================
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.rounded-2xl {
+  border-radius: 1rem;
+}
+
+.border {
+  border-width: 1px;
+}
+
+.border-r-4 {
+  border-right-width: 4px;
+}
+
+.blur-3xl {
+  filter: blur(64px);
+}
+
+// ==========================================
+// Opacity & Effects
+// ==========================================
+.opacity-20 {
+  opacity: 0.2;
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+.pointer-events-none {
+  pointer-events: none;
+}
+
+// ==========================================
+// Animations
+// ==========================================
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out backwards;
+}
+
+// ==========================================
+// Responsive Utilities
+// ==========================================
+@media (max-width: 767px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (max-width: 575px) {
+  .h-\[500px\] {
+    height: auto;
+    min-height: 550px;
+  }
+}
+
+// ==========================================
+// Custom Enhancements
+// ==========================================
+
+// Enhanced hero title glow effect
+h1 {
+  span.text-brand-green {
+    animation: textGlow 3s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes textGlow {
+  0%, 100% {
+    text-shadow:
+      0 0 30px rgba(0, 255, 65, 0.6),
+      0 0 60px rgba(0, 255, 65, 0.3);
+  }
+  50% {
+    text-shadow:
+      0 0 40px rgba(0, 255, 65, 0.8),
+      0 0 80px rgba(0, 255, 65, 0.4);
+  }
+}
+
+// Enhanced stat cards hover effect
+.grid-cols-3 > div {
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+
+    .text-brand-green {
+      filter: drop-shadow(0 0 12px rgba(0, 255, 65, 0.6));
+    }
+  }
+}
+
+// Enhanced value cards
+.bg-gradient-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0, 255, 65, 0.15);
+    border-color: rgba(0, 255, 65, 0.4);
+  }
+
+  svg {
+    transition: all 0.3s ease;
+  }
+
+  &:hover svg {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 12px rgba(0, 255, 65, 0.5));
+  }
+}
+
+// Story section border animation
+h2.border-r-4 {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: 0;
+    width: 4px;
+    height: 0;
+    background: $green;
+    animation: borderGrow 1s ease-out forwards;
+    animation-delay: 0.5s;
+  }
+}
+
+@keyframes borderGrow {
+  to {
+    height: 100%;
+  }
+}
+
+// Enhanced image overlay on hover
+.shadow-glow {
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+  }
+}
+
+// Stagger animation delays
+[style*="animation-delay"] {
+  animation-fill-mode: backwards;
+}
+
+// ==========================================
+// Accessibility
+// ==========================================
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// ==========================================
+// Print Styles
+// ==========================================
+@media print {
+  .min-h-screen {
+    min-height: 0;
+  }
+
+  .absolute {
+    position: static;
+  }
+}

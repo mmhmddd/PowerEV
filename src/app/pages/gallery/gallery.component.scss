@@ -1,0 +1,453 @@
+// Import Cairo font
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap');
+
+// Variables
+$brand-black: #0f172a;
+$brand-dark: #1e293b;
+$brand-gray: #334155;
+$brand-green: #10b981;
+$text-white: #ffffff;
+$text-gray: #94a3b8;
+
+// Mixins
+@mixin transition($property: all, $duration: 0.3s) {
+  transition: $property $duration ease-in-out;
+}
+
+// Main Container
+.gallery-section {
+  min-height: 100vh;
+  padding: 3rem 0;
+  font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(
+    135deg,
+    #0f172a 0%,
+    #141b2e 30%,
+    #1a2238 50%,
+    #17213a 70%,
+    #0f182c 100%
+  );
+  background-attachment: fixed;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+
+  @media (min-width: 768px) {
+    padding: 0 2rem;
+  }
+}
+
+// Page Header
+.page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: $text-white;
+  margin: 0 0 1rem 0;
+  font-family: 'Cairo', sans-serif;
+
+  @media (min-width: 768px) {
+    font-size: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    font-size: 3.5rem;
+  }
+}
+
+.page-description {
+  font-size: 1.125rem;
+  color: $text-gray;
+  margin: 0;
+  font-family: 'Cairo', sans-serif;
+
+  @media (min-width: 768px) {
+    font-size: 1.25rem;
+  }
+}
+
+// Gallery Grid
+.gallery-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+// Gallery Item
+.gallery-item {
+  position: relative;
+  cursor: pointer;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid $brand-gray;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  @include transition(transform);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+  }
+
+  &:focus {
+    outline: 2px solid $brand-green;
+    outline-offset: 2px;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-green;
+    outline-offset: 2px;
+  }
+}
+
+.image-wrapper {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  @include transition(transform, 0.5s);
+
+  .gallery-item:hover & {
+    transform: scale(1.1);
+  }
+}
+
+// Image Overlay
+.image-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  @include transition(opacity);
+
+  .gallery-item:hover & {
+    opacity: 1;
+  }
+}
+
+.zoom-badge {
+  color: $brand-green;
+  font-weight: 700;
+  font-size: 1.125rem;
+  border: 2px solid $brand-green;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-family: 'Cairo', sans-serif;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+
+  @media (max-width: 767px) {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+  }
+}
+
+// Lightbox Modal
+.lightbox-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-in-out;
+  backdrop-filter: blur(4px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Lightbox Close Button
+.lightbox-close {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10001;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid $text-white;
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: $text-white;
+  @include transition(all);
+
+  &:hover {
+    background: $brand-green;
+    border-color: $brand-green;
+    transform: rotate(90deg);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-green;
+    outline-offset: 2px;
+  }
+
+  @media (min-width: 768px) {
+    top: 2rem;
+    left: 2rem;
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+}
+
+// Navigation Buttons
+.lightbox-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10001;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid $text-white;
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: $text-white;
+  @include transition(all);
+
+  &:hover {
+    background: $brand-green;
+    border-color: $brand-green;
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-green;
+    outline-offset: 2px;
+  }
+
+  @media (min-width: 768px) {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+}
+
+.lightbox-prev {
+  right: 1rem;
+
+  @media (min-width: 768px) {
+    right: 2rem;
+  }
+}
+
+.lightbox-next {
+  left: 1rem;
+
+  @media (min-width: 768px) {
+    left: 2rem;
+  }
+}
+
+// Lightbox Content
+.lightbox-content {
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.lightbox-image {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: zoomIn 0.3s ease-in-out;
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Lightbox Info
+.lightbox-info {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: $text-white;
+}
+
+.image-counter {
+  font-size: 1rem;
+  margin: 0 0 0.5rem 0;
+  color: $text-gray;
+  font-family: 'Cairo', sans-serif;
+
+  @media (min-width: 768px) {
+    font-size: 1.125rem;
+  }
+}
+
+.image-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  color: $text-white;
+  font-family: 'Cairo', sans-serif;
+
+  @media (min-width: 768px) {
+    font-size: 1.25rem;
+  }
+}
+
+// Responsive Adjustments
+@media (max-width: 767px) {
+  .gallery-section {
+    padding: 2rem 0;
+  }
+
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  .gallery-grid {
+    gap: 1rem;
+  }
+
+  .lightbox-content {
+    max-width: 95vw;
+  }
+
+  .lightbox-image {
+    max-height: 70vh;
+  }
+
+  .lightbox-info {
+    margin-top: 1rem;
+  }
+}
+
+// Keyboard Navigation Hint
+@media (min-width: 768px) {
+  .lightbox-modal::before {
+    content: 'استخدم الأسهم ← → للتنقل أو ESC للإغلاق';
+    position: fixed;
+    bottom: 2rem;
+    right: 50%;
+    transform: translateX(50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: $text-gray;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-family: 'Cairo', sans-serif;
+    z-index: 10000;
+    animation: fadeIn 0.5s ease-in-out 0.5s both;
+  }
+}
+
+// Print Styles
+@media print {
+  .gallery-section {
+    background: white;
+  }
+
+  .lightbox-modal {
+    display: none;
+  }
+
+  .gallery-grid {
+    display: block;
+  }
+
+  .gallery-item {
+    page-break-inside: avoid;
+    margin-bottom: 1rem;
+  }
+
+  .image-overlay {
+    display: none;
+  }
+}
+
+// Accessibility - Reduced Motion
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .gallery-image {
+    transition: none;
+  }
+
+  .image-overlay {
+    transition: none;
+  }
+}
+
+// Loading State
+.gallery-item {
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba($brand-green, 0.1),
+      transparent
+    );
+    animation: shimmer 2s infinite;
+    pointer-events: none;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+// .gallery-image[src] ~ &::before {
+//   display: none;
+// }

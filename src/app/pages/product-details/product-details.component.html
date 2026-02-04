@@ -1,0 +1,148 @@
+<div class="product-details-container" *ngIf="product; else loadingOrNotFound">
+  <button class="back-btn" (click)="goBack()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    <span>العودة</span>
+  </button>
+
+  <div class="product-details-content">
+    <!-- Image Gallery Section -->
+    <div class="gallery-section">
+      <div class="main-image-container">
+        <img
+          [src]="product.images[selectedImageIndex]?.url"
+          [alt]="product.images[selectedImageIndex]?.alt"
+          class="main-image"
+        />
+
+        <!-- Image Navigation (only show if multiple images) -->
+        <div *ngIf="product.images.length > 1" class="image-navigation">
+          <button class="nav-btn prev-btn" (click)="prevImage()" title="الصورة السابقة">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <button class="nav-btn next-btn" (click)="nextImage()" title="الصورة التالية">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Image Counter -->
+        <div class="image-info">
+          <span>{{ selectedImageIndex + 1 }} من {{ product.images.length }}</span>
+        </div>
+      </div>
+
+      <!-- Thumbnail Gallery -->
+      <div *ngIf="product.images.length > 1" class="thumbnails">
+        <button
+          *ngFor="let image of product.images; let i = index"
+          class="thumbnail"
+          [class.active]="selectedImageIndex === i"
+          (click)="selectImage(i)"
+        >
+          <img [src]="image.url" [alt]="image.alt" />
+        </button>
+      </div>
+    </div>
+
+    <!-- Product Info Section -->
+    <div class="info-section">
+      <div class="product-header">
+        <span class="category-badge">{{ product.category }}</span>
+        <span class="stock-indicator" [class.in-stock]="product.inStock">
+          {{ product.inStock ? 'متوفر في المخزون' : 'غير متوفر' }}
+        </span>
+      </div>
+
+      <h1 class="product-title">{{ product.name }}</h1>
+
+      <p class="product-description">{{ product.description }}</p>
+
+      <!-- Specifications -->
+      <div class="specifications" *ngIf="product.specifications && product.specifications.length > 0">
+        <h3>المواصفات</h3>
+        <ul class="specs-list">
+          <li *ngFor="let spec of product.specifications">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>{{ spec }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Price Section -->
+      <div class="price-section">
+        <div class="price-display">
+          <span class="currency">ج.م</span>
+          <span class="price-value">{{ product.price | number: '0,0' }}</span>
+        </div>
+      </div>
+
+      <!-- Quantity & Add to Cart -->
+      <div class="purchase-section">
+        <div class="quantity-control">
+          <span class="quantity-label">الكمية:</span>
+          <button class="qty-btn" (click)="decrementQuantity()" [disabled]="quantity <= 1">−</button>
+          <input type="number" [(ngModel)]="quantity" class="qty-input" min="1" readonly />
+          <button class="qty-btn" (click)="incrementQuantity()">+</button>
+        </div>
+
+        <button
+          class="add-to-cart-main-btn"
+          (click)="addToCart()"
+          [class.added]="showAddedToCart"
+          [disabled]="!product.inStock"
+        >
+          <span *ngIf="!showAddedToCart">إضافة إلى السلة</span>
+          <span *ngIf="showAddedToCart">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            تم الإضافة بنجاح
+          </span>
+        </button>
+      </div>
+
+      <!-- Additional Info -->
+      <div class="additional-info">
+        <div class="info-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span>ضمان سنة واحدة</span>
+        </div>
+        <div class="info-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>دعم فني متاح</span>
+        </div>
+        <div class="info-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>توصيل سريع</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingOrNotFound>
+  <div class="not-found" *ngIf="!isLoading">
+    <h2>المنتج غير موجود</h2>
+    <p>عذراً، لم نتمكن من العثور على المنتج المطلوب</p>
+    <button (click)="goBack()">العودة إلى المنتجات</button>
+  </div>
+
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>جاري التحميل...</p>
+  </div>
+</ng-template>

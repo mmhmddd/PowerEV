@@ -1,0 +1,106 @@
+<div class="products-container">
+  <div class="products-header">
+    <h1 class="products-title">منتجاتنا</h1>
+    <button class="mobile-filter-btn" (click)="toggleMobileFilters()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"></path>
+      </svg>
+      <span>تصفية المنتجات</span>
+    </button>
+  </div>
+
+  <div class="products-content">
+    <!-- Sidebar Filters -->
+    <aside class="filters-sidebar" [class.mobile-open]="mobileFiltersOpen">
+      <div class="filters-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="21" x2="14" y1="4" y2="4"></line>
+          <line x1="10" x2="3" y1="4" y2="4"></line>
+          <line x1="21" x2="12" y1="12" y2="12"></line>
+          <line x1="8" x2="3" y1="12" y2="12"></line>
+          <line x1="21" x2="16" y1="20" y2="20"></line>
+          <line x1="12" x2="3" y1="20" y2="20"></line>
+          <line x1="14" x2="14" y1="2" y2="6"></line>
+          <line x1="8" x2="8" y1="10" y2="14"></line>
+          <line x1="16" x2="16" y1="18" y2="22"></line>
+        </svg>
+        <h3>التصنيفات</h3>
+      </div>
+
+      <ul class="categories-list">
+        <li *ngFor="let category of categories">
+          <button
+            class="category-btn"
+            [class.active]="selectedCategory === category.id"
+            (click)="selectCategory(category.id)"
+          >
+            {{ category.name }}
+          </button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Products Grid -->
+    <div class="products-grid">
+      <!-- Product Card -->
+      <div *ngFor="let product of products" class="product-card" (click)="viewProductDetails(product)">
+        <!-- Image Container -->
+        <div class="product-image-container">
+          <img
+            [src]="product.images[0]?.url"
+            [alt]="product.images[0]?.alt"
+            class="product-image"
+          />
+          <div class="image-overlay">
+            <button
+              class="action-btn add-to-cart-btn"
+              title="إضافة إلى السلة"
+              (click)="$event.stopPropagation()"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8" cy="21" r="1"></circle>
+                <circle cx="19" cy="21" r="1"></circle>
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+              </svg>
+            </button>
+
+            <button
+              class="action-btn details-btn"
+              title="عرض التفاصيل"
+              (click)="$event.stopPropagation(); viewProductDetails(product)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Image Counter -->
+          <div class="image-counter" *ngIf="product.images.length > 1">
+            <span>{{ product.images.length }} صور</span>
+          </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="product-info">
+          <span class="product-category">{{ product.category }}</span>
+          <h3 class="product-name">{{ product.name }}</h3>
+          <p class="product-description">{{ product.description }}</p>
+
+          <div class="product-footer">
+            <span class="product-price">{{ product.price | number: '1.0-0' }} ج.م</span>
+            <span class="stock-badge" [class.in-stock]="product.inStock">
+              {{ product.inStock ? 'متوفر' : 'غير متوفر' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Products Message -->
+      <div *ngIf="products.length === 0" class="no-products">
+        <p>لا توجد منتجات في هذا التصنيف</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,69 @@
+<section class="products-section" dir="rtl">
+  <div class="products-container">
+
+    <!-- Section Title -->
+    <h2 class="section-title" [@fadeInUp]>
+      {{ sectionTitle }}
+    </h2>
+
+    <!-- Products Grid -->
+    <div class="products-grid" [@listAnimation]="products.length">
+
+      <!-- Product Card -->
+      <a
+        *ngFor="let product of products; trackBy: trackByProductId"
+        [routerLink]="product.link"
+        class="product-card"
+        [attr.aria-label]="product.ariaLabel"
+      >
+        <!-- Product Image Container -->
+        <div class="product-image-wrapper">
+          <img
+            [src]="product.image"
+            [alt]="product.title"
+            class="product-image"
+            loading="lazy"
+          />
+          <!-- Gradient Overlay -->
+          <div class="product-overlay"></div>
+
+          <!-- Green Accent Line -->
+          <div class="accent-border"></div>
+        </div>
+
+        <!-- Product Content -->
+        <div class="product-content">
+          <h3 class="product-title">
+            {{ product.title }}
+          </h3>
+
+          <!-- Call-to-Action -->
+          <div class="product-cta">
+            <span class="cta-text">تصفح المنتجات</span>
+            <span class="cta-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="m12 19-7-7 7-7"></path>
+                <path d="M19 12H5"></path>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- Hover Effect Overlay -->
+        <div class="hover-glow"></div>
+      </a>
+
+    </div>
+
+  </div>
+</section>

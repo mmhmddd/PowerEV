@@ -1,0 +1,143 @@
+<section
+  class="slider-section"
+  dir="rtl"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+  (touchstart)="onTouchStart($event)"
+  (touchend)="onTouchEnd($event)"
+>
+  <div class="slider-container">
+
+    <!-- Slider Wrapper -->
+    <div class="slider-wrapper">
+
+      <!-- Slides - All slides rendered, active one visible -->
+      <div
+        *ngFor="let slide of slides; let i = index; trackBy: trackBySlideId"
+        class="slide"
+        [class.active]="i === currentSlide"
+        [class.prev]="i === getPrevSlideIndex()"
+        [class.next]="i === getNextSlideIndex()"
+      >
+        <!-- Background Image -->
+        <div class="slide-background">
+          <img
+            [src]="slide.image"
+            [alt]="slide.title"
+            class="slide-image"
+            [loading]="i === 0 ? 'eager' : 'lazy'"
+          />
+          <!-- Gradient Overlay -->
+          <div class="slide-overlay"></div>
+        </div>
+
+        <!-- Slide Content -->
+        <div class="slide-content-wrapper">
+          <div class="container">
+            <div class="slide-content">
+
+              <!-- Title -->
+              <h2 class="slide-title">
+                {{ slide.title }}
+              </h2>
+
+              <!-- Description -->
+              <p class="slide-description">
+                {{ slide.description }}
+              </p>
+
+              <!-- Call-to-Action Button -->
+              <div class="slide-action">
+                <a
+                  [routerLink]="slide.buttonLink"
+                  class="slide-button"
+                  [attr.aria-label]="slide.buttonAriaLabel"
+                >
+                  <span class="button-text">{{ slide.buttonText }}</span>
+                  <span class="button-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </span>
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Arrows -->
+      <button
+        class="nav-arrow nav-arrow-prev"
+        (click)="prevSlide()"
+        aria-label="الشريحة السابقة"
+        type="button"
+        [disabled]="isTransitioning"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <button
+        class="nav-arrow nav-arrow-next"
+        (click)="nextSlide()"
+        aria-label="الشريحة التالية"
+        type="button"
+        [disabled]="isTransitioning"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+
+      <!-- Pagination Dots -->
+      <div class="pagination-dots">
+        <button
+          *ngFor="let slide of slides; let i = index"
+          class="pagination-dot"
+          [class.active]="i === currentSlide"
+          (click)="goToSlide(i)"
+          [attr.aria-label]="'انتقل إلى الشريحة ' + (i + 1)"
+          [attr.aria-current]="i === currentSlide ? 'true' : 'false'"
+          type="button"
+          [disabled]="isTransitioning"
+        ></button>
+      </div>
+
+    </div>
+
+  </div>
+</section>

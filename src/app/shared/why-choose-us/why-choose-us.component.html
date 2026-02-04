@@ -1,0 +1,72 @@
+<!-- Why Choose PowerEV Section -->
+<section
+  class="why-choose-section"
+  dir="rtl"
+  aria-labelledby="why-choose-title"
+>
+  <div class="why-choose-container">
+
+    <!-- Decorative Top Border -->
+    <div class="top-border-gradient"></div>
+
+    <!-- Section Header -->
+    <div class="section-header">
+      <h2
+        id="why-choose-title"
+        class="section-title"
+      >
+        {{ sectionTitle }}
+        <span class="brand-name">{{ brandName }}</span>؟
+      </h2>
+      <p class="section-subtitle">
+        {{ sectionSubtitle }}
+      </p>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="features-grid">
+
+      <!-- Feature Card -->
+      <article
+        *ngFor="let feature of features; trackBy: trackByFeatureId"
+        class="feature-card"
+        [attr.aria-label]="feature.title"
+      >
+
+        <!-- Icon Container -->
+        <div class="icon-container">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path [attr.d]="getIconPath(feature.icon)"></path>
+          </svg>
+        </div>
+
+        <!-- Feature Title -->
+        <h3 class="feature-title">
+          {{ feature.title }}
+        </h3>
+
+        <!-- Feature Description -->
+        <p class="feature-description">
+          {{ feature.description }}
+        </p>
+
+        <!-- Hover Glow Effect -->
+        <div class="hover-glow"></div>
+
+      </article>
+
+    </div>
+
+  </div>
+</section>

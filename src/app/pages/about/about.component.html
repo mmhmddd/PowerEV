@@ -1,0 +1,155 @@
+<div class="min-h-screen">
+  <!-- Hero Section -->
+  <div class="relative h-[500px] md:h-[600px] overflow-hidden">
+    <!-- Background Image -->
+    <div class="absolute inset-0">
+      <img
+        src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=2000"
+        alt="Electric Vehicle Charging"
+        class="w-full h-full object-cover"
+      >
+      <!-- Dark Gradient Overlays - Matching exact design -->
+      <div class="absolute inset-0 hero-overlay-gradient"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="container mx-auto px-4 h-full relative z-10">
+      <div class="flex flex-col justify-center h-full max-w-3xl">
+        <div class="animate-fade-in-up">
+          <!-- Section Label -->
+          <div class="flex items-center gap-4 mb-6">
+            <div class="h-1 w-20 bg-brand-green shadow-glow"></div>
+            <span class="text-brand-green font-bold text-sm tracking-wider">من نحن</span>
+          </div>
+
+          <!-- Main Title -->
+          <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+            نقود مستقبل<br>
+            <span class="text-brand-green text-glow">الطاقة النظيفة</span>
+          </h1>
+
+          <!-- Subtitle -->
+          <p class="text-xl md:text-2xl text-gray-300 leading-relaxed mb-8 max-w-2xl">
+            PowerEV هي الشركة الرائدة في مجال حلول شحن السيارات الكهربائية في مصر. نوفر بنية تحتية متكاملة لمستقبل مستدام.
+          </p>
+
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-3 gap-6 max-w-xl">
+            <div
+              *ngFor="let stat of stats"
+              class="text-center animate-fade-in-up"
+              [style.animation-delay.ms]="stat.delay"
+            >
+              <div class="text-3xl md:text-4xl font-bold text-brand-green mb-2">
+                {{ stat.value }}
+              </div>
+              <div class="text-sm text-gray-400">
+                {{ stat.label }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wave Decoration -->
+    <div class="absolute bottom-0 left-0 right-0">
+      <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full">
+        <path
+          d="M0 0L60 10C120 20 240 40 360 46.7C480 53 600 47 720 43.3C840 40 960 40 1080 46.7C1200 53 1320 67 1380 73.3L1440 80V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V0Z"
+          fill="url(#gradient)"
+          fill-opacity="0.3"
+        ></path>
+        <defs>
+          <linearGradient id="gradient" x1="0" y1="0" x2="1440" y2="0">
+            <stop offset="0%" stop-color="#0a0e1a"></stop>
+            <stop offset="50%" stop-color="#1a2332"></stop>
+            <stop offset="100%" stop-color="#0f1729"></stop>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Our Story Section -->
+  <div class="container mx-auto px-4 py-16">
+    <!-- Story & Image -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20">
+      <!-- Text Content -->
+      <div class="animate-fade-in-up">
+        <h2 class="text-3xl font-bold text-white mb-6 border-r-4 border-brand-green pr-4">
+          قصتنا
+        </h2>
+        <p class="text-gray-300 leading-loose mb-6">
+          تأسست PowerEV برؤية واضحة: تمكين مستقبل النقل المستدام في مصر. نحن نؤمن بأن السيارات الكهربائية هي المستقبل، ولذلك نسعى لتوفير بنية تحتية قوية وموثوقة للشحن تجعل امتلاك سيارة كهربائية تجربة سهلة ومريحة.
+        </p>
+        <p class="text-gray-300 leading-loose">
+          نحن نقدم مجموعة متكاملة من المنتجات والخدمات، بدءاً من الشواحن المنزلية البسيطة وصولاً إلى محطات الشحن السريع التجارية، مع التركيز دائماً على الجودة والأمان وخدمة ما بعد البيع.
+        </p>
+      </div>
+
+      <!-- Image -->
+      <div class="relative rounded-2xl overflow-hidden border border-brand-gray shadow-glow animate-fade-in-up">
+        <img
+          src="/assets/images/home/banner2.jpeg"
+          alt="About PowerEV"
+          class="w-full h-full object-cover"
+        >
+        <div class="absolute inset-0 bg-gradient-to-br from-brand-green/10 to-transparent pointer-events-none"></div>
+      </div>
+    </div>
+
+    <!-- Vision, Mission, Values Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div
+        *ngFor="let value of values"
+        class="bg-gradient-card p-8 rounded-2xl border border-brand-gray text-center backdrop-blur-sm animate-fade-in-up"
+        [style.animation-delay.ms]="value.delay"
+      >
+        <!-- Icon -->
+        <div class="w-16 h-16 bg-brand-green/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-green">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide"
+            aria-hidden="true"
+          >
+            <ng-container [ngSwitch]="value.icon">
+              <!-- Target Icon -->
+              <ng-container *ngSwitchCase="'target'">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+              </ng-container>
+              <!-- Zap Icon -->
+              <ng-container *ngSwitchCase="'zap'">
+                <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path>
+              </ng-container>
+              <!-- Heart Icon -->
+              <ng-container *ngSwitchCase="'heart'">
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+              </ng-container>
+            </ng-container>
+          </svg>
+        </div>
+
+        <!-- Title -->
+        <h3 class="text-xl font-bold text-white mb-4">
+          {{ value.title }}
+        </h3>
+
+        <!-- Description -->
+        <p class="text-gray-400 leading-relaxed">
+          {{ value.description }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

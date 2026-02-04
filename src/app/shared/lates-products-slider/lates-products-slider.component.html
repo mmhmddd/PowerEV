@@ -1,0 +1,166 @@
+<!-- Latest Products Slider Section -->
+<section
+  class="latest-products-section"
+  dir="rtl"
+  aria-labelledby="latest-products-title"
+>
+  <div class="latest-products-container">
+
+    <!-- Section Header -->
+    <div class="section-header">
+
+      <!-- Section Title with Border Accent -->
+      <h2
+        id="latest-products-title"
+        class="section-title"
+      >
+        {{ sectionTitle }}
+      </h2>
+
+      <!-- Navigation Controls -->
+      <div class="nav-controls" role="group" aria-label="التحكم في العرض">
+
+        <!-- Previous Button (Right in RTL) -->
+        <button
+          class="nav-button nav-button-prev"
+          (click)="prevSlide()"
+          [disabled]="isTransitioning()"
+          aria-label="المنتجات السابقة"
+          type="button"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </button>
+
+        <!-- Next Button (Left in RTL) -->
+        <button
+          class="nav-button nav-button-next"
+          (click)="nextSlide()"
+          [disabled]="isTransitioning()"
+          aria-label="المنتجات التالية"
+          type="button"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m15 18-6-6 6-6"></path>
+          </svg>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Products Scroll Container -->
+    <div
+      class="products-scroll-container"
+      role="region"
+      aria-label="أحدث المنتجات"
+    >
+
+      <!-- Product Card -->
+      <article
+        *ngFor="let product of products; trackBy: trackByProductId"
+        class="product-card"
+        [attr.aria-label]="product.title + ' - ' + formatPrice(product.price)"
+      >
+        <a
+          [routerLink]="product.link"
+          class="product-link"
+          [attr.aria-label]="'عرض تفاصيل ' + product.title"
+        >
+
+          <!-- Product Image Container -->
+          <div class="product-image-wrapper">
+            <img
+              [src]="product.image"
+              [alt]="product.alt"
+              class="product-image"
+              loading="lazy"
+              width="320"
+              height="320"
+            />
+
+            <!-- Dark Overlay -->
+            <div class="product-overlay"></div>
+
+            <!-- Cart Button (Appears on Hover) -->
+            <div class="cart-overlay">
+              <button
+                class="cart-button"
+                (click)="addToCart(product, $event)"
+                [attr.aria-label]="'أضف ' + product.title + ' إلى السلة'"
+                type="button"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="8" cy="21" r="1"></circle>
+                  <circle cx="19" cy="21" r="1"></circle>
+                  <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Content -->
+          <div class="product-content">
+
+            <!-- Category Badge -->
+            <div class="product-category">
+              {{ product.category }}
+            </div>
+
+            <!-- Product Title -->
+            <h3 class="product-title">
+              {{ product.title }}
+            </h3>
+
+            <!-- Product Price -->
+            <div class="product-footer">
+              <span class="product-price">
+                {{ formatPrice(product.price) }}
+              </span>
+            </div>
+
+          </div>
+
+          <!-- Hover Glow Effect -->
+          <div class="hover-glow"></div>
+
+        </a>
+      </article>
+
+    </div>
+
+  </div>
+</section>

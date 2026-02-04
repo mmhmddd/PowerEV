@@ -1,0 +1,650 @@
+// ==========================================
+// Professional Hero Section Styles - UPDATED PALETTE
+// ==========================================
+
+// NEW Color Palette
+$green: rgb(0, 255, 65);
+$green-dark: #00cc34;
+$green-light: rgba(0, 255, 65, 0.1);
+$green-border: rgba(0, 255, 65, 0.3);
+$green-glow: rgba(0, 255, 65, 0.4);
+
+// Background Colors (Gradients)
+$dark-blue-black: #0a0e1a;
+$slate: #1a2332;
+$dark-blue: #0f1729;
+$medium-slate: #2a3647;
+
+// Card & Section Backgrounds
+$gray: #3d4d5c;
+$gray-light: #4a5a6a;
+
+// Teal Accents
+$cyan: #0d3d4d;
+$teal: #1a4d4d;
+$light-teal: #2d6666;
+
+$black: #000;
+$white: #fff;
+$white-dim: rgba(255, 255, 255, 0.7);
+$white-dimmer: rgba(255, 255, 255, 0.5);
+
+// Transitions
+$transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$transition-fast: all 0.2s ease;
+$transition-slow: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+$font-arabic-only: 'Cairo', sans-serif;
+
+
+// ==========================================
+// Hero Section
+// ==========================================
+.hero-section {
+  position: relative;
+  width: 100%;
+  min-height: 600px;
+  height: 80vh;
+  max-height: 900px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: transparent;
+
+  @media (max-width: 991px) {
+    min-height: 500px;
+    height: 80vh;
+  }
+
+  @media (max-width: 575px) {
+    min-height: 550px;
+    height: auto;
+    padding: 120px 0 80px;
+  }
+}
+
+// ==========================================
+// Background Image & Overlay
+// ==========================================
+.hero-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.background-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  .background-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.5;
+    animation: imageZoom 20s ease-in-out infinite alternate;
+
+    @media (max-width: 991px) {
+      opacity: 0.4;
+    }
+  }
+
+  .background-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(10, 14, 26, 0.85) 0%,
+      rgba(15, 23, 41, 0.7) 40%,
+      rgba(26, 35, 50, 0.5) 70%,
+      transparent 100%
+    );
+
+    @media (max-width: 991px) {
+      background: linear-gradient(
+        to bottom,
+        rgba(10, 14, 26, 0.9) 0%,
+        rgba(15, 23, 41, 0.8) 50%,
+        rgba(10, 14, 26, 0.95) 100%
+      );
+    }
+  }
+}
+
+// Animated Green Accent Lines
+.accent-line {
+  position: absolute;
+  background: linear-gradient(90deg, transparent, $green, transparent);
+  opacity: 0.3;
+  animation: accentMove 8s ease-in-out infinite;
+  font-family: $font-arabic-only;
+
+  &.accent-line-1 {
+    top: 20%;
+    right: -50%;
+    width: 100%;
+    height: 2px;
+    transform: rotate(-20deg);
+    animation-delay: 0s;
+  }
+
+  &.accent-line-2 {
+    top: 60%;
+    left: -50%;
+    width: 80%;
+    height: 3px;
+    transform: rotate(15deg);
+    animation-delay: 4s;
+  }
+}
+
+// ==========================================
+// Content Wrapper
+// ==========================================
+.hero-content-wrapper {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+
+  @media (max-width: 575px) {
+    padding: 0;
+  }
+
+  .container {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    width: 100%;
+
+    @media (max-width: 767px) {
+      padding: 0 1.5rem;
+    }
+  }
+}
+
+.hero-content {
+  max-width: 800px;
+  animation: fadeInUp 1s ease-out;
+
+  @media (max-width: 991px) {
+    max-width: 100%;
+  }
+}
+
+// ==========================================
+// Hero Title
+// ==========================================
+.hero-title {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 1.5rem;
+  color: $white;
+  text-shadow: 2px 4px 20px rgba(0, 0, 0, 0.5);
+
+  @media (max-width: 575px) {
+    margin-bottom: 1.25rem;
+  }
+
+  .title-main {
+    display: block;
+    animation: fadeInLeft 0.8s ease-out 0.2s backwards;
+  }
+
+  .title-highlight {
+    display: block;
+    color: $green;
+    text-shadow:
+      0 0 30px rgba(0, 255, 65, 0.6),
+      0 0 60px rgba(0, 255, 65, 0.3),
+      2px 4px 20px rgba(0, 0, 0, 0.5);
+    animation: fadeInLeft 0.8s ease-out 0.4s backwards, textGlow 3s ease-in-out infinite alternate;
+    position: relative;
+
+    // Subtle underline effect
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      right: 0;
+      width: 200px;
+      height: 4px;
+      background: linear-gradient(90deg, $green, transparent);
+      border-radius: 2px;
+      animation: lineExpand 1s ease-out 0.8s backwards;
+
+      @media (max-width: 575px) {
+        width: 150px;
+        height: 3px;
+        bottom: -8px;
+      }
+    }
+  }
+}
+
+// ==========================================
+// Hero Subtitle
+// ==========================================
+.hero-subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.35rem);
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 2.5rem;
+  max-width: 650px;
+  text-shadow: 1px 2px 10px rgba(0, 0, 0, 0.5);
+  animation: fadeInUp 0.8s ease-out 0.6s backwards;
+
+  @media (max-width: 575px) {
+    margin-bottom: 2rem;
+  }
+}
+
+// ==========================================
+// Hero Action Buttons
+// ==========================================
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+  animation: fadeInUp 0.8s ease-out 0.8s backwards;
+
+  @media (max-width: 575px) {
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+}
+
+.hero-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2.25rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 50px;
+  transition: $transition-base;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 2px solid transparent;
+
+  @media (max-width: 575px) {
+    padding: 0.9rem 1.75rem;
+    font-size: 1rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .button-text {
+    position: relative;
+    z-index: 2;
+    transition: $transition-fast;
+  }
+
+  .button-icon {
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    transition: $transition-fast;
+
+    svg {
+      transform: rotate(180deg); // RTL adjustment
+    }
+  }
+
+  // Primary Button (Green CTA)
+  &.hero-button-primary {
+    background: $green;
+    color: $black;
+    box-shadow:
+      0 4px 20px rgba(0, 255, 65, 0.3),
+      0 0 40px rgba(0, 255, 65, 0.2);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: 50%;
+      width: 0;
+      height: 0;
+      background: $white;
+      border-radius: 50%;
+      transform: translate(50%, -50%);
+      transition: width 0.5s ease, height 0.5s ease;
+    }
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 6px 30px rgba(0, 255, 65, 0.5),
+        0 0 60px rgba(0, 255, 65, 0.3);
+
+      &::before {
+        width: 400px;
+        height: 400px;
+      }
+
+      .button-icon {
+        transform: translateX(-5px);
+      }
+    }
+
+    &:active {
+      transform: translateY(-1px);
+    }
+  }
+
+  // Secondary Button (Outlined)
+  &.hero-button-secondary {
+    background: rgba(74, 90, 106, 0.3);
+    color: $white;
+    border-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: $white;
+      opacity: 0;
+      transition: $transition-base;
+      border-radius: 50px;
+    }
+
+    &:hover {
+      border-color: $green;
+      color: $black;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 25px rgba(0, 255, 65, 0.2);
+
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    &:active {
+      transform: translateY(-1px);
+    }
+  }
+
+  // Focus state for accessibility
+  &:focus-visible {
+    outline: 3px solid $green;
+    outline-offset: 4px;
+  }
+}
+
+// ==========================================
+// Hero Badges
+// ==========================================
+.hero-badges {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease-out 1s backwards;
+
+  @media (max-width: 767px) {
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 575px) {
+    justify-content: center;
+    gap: 1.25rem;
+  }
+
+  .badge {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: $white-dim;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: $transition-fast;
+
+    svg {
+      color: $green;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 8px rgba(0, 255, 65, 0.4));
+    }
+
+    &:hover {
+      color: $white;
+      transform: translateY(-2px);
+
+      svg {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 12px rgba(0, 255, 65, 0.6));
+      }
+    }
+
+    @media (max-width: 575px) {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// ==========================================
+// Scroll Indicator
+// ==========================================
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  animation: fadeIn 1s ease-out 1.5s backwards;
+
+  @media (max-width: 575px) {
+    display: none;
+  }
+
+  .scroll-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(74, 90, 106, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: $transition-base;
+    animation: bounce 2s ease-in-out infinite;
+
+    svg {
+      color: $green;
+      filter: drop-shadow(0 0 8px rgba(0, 255, 65, 0.4));
+    }
+
+    &:hover {
+      background: $green-light;
+      border-color: $green;
+      transform: scale(1.1);
+
+      svg {
+        animation: arrowDown 0.6s ease infinite;
+      }
+    }
+  }
+}
+
+// ==========================================
+// Animations
+// ==========================================
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes lineExpand {
+  from {
+    width: 0;
+  }
+  to {
+    width: 200px;
+  }
+}
+
+@keyframes textGlow {
+  0%, 100% {
+    text-shadow:
+      0 0 30px rgba(0, 255, 65, 0.6),
+      0 0 60px rgba(0, 255, 65, 0.3),
+      2px 4px 20px rgba(0, 0, 0, 0.5);
+  }
+  50% {
+    text-shadow:
+      0 0 40px rgba(0, 255, 65, 0.8),
+      0 0 80px rgba(0, 255, 65, 0.4),
+      2px 4px 20px rgba(0, 0, 0, 0.5);
+  }
+}
+
+@keyframes imageZoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes accentMove {
+  0%, 100% {
+    transform: translateX(0) rotate(-20deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateX(30%) rotate(-20deg);
+    opacity: 0.5;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes arrowDown {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+// ==========================================
+// Responsive Adjustments
+// ==========================================
+@media (max-width: 991px) {
+  .hero-section {
+    .container {
+      padding: 0 1.5rem;
+    }
+  }
+
+  .accent-line {
+    display: none;
+  }
+}
+
+@media (max-width: 575px) {
+  .hero-title .title-highlight::after {
+    width: 150px;
+  }
+
+  .hero-badges {
+    width: 100%;
+
+    .badge {
+      flex: 1;
+      min-width: 0;
+      justify-content: center;
+      text-align: center;
+
+      span:not(svg) {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}
+
+// ==========================================
+// High Performance Mode (Reduced Motion)
+// ==========================================
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// ==========================================
+// Print Styles
+// ==========================================
+@media print {
+  .hero-section {
+    height: auto;
+    min-height: 0;
+    page-break-after: always;
+
+    .scroll-indicator,
+    .accent-line {
+      display: none;
+    }
+
+    .background-image-wrapper {
+      .background-image {
+        opacity: 0.2;
+      }
+    }
+  }
+}

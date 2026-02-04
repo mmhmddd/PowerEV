@@ -1,0 +1,421 @@
+// Import Cairo font
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap');
+
+// Variables
+$brand-black: #0f172a;
+$brand-dark: #1e293b;
+$brand-gray: #334155;
+$brand-green: #10b981;
+$text-white: #ffffff;
+$text-gray: #94a3b8;
+$error-red: #ef4444;
+
+// Mixins
+@mixin card-style {
+  background: $brand-dark;
+  border: 1px solid $brand-gray;
+  border-radius: 1rem;
+  padding: 2rem;
+}
+
+@mixin transition($property: all, $duration: 0.3s) {
+  transition: $property $duration ease-in-out;
+}
+
+// Main Container
+.contact-section {
+  min-height: 100vh;
+  padding: 3rem 0;
+  font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(
+    135deg,
+    #0f172a 0%,
+    #141b2e 30%,
+    #1a2238 50%,
+    #17213a 70%,
+    #0f182c 100%
+  );
+  background-attachment: fixed;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+
+  @media (min-width: 768px) {
+    padding: 0 2rem;
+  }
+}
+
+// Page Header
+.page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: $text-white;
+  margin: 0;
+  font-family: 'Cairo', sans-serif;
+
+  @media (min-width: 768px) {
+    font-size: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    font-size: 3.5rem;
+  }
+}
+
+// Grid Layout
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+}
+
+// Contact Info Section
+.contact-info-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.contact-card {
+  @include card-style;
+}
+
+.card-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: $text-white;
+  margin: 0 0 1.5rem 0;
+  font-family: 'Cairo', sans-serif;
+
+  @media (min-width: 768px) {
+    font-size: 2rem;
+  }
+}
+
+.contact-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    gap: 1.25rem;
+  }
+}
+
+.icon-wrapper {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  background: rgba($brand-green, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $brand-green;
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+.contact-content {
+  flex: 1;
+}
+
+.contact-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: $text-white;
+  margin: 0 0 0.25rem 0;
+  font-family: 'Cairo', sans-serif;
+}
+
+.contact-text {
+  font-size: 1rem;
+  color: $text-gray;
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+// Map Container
+.map-container {
+  position: relative;
+  height: 16rem;
+  @include card-style;
+  padding: 0;
+  overflow: hidden;
+
+  @media (min-width: 768px) {
+    height: 20rem;
+  }
+}
+
+.map-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.5;
+}
+
+.map-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-label {
+  background: rgba($brand-black, 0.8);
+  backdrop-filter: blur(8px);
+  color: $text-white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-family: 'Cairo', sans-serif;
+}
+
+// Form Section
+.form-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-card {
+  @include card-style;
+  height: 100%;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  color: $text-gray;
+  font-weight: 500;
+  font-family: 'Cairo', sans-serif;
+
+  .required {
+    color: $error-red;
+  }
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 90%;
+  background: $brand-black;
+  border: 1px solid $brand-gray;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: $text-white;
+  font-size: 1rem;
+  font-family: 'Cairo', sans-serif;
+  @include transition(border-color);
+
+  &:focus {
+    outline: none;
+    border-color: $brand-green;
+    box-shadow: 0 0 0 3px rgba($brand-green, 0.1);
+  }
+
+  &::placeholder {
+    color: $text-gray;
+    opacity: 0.6;
+  }
+
+  &.error {
+    border-color: $error-red;
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba($error-red, 0.1);
+    }
+  }
+}
+
+.form-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 0.75rem center;
+  background-size: 1.25rem;
+  padding-left: 2.5rem;
+
+  option {
+    background: $brand-dark;
+    color: $text-white;
+  }
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 8rem;
+  line-height: 1.6;
+}
+
+.error-message {
+  font-size: 0.875rem;
+  color: $error-red;
+  font-family: 'Cairo', sans-serif;
+  margin-top: -0.25rem;
+}
+
+// Submit Button
+.submit-btn {
+  width: 100%;
+  background: $brand-green;
+  color: $brand-black;
+  font-weight: 700;
+  font-size: 1.125rem;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  @include transition(all);
+  box-shadow: 0 0 20px rgba($brand-green, 0.3);
+
+  &:hover:not(:disabled) {
+    background: $text-white;
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba($brand-green, 0.5);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.submitting {
+    background: $brand-gray;
+  }
+}
+
+// Responsive Adjustments
+@media (max-width: 767px) {
+  .contact-section {
+    padding: 2rem 0;
+  }
+
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  .contact-grid {
+    gap: 1.5rem;
+  }
+
+  .contact-card,
+  .form-card,
+  .map-container {
+    padding: 1.5rem;
+  }
+
+  .contact-item {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .icon-wrapper {
+    width: 2.5rem;
+    height: 2.5rem;
+
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+}
+
+// Print Styles
+@media print {
+  .contact-section {
+    background: white;
+    color: black;
+  }
+
+  .submit-btn,
+  .map-container {
+    display: none;
+  }
+
+  .contact-card,
+  .form-card {
+    border: 1px solid #ccc;
+    page-break-inside: avoid;
+  }
+}
+
+// Dark mode support (if needed)
+@media (prefers-color-scheme: dark) {
+  .contact-section {
+    // Already dark by default
+  }
+}
+
+// Accessibility
+.form-input:focus-visible,
+.form-select:focus-visible,
+.form-textarea:focus-visible,
+.submit-btn:focus-visible {
+  outline: 2px solid $brand-green;
+  outline-offset: 2px;
+}
+
+// RTL Support
+[dir="rtl"] {
+  .form-select {
+    background-position: left 0.75rem center;
+    padding-left: 2.5rem;
+    padding-right: 1rem;
+  }
+
+  .contact-item {
+    text-align: right;
+  }
+}

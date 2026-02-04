@@ -1,0 +1,453 @@
+// ==========================================
+// WHY CHOOSE US - UPDATED PALETTE
+// ==========================================
+
+// NEW Color Palette
+$green: rgb(0, 255, 65);
+$green-dark: #00cc34;
+$green-light: rgba(0, 255, 65, 0.1);
+$green-border: rgba(0, 255, 65, 0.3);
+$green-glow: rgba(0, 255, 65, 0.4);
+$green-shadow: rgba(0, 255, 65, 0.5);
+
+// Background Colors (Gradients)
+$dark-blue-black: #0a0e1a;
+$slate: #1a2332;
+$dark-blue: #0f1729;
+$medium-slate: #2a3647;
+
+// Card & Section Backgrounds
+$gray: #3d4d5c;
+$gray-light: #4a5a6a;
+
+// Teal Accents
+$cyan: #0d3d4d;
+$teal: #1a4d4d;
+$light-teal: #2d6666;
+
+$black: #000;
+$white: #fff;
+$white-dim: rgba(255, 255, 255, 0.7);
+$white-dimmer: rgba(255, 255, 255, 0.5);
+
+$transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$transition-fast: all 0.2s ease;
+$transition-slow: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+$transition-smooth: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ==========================================
+// Why Choose Section
+// ==========================================
+.why-choose-section {
+  position: relative;
+  width: 100%;
+  padding: 4rem 0;
+  background: transparent;
+  overflow: hidden;
+
+  @media (max-width: 991px) {
+    padding: 3rem 0;
+  }
+
+  @media (max-width: 575px) {
+    padding: 2rem 0;
+  }
+}
+
+// ==========================================
+// Container
+// ==========================================
+.why-choose-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(13, 61, 77, 0.3) 0%, rgba(26, 77, 77, 0.25) 50%, rgba(42, 54, 71, 0.3) 100%);
+  border-radius: 2rem;
+  border: 1px solid rgba(74, 90, 106, 0.5);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+
+  @media (max-width: 991px) {
+    padding: 2rem 1.5rem;
+    border-radius: 1.5rem;
+  }
+
+  @media (max-width: 767px) {
+    padding: 1.5rem 1rem;
+    border-radius: 1.25rem;
+  }
+
+  @media (max-width: 575px) {
+    padding: 1.5rem 1rem;
+    border-radius: 1rem;
+    margin: 0 1rem;
+  }
+}
+
+// ==========================================
+// Top Border Gradient
+// ==========================================
+.top-border-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    $green 50%,
+    transparent 100%
+  );
+  opacity: 0.5;
+}
+
+// ==========================================
+// Section Header
+// ==========================================
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+
+  @media (max-width: 767px) {
+    margin-bottom: 2.5rem;
+  }
+
+  @media (max-width: 575px) {
+    margin-bottom: 2rem;
+  }
+}
+
+// ==========================================
+// Section Title
+// ==========================================
+.section-title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: $white;
+  margin: 0 0 1rem;
+  text-shadow: 2px 4px 20px rgba(0, 0, 0, 0.5);
+  line-height: 1.3;
+
+  .brand-name {
+    color: $green;
+    text-shadow:
+      0 0 20px rgba(0, 255, 65, 0.4),
+      2px 4px 20px rgba(0, 0, 0, 0.5);
+  }
+}
+
+// ==========================================
+// Section Subtitle
+// ==========================================
+.section-subtitle {
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  color: $white-dim;
+  max-width: 42rem;
+  margin: 0 auto;
+  line-height: 1.7;
+  text-shadow: 1px 2px 8px rgba(0, 0, 0, 0.4);
+
+  @media (max-width: 575px) {
+    line-height: 1.6;
+  }
+}
+
+// ==========================================
+// Features Grid
+// ==========================================
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+
+  @media (max-width: 991px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 767px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 575px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+// ==========================================
+// Feature Card
+// ==========================================
+.feature-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: rgba(42, 54, 71, 0.6);
+  padding: 2rem 1.5rem;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(74, 90, 106, 0.5);
+  transition: $transition-base;
+  overflow: hidden;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+
+  @media (max-width: 767px) {
+    padding: 1.75rem 1.25rem;
+    border-radius: 1rem;
+  }
+
+  @media (max-width: 575px) {
+    padding: 1.5rem 1rem;
+    border-radius: 0.875rem;
+  }
+
+  &:hover {
+    transform: translateY(-6px);
+    border-color: $green-border;
+    box-shadow:
+      0 20px 50px rgba(0, 0, 0, 0.4),
+      0 0 40px rgba(0, 255, 65, 0.15),
+      0 0 0 1px $green-border;
+
+    .icon-container {
+      background: $green-light;
+      border-color: $green-border;
+      transform: scale(1.05);
+      box-shadow:
+        0 0 30px rgba(0, 255, 65, 0.3),
+        0 0 60px rgba(0, 255, 65, 0.15);
+
+      svg {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 10px rgba(0, 255, 65, 0.5));
+      }
+    }
+
+    .feature-title {
+      color: $green;
+      text-shadow:
+        0 0 15px rgba(0, 255, 65, 0.3),
+        2px 4px 15px rgba(0, 0, 0, 0.6);
+    }
+
+    .hover-glow {
+      opacity: 1;
+    }
+  }
+
+  &:active {
+    transform: translateY(-3px);
+  }
+
+  &:focus-visible {
+    outline: 3px solid $green;
+    outline-offset: 4px;
+  }
+}
+
+// ==========================================
+// Icon Container
+// ==========================================
+.icon-container {
+  width: 4rem;
+  height: 4rem;
+  background: rgba(13, 61, 77, 0.5);
+  border: 1px solid rgba(45, 102, 102, 0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  transition: $transition-base;
+  color: $green;
+  flex-shrink: 0;
+
+  @media (max-width: 767px) {
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-bottom: 1.25rem;
+
+    svg {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  @media (max-width: 575px) {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  svg {
+    transition: $transition-fast;
+  }
+}
+
+// ==========================================
+// Feature Title
+// ==========================================
+.feature-title {
+  font-size: clamp(1.1rem, 2vw, 1.25rem);
+  font-weight: 700;
+  color: $white;
+  margin: 0 0 0.75rem;
+  transition: $transition-base;
+  text-shadow: 1px 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+// ==========================================
+// Feature Description
+// ==========================================
+.feature-description {
+  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  color: $white-dim;
+  margin: 0;
+  line-height: 1.6;
+  text-shadow: 1px 2px 8px rgba(0, 0, 0, 0.4);
+
+  @media (max-width: 575px) {
+    line-height: 1.5;
+  }
+}
+
+// ==========================================
+// Hover Glow Effect
+// ==========================================
+.hover-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(0, 255, 65, 0.08) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: $transition-smooth;
+  pointer-events: none;
+  z-index: -1;
+}
+
+// ==========================================
+// Accessibility
+// ==========================================
+@media (prefers-reduced-motion: reduce) {
+  .feature-card,
+  .icon-container,
+  .feature-title,
+  .hover-glow {
+    transition-duration: 0.01ms !important;
+    animation: none !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .feature-card {
+    border-width: 2px;
+  }
+
+  .icon-container {
+    border-width: 2px;
+  }
+
+  .hover-glow,
+  .top-border-gradient {
+    display: none;
+  }
+}
+
+@media print {
+  .why-choose-section {
+    page-break-inside: avoid;
+  }
+
+  .why-choose-container {
+    background: white;
+    border: 2px solid $gray;
+    box-shadow: none;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .feature-card {
+    background: white;
+    border: 2px solid $gray;
+    box-shadow: none;
+    page-break-inside: avoid;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  .hover-glow,
+  .top-border-gradient {
+    display: none;
+  }
+
+  .section-title,
+  .feature-title {
+    color: $black;
+  }
+
+  .brand-name {
+    color: $black;
+  }
+
+  .section-subtitle,
+  .feature-description {
+    color: #333;
+  }
+}
+
+// ==========================================
+// Responsive Fine-tuning
+// ==========================================
+@media (max-width: 375px) {
+  .why-choose-container {
+    margin: 0 0.5rem;
+    padding: 1.25rem 0.75rem;
+  }
+
+  .features-grid {
+    gap: 0.875rem;
+  }
+}
+
+// Touch device optimizations
+@media (hover: none) and (pointer: coarse) {
+  .feature-card:active {
+    transform: scale(0.98);
+  }
+}
+
+// ==========================================
+// RTL Specific Adjustments
+// ==========================================
+[dir="rtl"] {
+  .section-title {
+    direction: rtl;
+  }
+
+  .feature-title,
+  .feature-description {
+    direction: rtl;
+  }
+}
