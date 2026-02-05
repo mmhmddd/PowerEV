@@ -1,3 +1,4 @@
+<!-- src/app/features/product-details/product-details.component.html -->
 <div class="product-details-container" *ngIf="product; else loadingOrNotFound">
   <button class="back-btn" (click)="goBack()">
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -16,6 +17,12 @@
           class="main-image"
         />
 
+        <!-- Offer Badge -->
+        <div class="offer-badge" *ngIf="product.offer?.enabled">
+          <i class="bi bi-tag-fill"></i>
+          خصم {{ product.offer?.discountPercentage }}%
+        </div>
+
         <!-- Image Navigation (only show if multiple images) -->
         <div *ngIf="product.images.length > 1" class="image-navigation">
           <button class="nav-btn prev-btn" (click)="prevImage()" title="الصورة السابقة">
@@ -32,6 +39,7 @@
 
         <!-- Image Counter -->
         <div class="image-info">
+          <i class="bi bi-images"></i>
           <span>{{ selectedImageIndex + 1 }} من {{ product.images.length }}</span>
         </div>
       </div>
@@ -52,8 +60,12 @@
     <!-- Product Info Section -->
     <div class="info-section">
       <div class="product-header">
-        <span class="category-badge">{{ product.category }}</span>
-        <span class="stock-indicator" [class.in-stock]="product.inStock">
+        <span class="category-badge">
+          <i class="bi bi-bookmark-fill"></i>
+          {{ product.category }}
+        </span>
+        <span class="stock-indicator" [class.in-stock]="product.inStock" [class.out-of-stock]="!product.inStock">
+          <i [class]="product.inStock ? 'bi bi-check-circle-fill' : 'bi bi-x-circle-fill'"></i>
           {{ product.inStock ? 'متوفر في المخزون' : 'غير متوفر' }}
         </span>
       </div>
@@ -62,34 +74,67 @@
 
       <p class="product-description">{{ product.description }}</p>
 
+      <!-- Brand -->
+      <div class="product-brand" *ngIf="product.brand">
+        <i class="bi bi-award"></i>
+        <span>العلامة التجارية: <strong>{{ product.brand }}</strong></span>
+      </div>
+
       <!-- Specifications -->
       <div class="specifications" *ngIf="product.specifications && product.specifications.length > 0">
-        <h3>المواصفات</h3>
-        <ul class="specs-list">
-          <li *ngFor="let spec of product.specifications">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
+        <h3 class="specs-title">
+          <i class="bi bi-list-check"></i>
+          <span>المواصفات الفنية</span>
+        </h3>
+        <div class="specs-grid">
+          <div class="spec-item" *ngFor="let spec of product.specifications">
+            <i class="bi bi-check-circle-fill"></i>
             <span>{{ spec }}</span>
-          </li>
-        </ul>
+          </div>
+        </div>
       </div>
 
       <!-- Price Section -->
       <div class="price-section">
-        <div class="price-display">
+        <div class="price-display" *ngIf="!product.offer?.enabled">
+          <span class="price-value">{{ product.price | number: '1.0-0' }}</span>
           <span class="currency">ج.م</span>
-          <span class="price-value">{{ product.price | number: '0,0' }}</span>
         </div>
+
+        <div class="price-display with-offer" *ngIf="product.offer?.enabled">
+          <div class="original-price-wrapper">
+            <span class="original-price">{{ product.price | number: '1.0-0' }} ج.م</span>
+          </div>
+          <div class="final-price-wrapper">
+            <span class="price-value">{{ product.finalPrice | number: '1.0-0' }}</span>
+            <span class="currency">ج.م</span>
+          </div>
+          <div class="savings">
+            <i class="bi bi-piggy-bank"></i>
+            <span>وفر {{ (product.price - (product.finalPrice || 0)) | number: '1.0-0' }} ج.م</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stock Info -->
+      <div class="stock-info" *ngIf="product.inStock && product.stock">
+        <i class="bi bi-box-seam"></i>
+        <span>متوفر: {{ product.stock }} قطعة</span>
       </div>
 
       <!-- Quantity & Add to Cart -->
       <div class="purchase-section">
         <div class="quantity-control">
           <span class="quantity-label">الكمية:</span>
-          <button class="qty-btn" (click)="decrementQuantity()" [disabled]="quantity <= 1">−</button>
-          <input type="number" [(ngModel)]="quantity" class="qty-input" min="1" readonly />
-          <button class="qty-btn" (click)="incrementQuantity()">+</button>
+          <div class="quantity-buttons">
+            <button class="qty-btn" (click)="decrementQuantity()" [disabled]="quantity <= 1">
+              <i class="bi bi-dash"></i>
+            </button>
+            <input type="number" [(ngModel)]="quantity" class="qty-input" min="1" [max]="product.stock || 999" readonly />
+            <button class="qty-btn" (click)="incrementQuantity()" [disabled]="product.stock && quantity >= product.stock">
+              <i class="bi bi-plus"></i>
+            </button>
+          </div>
         </div>
 
         <button
@@ -98,7 +143,10 @@
           [class.added]="showAddedToCart"
           [disabled]="!product.inStock"
         >
-          <span *ngIf="!showAddedToCart">إضافة إلى السلة</span>
+          <span *ngIf="!showAddedToCart">
+            <i class="bi bi-cart-plus"></i>
+            إضافة إلى السلة
+          </span>
           <span *ngIf="showAddedToCart">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
@@ -107,6 +155,12 @@
           </span>
         </button>
       </div>
+
+      <!-- Share Button -->
+      <button class="share-btn" (click)="sharePage()" *ngIf="isShareSupported">
+        <i class="bi bi-share"></i>
+        <span>مشاركة المنتج</span>
+      </button>
 
       <!-- Additional Info -->
       <div class="additional-info">
@@ -129,6 +183,13 @@
           </svg>
           <span>توصيل سريع</span>
         </div>
+        <div class="info-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>خدمة عملاء 24/7</span>
+        </div>
       </div>
     </div>
   </div>
@@ -136,13 +197,17 @@
 
 <ng-template #loadingOrNotFound>
   <div class="not-found" *ngIf="!isLoading">
+    <i class="bi bi-exclamation-triangle"></i>
     <h2>المنتج غير موجود</h2>
     <p>عذراً، لم نتمكن من العثور على المنتج المطلوب</p>
-    <button (click)="goBack()">العودة إلى المنتجات</button>
+    <button class="back-to-products-btn" (click)="goBack()">
+      <i class="bi bi-arrow-right"></i>
+      العودة إلى المنتجات
+    </button>
   </div>
 
   <div class="loading" *ngIf="isLoading">
     <div class="spinner"></div>
-    <p>جاري التحميل...</p>
+    <p>جاري تحميل المنتج...</p>
   </div>
 </ng-template>

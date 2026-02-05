@@ -1,158 +1,367 @@
+// src/app/core/services/product.service.ts
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, forkJoin, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
-export interface ProductImage {
-  url: string;
-  alt: string;
-}
+import { AdapterService } from './adapter.service';
+import { BoxService } from './box.service';
+import { BreakerService } from './breaker.service';
+import { CableService } from './cable.service';
+import { ChargerService } from './charger.service';
+import { OtherService } from './other.service';
+import { PlugService } from './plug.service';
+import { StationService } from './station.service';
+import { WireService } from './wire.service';
 
 export interface Product {
   id: string;
   name: string;
-  category: 'chargers' | 'cables' | 'adapters' | 'accessories';
-  price: number;
-  images: ProductImage[];
   description: string;
-  specifications?: string[];
+  price: number;
+  category: string;
+  categoryType: ProductCategoryType;
   inStock: boolean;
+  stock?: number;
+  images: Array<{ url: string; alt: string }>;
+  specifications?: string[];
+  brand?: string;
+  offer?: {
+    enabled: boolean;
+    discountPercentage: number;
+  };
+  finalPrice?: number;
+}
+
+export enum ProductCategoryType {
+  ADAPTER = 'adapter',
+  BOX = 'box',
+  BREAKER = 'breaker',
+  CABLE = 'cable',
+  CHARGER = 'charger',
+  OTHER = 'other',
+  PLUG = 'plug',
+  STATION = 'station',
+  WIRE = 'wire'
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
-  private products: Product[] = [
-    {
-      id: '1',
-      name: 'شاحن منزلي ذكي 7kW',
-      category: 'chargers',
-      price: 4500,
-      images: [
-        { url: 'https://images.unsplash.com/photo-1662446759714-38641957247e?auto=format&fit=crop&q=80&w=800', alt: 'شاحن منزلي ذكي 7kW' },
-        { url: 'https://images.unsplash.com/photo-1662446759714-38641957247e?auto=format&fit=crop&q=80&w=800', alt: 'شاحن منزلي ذكي 7kW - الجانب' }
-      ],
-      description: 'شاحن ذكي للمنزل بقوة 7 كيلوواط مع تحكم ذكي وأمان عالي',
-      specifications: ['قوة: 7 كيلوواط', 'تحكم ذكي متقدم', 'حماية من الزيادة', 'قابل للتثبيت على الجدار'],
-      inStock: true
-    },
-    {
-      id: '2',
-      name: 'كابل شحن Type 2',
-      category: 'cables',
-      price: 1200,
-      images: [
-        { url: 'https://images.unsplash.com/photo-1646719000106-963507639034?auto=format&fit=crop&q=80&w=800', alt: 'كابل شحن Type 2' }
-      ],
-      description: 'كابل شحن Type 2 عالي الجودة مع حماية متقدمة',
-      specifications: ['نوع: Type 2', 'طول: 5 متر', 'معايير أوروبية', 'مقاومة للعوامل الجوية'],
-      inStock: true
-    },
-    {
-      id: '3',
-      name: 'محول شحن محمول',
-      category: 'adapters',
-      price: 800,
-      images: [
-        { url: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=800', alt: 'محول شحن محمول' }
-      ],
-      description: 'محول شحن محمول متعدد الاستخدامات',
-      specifications: ['وزن: 200 غرام', 'قابل للطي', 'آمن للسفر', 'متوافق مع معظم الأجهزة'],
-      inStock: true
-    },
-    {
-      id: '4',
-      name: 'شاحن سريع 22kW',
-      category: 'chargers',
-      price: 12000,
-      images: [
-        { url: 'https://images.unsplash.com/photo-1646719000106-963507639034?auto=format&fit=crop&q=80&w=800', alt: 'شاحن سريع 22kW' }
-      ],
-      description: 'شاحن سريع احترافي بقوة 22 كيلوواط',
-      specifications: ['قوة: 22 كيلوواط', 'شحن سريع جداً', 'تبريد ذكي', 'واجهة تحكم رقمية'],
-      inStock: true
-    },
-    {
-      id: '5',
-      name: 'قاطع كهربائي 32A',
-      category: 'accessories',
-      price: 350,
-      images: [
-        { url: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=800', alt: 'قاطع كهربائي 32A' }
-      ],
-      description: 'قاطع كهربائي آمن 32 أمبير',
-      specifications: ['قوة: 32 أمبير', 'معايير عالية', 'حماية من الحمل الزائد', 'معتمد دولياً'],
-      inStock: true
-    },
-    {
-      id: '6',
-      name: 'حامل كابل جداري',
-      category: 'accessories',
-      price: 250,
-      images: [
-        { url: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=800', alt: 'حامل كابل جداري' }
-      ],
-      description: 'حامل كابل جداري منظم وعملي',
-      specifications: ['مادة: بلاستيك متين', 'سهل التركيب', 'يحمل عدة كابلات', 'تصميم عصري'],
-      inStock: true
-    },
-    {
-      id: '7',
-      name: 'شاحن محمول 3.5kW',
-      category: 'chargers',
-      price: 3200,
-      images: [
-        { url: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=800', alt: 'شاحن محمول 3.5kW' }
-      ],
-      description: 'شاحن محمول عملي بقوة 3.5 كيلوواط',
-      specifications: ['قوة: 3.5 كيلوواط', 'محمول وخفيف', 'بطارية مدمجة', 'شاشة عرض رقمية'],
-      inStock: true
-    },
-    {
-      id: '8',
-      name: 'كابل تمديد 10 متر',
-      category: 'cables',
-      price: 2100,
-      images: [
-        { url: 'https://images.unsplash.com/photo-1646719000106-963507639034?auto=format&fit=crop&q=80&w=800', alt: 'كابل تمديد 10 متر' }
-      ],
-      description: 'كابل تمديد قوي 10 متر',
-      specifications: ['طول: 10 متر', 'قوة: 32 أمبير', 'مرن وآمن', 'مقاومة للماء'],
-      inStock: true
+  private allProducts$ = new BehaviorSubject<Product[]>([]);
+  private filteredProducts$ = new BehaviorSubject<Product[]>([]);
+  private isLoading$ = new BehaviorSubject<boolean>(false);
+
+  constructor(
+    private adapterService: AdapterService,
+    private boxService: BoxService,
+    private breakerService: BreakerService,
+    private cableService: CableService,
+    private chargerService: ChargerService,
+    private otherService: OtherService,
+    private plugService: PlugService,
+    private stationService: StationService,
+    private wireService: WireService
+  ) {
+    this.loadAllProducts();
+  }
+
+  /**
+   * Load all products from all services
+   */
+  private loadAllProducts(): void {
+    this.isLoading$.next(true);
+
+    forkJoin({
+      adapters: this.adapterService.getAllAdapters().pipe(
+        catchError(err => {
+          console.error('Error loading adapters:', err);
+          return of({ success: false, count: 0, adapters: [] });
+        })
+      ),
+      boxes: this.boxService.getAllBoxes().pipe(
+        catchError(err => {
+          console.error('Error loading boxes:', err);
+          return of({ success: false, count: 0, boxes: [] });
+        })
+      ),
+      breakers: this.breakerService.getAllBreakers().pipe(
+        catchError(err => {
+          console.error('Error loading breakers:', err);
+          return of({ success: false, count: 0, breakers: [] });
+        })
+      ),
+      cables: this.cableService.getAllCables().pipe(
+        catchError(err => {
+          console.error('Error loading cables:', err);
+          return of({ success: false, count: 0, cables: [] });
+        })
+      ),
+      chargers: this.chargerService.getAllChargers().pipe(
+        catchError(err => {
+          console.error('Error loading chargers:', err);
+          return of({ success: false, count: 0, chargers: [] });
+        })
+      ),
+      others: this.otherService.getAllOthers().pipe(
+        catchError(err => {
+          console.error('Error loading others:', err);
+          return of({ success: false, count: 0, others: [] });
+        })
+      ),
+      plugs: this.plugService.getAllPlugs().pipe(
+        catchError(err => {
+          console.error('Error loading plugs:', err);
+          return of({ success: false, count: 0, plugs: [] });
+        })
+      ),
+      stations: this.stationService.getAllStations().pipe(
+        catchError(err => {
+          console.error('Error loading stations:', err);
+          return of({ success: false, count: 0, stations: [] });
+        })
+      ),
+      wires: this.wireService.getAllWires().pipe(
+        catchError(err => {
+          console.error('Error loading wires:', err);
+          return of({ success: false, count: 0, wires: [] });
+        })
+      )
+    }).subscribe({
+      next: (responses) => {
+        const products: Product[] = [
+          ...this.mapToProducts(responses.adapters.adapters || [], ProductCategoryType.ADAPTER, 'محولات'),
+          ...this.mapToProducts(responses.boxes.boxes || [], ProductCategoryType.BOX, 'صناديق توزيع'),
+          ...this.mapToProducts(responses.breakers.breakers || [], ProductCategoryType.BREAKER, 'قواطع كهربائية'),
+          ...this.mapToProducts(responses.cables.cables || [], ProductCategoryType.CABLE, 'كابلات'),
+          ...this.mapToProducts(responses.chargers.chargers || [], ProductCategoryType.CHARGER, 'شواحن'),
+          ...this.mapToProducts(responses.others.others || [], ProductCategoryType.OTHER, 'منتجات أخرى'),
+          ...this.mapToProducts(responses.plugs.plugs || [], ProductCategoryType.PLUG, 'قوابس'),
+          ...this.mapToProducts(responses.stations.stations || [], ProductCategoryType.STATION, 'محطات شحن'),
+          ...this.mapToProducts(responses.wires.wires || [], ProductCategoryType.WIRE, 'أسلاك')
+        ];
+
+        console.log('Loaded products:', products.length);
+        this.allProducts$.next(products);
+        this.filteredProducts$.next(products);
+        this.isLoading$.next(false);
+      },
+      error: (error) => {
+        console.error('Error loading products:', error);
+        this.isLoading$.next(false);
+      }
+    });
+  }
+
+  /**
+   * Map API response to Product interface
+   */
+  private mapToProducts(items: any[], categoryType: ProductCategoryType, categoryName: string): Product[] {
+    if (!items || !Array.isArray(items)) return [];
+
+    return items.map(item => ({
+      id: item._id,
+      name: item.name,
+      description: item.description || '',
+      price: item.price,
+      category: categoryName,
+      categoryType: categoryType,
+      inStock: item.stock > 0,
+      stock: item.stock,
+      images: this.mapImages(item.images),
+      specifications: this.extractSpecifications(item),
+      brand: item.brand,
+      offer: item.offer,
+      finalPrice: this.calculateFinalPrice(item)
+    }));
+  }
+
+  /**
+   * Map image objects to standard format
+   */
+  private mapImages(images: any[]): Array<{ url: string; alt: string }> {
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return [{
+        url: 'assets/images/placeholder.jpg',
+        alt: 'Product Image'
+      }];
     }
-  ];
 
-  private filteredProductsSubject = new BehaviorSubject<Product[]>(this.products);
-  public filteredProducts$ = this.filteredProductsSubject.asObservable();
-
-  private selectedCategorySubject = new BehaviorSubject<string>('all');
-  public selectedCategory$ = this.selectedCategorySubject.asObservable();
-
-  constructor() {}
-
-  getAllProducts(): Product[] {
-    return this.products;
+    return images.map(img => ({
+      url: img.url || img,
+      alt: img.alt || 'Product Image'
+    }));
   }
 
-  getProductById(id: string): Product | undefined {
-    return this.products.find(p => p.id === id);
+  /**
+   * Extract specifications from product based on type
+   */
+  private extractSpecifications(item: any): string[] {
+    const specs: string[] = [];
+
+    if (item.voltage) specs.push(`الجهد: ${item.voltage}V`);
+    if (item.current) specs.push(`التيار: ${item.current}A`);
+    if (item.ampere) specs.push(`الأمبير: ${item.ampere}A`);
+    if (item.amperage) specs.push(`الأمبير: ${item.amperage}A`);
+    if (item.phase) specs.push(`الطور: ${item.phase}`);
+    if (item.wireGauge) specs.push(`مقاس السلك: ${item.wireGauge}`);
+    if (item.cableLength) specs.push(`طول الكابل: ${item.cableLength}m`);
+    if (item.length) specs.push(`الطول: ${item.length}m`);
+    if (item.efficiency) specs.push(`الكفاءة: ${item.efficiency}%`);
+    if (item.type) specs.push(`النوع: ${item.type}`);
+    if (item.connectorType) specs.push(`نوع الموصل: ${item.connectorType}`);
+    if (item.connectorFrom) specs.push(`موصل من: ${item.connectorFrom}`);
+    if (item.connectorTo) specs.push(`موصل إلى: ${item.connectorTo}`);
+    if (item.size) specs.push(`الحجم: ${item.size}`);
+    if (item.material) specs.push(`المادة: ${item.material}`);
+    if (item.power) specs.push(`القدرة: ${item.power}W`);
+    if (item.brand) specs.push(`العلامة التجارية: ${item.brand}`);
+    if (item.quantity) specs.push(`الكمية: ${item.quantity}`);
+
+    return specs;
   }
 
+  /**
+   * Calculate final price with discount
+   */
+  private calculateFinalPrice(item: any): number {
+    if (item.offer?.enabled && item.offer.discountPercentage > 0) {
+      return item.price - (item.price * item.offer.discountPercentage) / 100;
+    }
+    return item.price;
+  }
+
+  /**
+   * Filter products by category
+   */
   filterByCategory(category: string): void {
-    this.selectedCategorySubject.next(category);
+    const allProducts = this.allProducts$.value;
 
     if (category === 'all') {
-      this.filteredProductsSubject.next(this.products);
-    } else {
-      const filtered = this.products.filter(p => p.category === category);
-      this.filteredProductsSubject.next(filtered);
+      this.filteredProducts$.next(allProducts);
+      return;
     }
+
+    // Map frontend categories to backend types
+    const categoryMap: { [key: string]: ProductCategoryType[] } = {
+      'chargers': [ProductCategoryType.CHARGER, ProductCategoryType.STATION],
+      'cables': [ProductCategoryType.CABLE, ProductCategoryType.WIRE],
+      'adapters': [ProductCategoryType.ADAPTER, ProductCategoryType.PLUG],
+      'boxes': [ProductCategoryType.BOX],
+      'breakers': [ProductCategoryType.BREAKER],
+      'accessories': [ProductCategoryType.OTHER]
+    };
+
+    const categoryTypes = categoryMap[category] || [];
+    const filtered = allProducts.filter(product =>
+      categoryTypes.includes(product.categoryType)
+    );
+
+    this.filteredProducts$.next(filtered);
   }
 
+  /**
+   * Search products by name or description
+   */
+  searchProducts(query: string): void {
+    const allProducts = this.allProducts$.value;
+    const searchTerm = query.toLowerCase().trim();
+
+    if (!searchTerm) {
+      this.filteredProducts$.next(allProducts);
+      return;
+    }
+
+    const filtered = allProducts.filter(product =>
+      product.name.toLowerCase().includes(searchTerm) ||
+      product.description.toLowerCase().includes(searchTerm) ||
+      product.category.toLowerCase().includes(searchTerm)
+    );
+
+    this.filteredProducts$.next(filtered);
+  }
+
+  /**
+   * Filter by price range
+   */
+  filterByPriceRange(minPrice: number, maxPrice: number): void {
+    const allProducts = this.allProducts$.value;
+    const filtered = allProducts.filter(product => {
+      const price = product.finalPrice || product.price;
+      return price >= minPrice && price <= maxPrice;
+    });
+
+    this.filteredProducts$.next(filtered);
+  }
+
+  /**
+   * Filter by stock availability
+   */
+  filterByStock(inStockOnly: boolean): void {
+    const allProducts = this.allProducts$.value;
+    const filtered = inStockOnly
+      ? allProducts.filter(product => product.inStock)
+      : allProducts;
+
+    this.filteredProducts$.next(filtered);
+  }
+
+  /**
+   * Sort products
+   */
+  sortProducts(sortBy: 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc'): void {
+    const products = [...this.filteredProducts$.value];
+
+    products.sort((a, b) => {
+      switch (sortBy) {
+        case 'price-asc':
+          return (a.finalPrice || a.price) - (b.finalPrice || b.price);
+        case 'price-desc':
+          return (b.finalPrice || b.price) - (a.finalPrice || a.price);
+        case 'name-asc':
+          return a.name.localeCompare(b.name, 'ar');
+        case 'name-desc':
+          return b.name.localeCompare(a.name, 'ar');
+        default:
+          return 0;
+      }
+    });
+
+    this.filteredProducts$.next(products);
+  }
+
+  /**
+   * Get product by ID
+   */
+  getProductById(id: string): Product | undefined {
+    return this.allProducts$.value.find(product => product.id === id);
+  }
+
+  /**
+   * Get filtered products observable
+   */
   getFilteredProducts(): Observable<Product[]> {
-    return this.filteredProducts$;
+    return this.filteredProducts$.asObservable();
   }
 
-  getCurrentCategory(): string {
-    return this.selectedCategorySubject.value;
+  /**
+   * Get all products observable
+   */
+  getAllProducts(): Observable<Product[]> {
+    return this.allProducts$.asObservable();
+  }
+
+  /**
+   * Get loading state
+   */
+  getLoadingState(): Observable<boolean> {
+    return this.isLoading$.asObservable();
+  }
+
+  /**
+   * Refresh all products
+   */
+  refreshProducts(): void {
+    this.loadAllProducts();
   }
 }

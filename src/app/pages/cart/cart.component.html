@@ -1,29 +1,57 @@
+<!-- src/app/features/cart/cart.component.html -->
 <main class="cart-page">
   <div class="container">
     <h1 class="page-title">سلة المشتريات</h1>
 
-    <div class="cart-grid">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-overlay">
+      <div class="spinner"></div>
+      <p>جاري تحميل السلة...</p>
+    </div>
+
+    <!-- Cart Content -->
+    <div *ngIf="!isLoading" class="cart-grid">
       <!-- Cart Items Section -->
       <div class="cart-items-section">
-        <div *ngFor="let item of cartItems" class="cart-item">
-          <img [src]="item.image" [alt]="item.name" class="item-image">
+        <!-- Cart Header with Clear Button -->
+        <div *ngIf="cartItems.length > 0" class="cart-header">
+          <h3 class="items-count">{{ itemCount }} منتج في السلة</h3>
+          <button class="clear-cart-btn" (click)="clearCart()">
+            <i class="bi bi-trash"></i>
+            حذف الكل
+          </button>
+        </div>
+
+        <!-- Cart Items -->
+        <div
+          *ngFor="let item of cartItems"
+          class="cart-item"
+          [class.deleting]="isDeleting(item.productId)">
+          <img
+            [src]="item.image || 'assets/images/placeholder.jpg'"
+            [alt]="item.name || 'Product'"
+            class="item-image">
 
           <div class="item-details">
-            <h3 class="item-name">{{ item.name }}</h3>
-            <p class="item-price">{{ item.price }} ج.م</p>
+            <h3 class="item-name">{{ item.name || 'منتج' }}</h3>
+            <p class="item-price">{{ item.price | number: '1.0-0' }} ج.م</p>
+            <p class="item-subtotal">الإجمالي: {{ (item.price * item.quantity) | number: '1.0-0' }} ج.م</p>
           </div>
 
           <div class="quantity-controls">
             <button
               class="quantity-btn"
               (click)="decreaseQuantity(item)"
-              [disabled]="item.quantity <= 1">
+              [disabled]="item.quantity <= 1 || isLoading || isDeleting(item.productId)">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M5 12h14"></path>
               </svg>
             </button>
             <span class="quantity-value">{{ item.quantity }}</span>
-            <button class="quantity-btn" (click)="increaseQuantity(item)">
+            <button
+              class="quantity-btn"
+              (click)="increaseQuantity(item)"
+              [disabled]="isLoading || isDeleting(item.productId)">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M5 12h14"></path>
                 <path d="M12 5v14"></path>
@@ -31,32 +59,57 @@
             </button>
           </div>
 
-          <button class="remove-btn" (click)="removeItem(item.id)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button
+            class="remove-btn"
+            (click)="removeItem(item)"
+            [disabled]="isLoading || isDeleting(item.productId)"
+            [title]="isDeleting(item.productId) ? 'جاري الحذف...' : 'حذف من السلة'">
+            <svg
+              *ngIf="!isDeleting(item.productId)"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round">
               <path d="M3 6h18"></path>
               <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
               <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
               <line x1="10" x2="10" y1="11" y2="17"></line>
               <line x1="14" x2="14" y1="11" y2="17"></line>
             </svg>
+            <div *ngIf="isDeleting(item.productId)" class="delete-spinner"></div>
           </button>
         </div>
 
+        <!-- Empty Cart State -->
         <div *ngIf="cartItems.length === 0" class="empty-cart">
-          <p>سلة المشتريات فارغة</p>
-          <a routerLink="/products" class="continue-shopping">متابعة التسوق</a>
+          <i class="bi bi-cart-x"></i>
+          <h3>سلة المشتريات فارغة</h3>
+          <p>لم تقم بإضافة أي منتجات بعد</p>
+          <a routerLink="/products" class="continue-shopping">
+            <i class="bi bi-arrow-right"></i>
+            متابعة التسوق
+          </a>
         </div>
       </div>
 
       <!-- Order Summary Section -->
-      <div class="order-summary">
+      <div class="order-summary" *ngIf="cartItems.length > 0">
         <div class="summary-card">
           <h3 class="summary-title">ملخص الطلب</h3>
 
           <div class="summary-details">
             <div class="summary-row">
+              <span>عدد المنتجات</span>
+              <span>{{ itemCount }}</span>
+            </div>
+            <div class="summary-row">
               <span>المجموع الفرعي</span>
-              <span>{{ subtotal }} ج.م</span>
+              <span>{{ subtotal | number: '1.0-0' }} ج.م</span>
             </div>
             <div class="summary-row">
               <span>الشحن</span>
@@ -66,15 +119,15 @@
 
           <div class="summary-total">
             <span>الإجمالي</span>
-            <span class="total-amount">{{ total }} ج.م</span>
+            <span class="total-amount">{{ total | number: '1.0-0' }} ج.م</span>
           </div>
 
-          <a
-            routerLink="/checkout"
+          <button
             class="checkout-btn"
-            [class.disabled]="cartItems.length === 0">
+            (click)="proceedToCheckout()"
+            [disabled]="cartItems.length === 0 || isLoading">
             إتمام الشراء
-          </a>
+          </button>
 
           <a routerLink="/products" class="continue-shopping-link">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

@@ -1,0 +1,25 @@
+<!-- src/app/shared/components/toast/toast.component.html -->
+<div class="toast-container">
+  <div
+    *ngFor="let toast of toasts"
+    class="toast toast-{{toast.type}}"
+    [@toastAnimation]
+  >
+    <div class="toast-content">
+      <div class="toast-icon">
+        <i [class]="'bi ' + getIcon(toast.type)"></i>
+      </div>
+      <div class="toast-message">
+        <h4 class="toast-title" *ngIf="toast.title">{{ toast.title }}</h4>
+        <p class="toast-text">{{ toast.message }}</p>
+      </div>
+      <button class="toast-close" (click)="removeToast(toast.id)">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div
+      class="toast-progress"
+      [@progressBar]="{ value: toast.progressState, params: { duration: toast.duration || 3000 } }"
+    ></div>
+  </div>
+</div>

@@ -1,6 +1,21 @@
+<!-- src/app/features/checkout/checkout.component.html -->
 <main class="checkout-page">
   <div class="container">
+    <!-- Back Button -->
+    <button class="back-btn" (click)="goBackToCart()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      <span>العودة إلى السلة</span>
+    </button>
+
     <h1 class="page-title">إتمام الطلب</h1>
+
+    <!-- Loading State -->
+    <div *ngIf="isSubmitting" class="loading-overlay">
+      <div class="spinner"></div>
+      <p>جاري إنشاء الطلب...</p>
+    </div>
 
     <div class="checkout-grid">
       <!-- Shipping Form Section -->
@@ -9,67 +24,126 @@
           <h3 class="form-title">بيانات الشحن</h3>
 
           <form (ngSubmit)="onSubmit()" #checkoutForm="ngForm" class="shipping-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">الاسم الأول</label>
-                <input
-                  type="text"
-                  [(ngModel)]="shippingData.firstName"
-                  name="firstName"
-                  required
-                  class="form-input">
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">اسم العائلة</label>
-                <input
-                  type="text"
-                  [(ngModel)]="shippingData.lastName"
-                  name="lastName"
-                  required
-                  class="form-input">
-              </div>
+            <!-- Full Name -->
+            <div class="form-group">
+              <label class="form-label">
+                <i class="bi bi-person"></i>
+                الاسم الكامل *
+              </label>
+              <input
+                type="text"
+                [(ngModel)]="shippingData.name"
+                name="name"
+                required
+                placeholder="أدخل اسمك الكامل"
+                class="form-input"
+                [disabled]="isSubmitting">
             </div>
 
+            <!-- Phone -->
             <div class="form-group">
-              <label class="form-label">رقم الهاتف</label>
+              <label class="form-label">
+                <i class="bi bi-phone"></i>
+                رقم الهاتف *
+              </label>
               <input
                 type="tel"
                 [(ngModel)]="shippingData.phone"
                 name="phone"
                 required
+                placeholder="01xxxxxxxxx"
                 dir="ltr"
-                class="form-input">
+                maxlength="11"
+                class="form-input"
+                [disabled]="isSubmitting">
+              <small class="form-hint">مثال: 01012345678</small>
             </div>
 
+            <!-- Email (Optional) -->
             <div class="form-group">
-              <label class="form-label">العنوان بالتفصيل</label>
-              <textarea
-                [(ngModel)]="shippingData.address"
-                name="address"
-                required
-                rows="3"
-                class="form-textarea"></textarea>
+              <label class="form-label">
+                <i class="bi bi-envelope"></i>
+                البريد الإلكتروني (اختياري)
+              </label>
+              <input
+                type="email"
+                [(ngModel)]="shippingData.email"
+                name="email"
+                placeholder="example@email.com"
+                dir="ltr"
+                class="form-input"
+                [disabled]="isSubmitting">
             </div>
 
+            <!-- Governorate -->
             <div class="form-group">
-              <label class="form-label">المحافظة</label>
+              <label class="form-label">
+                <i class="bi bi-geo-alt"></i>
+                المحافظة *
+              </label>
               <select
                 [(ngModel)]="shippingData.governorate"
                 name="governorate"
-                class="form-select">
+                required
+                class="form-select"
+                [disabled]="isSubmitting">
                 <option *ngFor="let gov of governorates" [value]="gov">
                   {{ gov }}
                 </option>
               </select>
             </div>
 
+            <!-- Address -->
+            <div class="form-group">
+              <label class="form-label">
+                <i class="bi bi-house"></i>
+                العنوان بالتفصيل *
+              </label>
+              <textarea
+                [(ngModel)]="shippingData.address"
+                name="address"
+                required
+                rows="3"
+                placeholder="الشارع، المنطقة، معالم قريبة..."
+                class="form-textarea"
+                [disabled]="isSubmitting"></textarea>
+            </div>
+
+            <!-- Notes (Optional) -->
+            <div class="form-group">
+              <label class="form-label">
+                <i class="bi bi-chat-left-text"></i>
+                ملاحظات إضافية (اختياري)
+              </label>
+              <textarea
+                [(ngModel)]="shippingData.notes"
+                name="notes"
+                rows="2"
+                placeholder="أي ملاحظات أو طلبات خاصة..."
+                class="form-textarea"
+                [disabled]="isSubmitting"></textarea>
+            </div>
+
+            <!-- Submit Button -->
             <button
               type="submit"
-              [disabled]="!checkoutForm.form.valid"
+              [disabled]="!checkoutForm.form.valid || isSubmitting || orderItems.length === 0"
               class="submit-btn">
-              تأكيد الطلب
+              <span *ngIf="!isSubmitting">
+                <i class="bi bi-check-circle"></i>
+                تأكيد الطلب
+              </span>
+              <span *ngIf="isSubmitting">
+                <i class="bi bi-hourglass-split"></i>
+                جاري الإرسال...
+              </span>
             </button>
+
+            <!-- Payment Info -->
+            <div class="payment-info">
+              <i class="bi bi-info-circle"></i>
+              <p>سيتم الدفع عند الاستلام</p>
+            </div>
           </form>
         </div>
       </div>
@@ -77,27 +151,54 @@
       <!-- Order Summary Section -->
       <div class="summary-section">
         <div class="summary-card">
-          <h3 class="summary-title">ملخص الطلب</h3>
+          <h3 class="summary-title">
+            <i class="bi bi-cart-check"></i>
+            ملخص الطلب
+          </h3>
 
+          <!-- Items Count -->
+          <div class="items-count-badge">
+            <i class="bi bi-box-seam"></i>
+            <span>{{ itemCount }} منتج</span>
+          </div>
+
+          <!-- Items List -->
           <div class="items-list">
             <div *ngFor="let item of orderItems" class="order-item">
-              <img [src]="item.image" [alt]="item.name" class="item-image">
+              <img
+                [src]="item.image || 'assets/images/placeholder.jpg'"
+                [alt]="item.name || 'Product'"
+                class="item-image">
 
               <div class="item-info">
-                <h4 class="item-name">{{ item.name }}</h4>
+                <h4 class="item-name">{{ item.name || 'منتج' }}</h4>
                 <p class="item-quantity">الكمية: {{ item.quantity }}</p>
               </div>
 
-              <span class="item-price">{{ item.price }} ج.م</span>
+              <span class="item-price">{{ (item.price * item.quantity) | number: '1.0-0' }} ج.م</span>
             </div>
           </div>
 
+          <!-- Summary Footer -->
           <div class="summary-footer">
+            <div class="summary-row">
+              <span>المجموع الفرعي</span>
+              <span>{{ totalAmount | number: '1.0-0' }} ج.م</span>
+            </div>
+            <div class="summary-row">
+              <span>الشحن</span>
+              <span>يحدد عند التأكيد</span>
+            </div>
+
             <div class="total-row">
               <span>الإجمالي الكلي</span>
-              <span class="total-amount">{{ totalAmount }} ج.م</span>
+              <span class="total-amount">{{ totalAmount | number: '1.0-0' }} ج.م</span>
             </div>
-            <p class="payment-note">* الدفع عند الاستلام متاح لجميع المحافظات</p>
+
+            <div class="payment-note">
+              <i class="bi bi-cash-coin"></i>
+              <p>الدفع عند الاستلام متاح لجميع المحافظات</p>
+            </div>
           </div>
         </div>
       </div>

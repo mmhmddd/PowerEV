@@ -1,5 +1,313 @@
-<app-hero-section></app-hero-section>
+<div class="home-container" dir="rtl">
+
+  <!-- ==========================================
+       HERO SECTION
+       ========================================== -->
+  <section class="hero-section" [@fadeIn]>
+
+    <!-- Background Image Layer -->
+    <div class="hero-background">
+      <div class="background-image-wrapper">
+        <img
+          [src]="'./assets/images/home/banner.webp'"
+          alt="PowerEV - شواحن السيارات الكهربائية"
+          class="background-image"
+          loading="eager"
+          fetchpriority="high"
+        />
+        <!-- Dark Overlay with Gradient -->
+        <div class="background-overlay"></div>
+        <!-- Animated Green Accents -->
+        <div class="accent-line accent-line-1"></div>
+        <div class="accent-line accent-line-2"></div>
+      </div>
+    </div>
+
+    <!-- Content Container -->
+    <div class="hero-content-wrapper">
+      <div class="container">
+        <div class="hero-content" [@fadeInUp]>
+
+          <!-- Main Heading -->
+          <h1 class="hero-title">
+            <span class="title-main">{{ heroContent.title.main }}</span>
+            <span class="title-highlight">{{ heroContent.title.highlight }}</span>
+          </h1>
+
+          <!-- Subtitle/Description -->
+          <p class="hero-subtitle">
+            {{ heroContent.subtitle }}
+          </p>
+
+          <!-- Call-to-Action Buttons -->
+          <div class="hero-actions">
+            <a
+              *ngFor="let button of heroContent.buttons; trackBy: trackByText"
+              [routerLink]="button.link"
+              [class]="'hero-button hero-button-' + button.type"
+              [attr.aria-label]="button.ariaLabel"
+            >
+              <span class="button-text">{{ button.text }}</span>
+              <span class="button-icon" *ngIf="button.type === 'primary'">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </span>
+            </a>
+          </div>
+
+          <!-- Additional Info -->
+          <div class="hero-badges">
+            <div class="badge">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <path d="m9 12 2 2 4-4"></path>
+              </svg>
+              <span>ضمان شامل</span>
+            </div>
+
+            <div class="badge">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 7h-9"></path>
+                <path d="M14 17H5"></path>
+                <circle cx="17" cy="17" r="3"></circle>
+                <circle cx="7" cy="7" r="3"></circle>
+              </svg>
+              <span>تركيب احترافي</span>
+            </div>
+
+            <div class="badge">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>دعم 24/7</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator">
+      <div class="scroll-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <polyline points="19 12 12 19 5 12"></polyline>
+        </svg>
+      </div>
+    </div>
+
+  </section>
 <app-slider></app-slider>
-<app-products-section></app-products-section>
-<app-lates-products-slider></app-lates-products-slider>
-<app-why-choose-us></app-why-choose-us>
+
+ <!-- Section Separator -->
+  <div class="section-separator">
+    <div class="separator-line"></div>
+  </div>
+
+
+  <!-- ==========================================
+       PRODUCTS SECTION
+       ========================================== -->
+  <section class="products-section">
+    <div class="products-container">
+
+      <!-- Section Title -->
+      <h2 class="section-title" [@fadeInUp]>
+        {{ productsSectionTitle }}
+      </h2>
+
+      <!-- Products Grid -->
+      <div class="products-grid" [@listAnimation]="products.length">
+
+        <!-- Product Card -->
+        <a
+          *ngFor="let product of products; trackBy: trackByProductId"
+          [routerLink]="product.link"
+          class="product-card"
+          [attr.aria-label]="product.ariaLabel"
+        >
+          <!-- Product Image Container -->
+          <div class="product-image-wrapper">
+            <img
+              [src]="product.image"
+              [alt]="product.title"
+              class="product-image"
+              loading="lazy"
+            />
+            <!-- Gradient Overlay -->
+            <div class="product-overlay"></div>
+
+            <!-- Green Accent Line -->
+            <div class="accent-border"></div>
+          </div>
+
+          <!-- Product Content -->
+          <div class="product-content">
+            <h3 class="product-title">
+              {{ product.title }}
+            </h3>
+
+            <!-- Call-to-Action -->
+            <div class="product-cta">
+              <span class="cta-text">تصفح المنتجات</span>
+              <span class="cta-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="m12 19-7-7 7-7"></path>
+                  <path d="M19 12H5"></path>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <!-- Hover Effect Overlay -->
+          <div class="hover-glow"></div>
+        </a>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Section Separator -->
+  <div class="section-separator">
+    <div class="separator-line"></div>
+  </div>
+
+  <app-lates-products-slider></app-lates-products-slider>
+
+  <!-- ==========================================
+       WHY CHOOSE US SECTION
+       ========================================== -->
+  <section class="why-choose-section" aria-labelledby="why-choose-title">
+    <div class="why-choose-container">
+
+      <!-- Decorative Top Border -->
+      <div class="top-border-gradient"></div>
+
+      <!-- Section Header -->
+      <div class="section-header">
+        <h2
+          id="why-choose-title"
+          class="section-title"
+        >
+          {{ whyChooseTitle }}
+          <span class="brand-name">{{ brandName }}</span>؟
+        </h2>
+        <p class="section-subtitle">
+          {{ whyChooseSubtitle }}
+        </p>
+      </div>
+
+      <!-- Features Grid -->
+      <div class="features-grid">
+
+        <!-- Feature Card -->
+        <article
+          *ngFor="let feature of features; trackBy: trackByFeatureId"
+          class="feature-card"
+          [attr.aria-label]="feature.title"
+        >
+
+          <!-- Icon Container -->
+          <div class="icon-container">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path [attr.d]="getIconPath(feature.icon)"></path>
+            </svg>
+          </div>
+
+          <!-- Feature Title -->
+          <h3 class="feature-title">
+            {{ feature.title }}
+          </h3>
+
+          <!-- Feature Description -->
+          <p class="feature-description">
+            {{ feature.description }}
+          </p>
+
+          <!-- Hover Glow Effect -->
+          <div class="hover-glow"></div>
+
+        </article>
+
+      </div>
+
+    </div>
+  </section>
+
+</div>
