@@ -7,8 +7,14 @@ import {
   Box,
   BoxesResponse,
   BoxResponse,
-  ApiResponse
+  ApiResponse,
+  ImageObject
 } from '../models/product.models';
+
+// Backend expects images as string[] (base64 or URLs)
+export interface BoxBackendData extends Omit<Box, 'images'> {
+  images?: string[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -37,10 +43,10 @@ export class BoxService {
    * Create new box (Admin only)
    * Required fields: name, price, stock
    * Optional fields: brand, description, images, size, quantity, offer
-   * @param box - Box data
+   * @param box - Box data (with images as string[])
    * @returns Observable of created box response
    */
-  createBox(box: Partial<Box>): Observable<BoxResponse> {
+  createBox(box: Partial<BoxBackendData>): Observable<BoxResponse> {
     return this.http.post<BoxResponse>(ApiEndpoints.boxes.create, box);
   }
 
@@ -48,10 +54,10 @@ export class BoxService {
    * Update box (Admin only)
    * All fields are optional
    * @param id - Box ID
-   * @param box - Updated box data
+   * @param box - Updated box data (with images as string[])
    * @returns Observable of updated box response
    */
-  updateBox(id: string, box: Partial<Box>): Observable<BoxResponse> {
+  updateBox(id: string, box: Partial<BoxBackendData>): Observable<BoxResponse> {
     return this.http.put<BoxResponse>(ApiEndpoints.boxes.update(id), box);
   }
 

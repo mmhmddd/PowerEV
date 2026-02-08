@@ -38,7 +38,7 @@
         </div>
 
         <!-- Image Counter -->
-        <div class="image-info">
+        <div class="image-info" *ngIf="product.images.length > 1">
           <i class="bi bi-images"></i>
           <span>{{ selectedImageIndex + 1 }} من {{ product.images.length }}</span>
         </div>
@@ -74,17 +74,26 @@
 
       <p class="product-description">{{ product.description }}</p>
 
-      <!-- Brand -->
-      <div class="product-brand" *ngIf="product.brand">
-        <i class="bi bi-award"></i>
-        <span>العلامة التجارية: <strong>{{ product.brand }}</strong></span>
+      <!-- Two Column Layout for Brand and Stock -->
+      <div class="meta-info-grid">
+        <!-- Brand -->
+        <div class="product-brand" *ngIf="product.brand">
+          <i class="bi bi-award"></i>
+          <span><strong>{{ product.brand }}</strong></span>
+        </div>
+
+        <!-- Stock Info -->
+        <div class="stock-info" *ngIf="product.inStock && product.stock">
+          <i class="bi bi-box-seam"></i>
+          <span>{{ product.stock }} قطعة متوفرة</span>
+        </div>
       </div>
 
       <!-- Specifications -->
       <div class="specifications" *ngIf="product.specifications && product.specifications.length > 0">
         <h3 class="specs-title">
           <i class="bi bi-list-check"></i>
-          <span>المواصفات الفنية</span>
+          <span>المواصفات</span>
         </h3>
         <div class="specs-grid">
           <div class="spec-item" *ngFor="let spec of product.specifications">
@@ -94,36 +103,31 @@
         </div>
       </div>
 
-      <!-- Price Section -->
-      <div class="price-section">
-        <div class="price-display" *ngIf="!product.offer?.enabled">
-          <span class="price-value">{{ product.price | number: '1.0-0' }}</span>
-          <span class="currency">ج.م</span>
-        </div>
-
-        <div class="price-display with-offer" *ngIf="product.offer?.enabled">
-          <div class="original-price-wrapper">
-            <span class="original-price">{{ product.price | number: '1.0-0' }} ج.م</span>
-          </div>
-          <div class="final-price-wrapper">
-            <span class="price-value">{{ product.finalPrice | number: '1.0-0' }}</span>
+      <!-- Price and Purchase Section - Combined -->
+      <div class="purchase-card">
+        <!-- Price Section -->
+        <div class="price-section">
+          <div class="price-display" *ngIf="!product.offer?.enabled">
+            <span class="price-value">{{ product.price | number: '1.0-0' }}</span>
             <span class="currency">ج.م</span>
           </div>
-          <div class="savings">
-            <i class="bi bi-piggy-bank"></i>
-            <span>وفر {{ (product.price - (product.finalPrice || 0)) | number: '1.0-0' }} ج.م</span>
+
+          <div class="price-display with-offer" *ngIf="product.offer?.enabled">
+            <div class="original-price-wrapper">
+              <span class="original-price">{{ product.price | number: '1.0-0' }} ج.م</span>
+            </div>
+            <div class="final-price-wrapper">
+              <span class="price-value">{{ product.finalPrice | number: '1.0-0' }}</span>
+              <span class="currency">ج.م</span>
+            </div>
+            <div class="savings">
+              <i class="bi bi-piggy-bank"></i>
+              <span>وفر {{ (product.price - (product.finalPrice || 0)) | number: '1.0-0' }} ج.م</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Stock Info -->
-      <div class="stock-info" *ngIf="product.inStock && product.stock">
-        <i class="bi bi-box-seam"></i>
-        <span>متوفر: {{ product.stock }} قطعة</span>
-      </div>
-
-      <!-- Quantity & Add to Cart -->
-      <div class="purchase-section">
+        <!-- Quantity Control -->
         <div class="quantity-control">
           <span class="quantity-label">الكمية:</span>
           <div class="quantity-buttons">
@@ -137,58 +141,63 @@
           </div>
         </div>
 
-        <button
-          class="add-to-cart-main-btn"
-          (click)="addToCart()"
-          [class.added]="showAddedToCart"
-          [disabled]="!product.inStock"
-        >
-          <span *ngIf="!showAddedToCart">
-            <i class="bi bi-cart-plus"></i>
-            إضافة إلى السلة
-          </span>
-          <span *ngIf="showAddedToCart">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            تم الإضافة بنجاح
-          </span>
-        </button>
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button
+            class="add-to-cart-main-btn"
+            (click)="addToCart()"
+            [class.added]="showAddedToCart"
+            [disabled]="!product.inStock || isAddingToCart"
+          >
+            <span *ngIf="!showAddedToCart && !isAddingToCart">
+              <i class="bi bi-cart-plus"></i>
+              إضافة إلى السلة
+            </span>
+            <span *ngIf="isAddingToCart">
+              <i class="bi bi-hourglass-split"></i>
+              جاري الإضافة...
+            </span>
+            <span *ngIf="showAddedToCart && !isAddingToCart">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              تمت الإضافة بنجاح
+            </span>
+          </button>
+
+          <button class="share-btn" (click)="sharePage()" *ngIf="isShareSupported">
+            <i class="bi bi-share"></i>
+          </button>
+        </div>
       </div>
 
-      <!-- Share Button -->
-      <button class="share-btn" (click)="sharePage()" *ngIf="isShareSupported">
-        <i class="bi bi-share"></i>
-        <span>مشاركة المنتج</span>
-      </button>
-
-      <!-- Additional Info -->
-      <div class="additional-info">
+      <!-- Additional Info - Mobile -->
+      <div class="additional-info mobile-only">
         <div class="info-item">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
           </svg>
-          <span>ضمان سنة واحدة</span>
+          <span>ضمان سنة</span>
         </div>
         <div class="info-item">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
           </svg>
-          <span>دعم فني متاح</span>
+          <span>دعم فني</span>
         </div>
         <div class="info-item">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
           <span>توصيل سريع</span>
         </div>
         <div class="info-item">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
-          <span>خدمة عملاء 24/7</span>
+          <span>خدمة 24/7</span>
         </div>
       </div>
     </div>

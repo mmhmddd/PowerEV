@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { trigger, state, style, transition, animate, stagger, query } from '@angular/animations';
 import { SliderComponent } from "../../shared/slider/slider.component";
 import { LatestProductsSliderComponent } from "../../shared/lates-products-slider/lates-products-slider.component";
@@ -10,7 +10,7 @@ interface ProductCard {
   id: string;
   title: string;
   image: string;
-  link: string;
+  categoryId: string;
   ariaLabel: string;
 }
 
@@ -94,28 +94,28 @@ export class HomeComponent implements OnInit, OnDestroy {
       id: 'chargers',
       title: 'شواحن كهربائية',
       image: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=600',
-      link: '/products?category=chargers',
+      categoryId: 'chargers',
       ariaLabel: 'تصفح شواحن كهربائية للسيارات'
     },
     {
       id: 'cables',
       title: 'كابلات الشحن',
-      image: 'https://images.unsplash.com/photo-1646719000106-963507639034?auto=format&fit=crop&q=80&w=600',
-      link: '/products?category=cables',
+      image: '/assets/images/home/cables.jpg',
+      categoryId: 'cables',
       ariaLabel: 'تصفح كابلات الشحن'
     },
     {
       id: 'adapters',
       title: 'محولات وقوابس',
-      image: 'https://images.unsplash.com/photo-1662446759714-38641957247e?auto=format&fit=crop&q=80&w=600',
-      link: '/products?category=adapters',
+      image: '/assets/images/home/charger.jpg',
+      categoryId: 'adapters',
       ariaLabel: 'تصفح محولات وقوابس الشحن'
     },
     {
       id: 'accessories',
       title: 'اكسسوارات وقطع غيار',
       image: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=600',
-      link: '/products?category=accessories',
+      categoryId: 'accessories',
       ariaLabel: 'تصفح اكسسوارات وقطع الغيار'
     }
   ];
@@ -123,7 +123,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Why Choose Us Section Data
   whyChooseTitle = 'لماذا تختار';
   brandName = 'PowerEV';
-  whyChooseSubtitle = 'نحن نقدم أكثر من مجرد منتجات، نحن نقدم حلولاً متكاملة لطاقة نظيفة ومستقبل مستدام.';
+  whyChooseSubtitle = 'نحن نقدم أكثر من مجرد منتجات، نحن نقدم حلولاً متكاملة لطاقة نظيفة ومستدام.';
   features: Feature[] = [
     {
       id: 'f1',
@@ -151,7 +151,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   ];
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private router: Router
+  ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
@@ -167,6 +170,15 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     // Cleanup if needed
+  }
+
+  /**
+   * Navigate to products page with category filter
+   */
+  navigateToCategory(categoryId: string): void {
+    this.router.navigate(['/products'], {
+      queryParams: { category: categoryId }
+    });
   }
 
   /**

@@ -121,6 +121,7 @@ export const ApiEndpoints = {
     getMyOrders: `${API_BASE}/orders/user/my-orders`,
     trackByOrderNumber: (orderNumber: string) => `${API_BASE}/orders/track/${orderNumber}`,
     updateStatus: (id: string) => `${API_BASE}/orders/${id}/status`,
+    updatePaymentStatus: (id: string) => `${API_BASE}/orders/${id}/payment-status`,
     update: (id: string) => `${API_BASE}/orders/${id}`,
     delete: (id: string) => `${API_BASE}/orders/${id}`
   }

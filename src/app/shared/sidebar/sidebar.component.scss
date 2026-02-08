@@ -1,0 +1,421 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+
+// ══════════════════════════════════════════════════════════
+// Variables (from your existing variables)
+// ══════════════════════════════════════════════════════════
+$green:          rgb(0, 255, 65);
+$green-light:    rgba(0, 255, 65, 0.10);
+$green-border:   rgba(0, 255, 65, 0.30);
+$green-glow:     rgba(0, 255, 65, 0.15);
+
+$white:          #ffffff;
+$white-dim:      rgba(255, 255, 255, 0.78);
+$gray-medium:    rgba(255, 255, 255, 0.09);
+$gray-light:     rgba(255, 255, 255, 0.07);
+
+$font-arabic-only: 'Cairo', sans-serif;
+
+$transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$transition-fast: all 0.2s ease;
+
+// Design-specific variables
+$bg-primary:     #0a2540;
+$bg-secondary:   #163a5f;
+$sidebar-width:  280px;
+$sidebar-collapsed: 80px;
+
+// ══════════════════════════════════════════════════════════
+// Sidebar Container
+// ══════════════════════════════════════════════════════════
+.sidebar {
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  width: $sidebar-width;
+  z-index: 1000;
+
+  // Collapsed state
+  &--closed {
+    .sidebar__container {
+      width: $sidebar-collapsed;
+    }
+
+    .sidebar__logo-text {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .sidebar__nav-label,
+    .sidebar__logout-label {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .sidebar__nav-item {
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .sidebar__logout {
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    // Hide backdrop when closed
+    .sidebar__backdrop {
+      display: none;
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // Backdrop (for mobile)
+  // ══════════════════════════════════════════════════════════
+  &__backdrop {
+    display: none; // Hidden by default on desktop
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+
+    @media (max-width: 1024px) {
+      display: block; // Show on mobile/tablet
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // Sidebar Container (actual sidebar panel)
+  // ══════════════════════════════════════════════════════════
+  &__container {
+    position: relative;
+    width: $sidebar-width;
+    height: 100vh;
+    background: linear-gradient(180deg, $bg-primary 0%, $bg-secondary 100%);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    transition: $transition-base;
+    z-index: 1001;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.3);
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // Header Section
+  // ══════════════════════════════════════════════════════════
+  &__header {
+    padding: 2rem 1.5rem;
+    border-bottom: 1px solid $gray-medium;
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__logo-icon {
+    width: 40px;
+    height: 40px;
+    color: $green;
+    filter: drop-shadow(0 0 8px $green-glow);
+    flex-shrink: 0;
+  }
+
+  &__logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    transition: $transition-base;
+  }
+
+  &__title {
+    font-family: $font-arabic-only;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $white;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  &__subtitle {
+    font-family: $font-arabic-only;
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: $white-dim;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // Navigation Section
+  // ══════════════════════════════════════════════════════════
+  &__nav {
+    flex: 1;
+    padding: 1.5rem 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $gray-medium;
+      border-radius: 4px;
+    }
+  }
+
+  &__nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    color: $white-dim;
+    text-decoration: none;
+    font-family: $font-arabic-only;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: $transition-fast;
+    position: relative;
+    cursor: pointer;
+
+    // Right border for active state
+    &::before {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 0;
+      background: $green;
+      border-radius: 4px 0 0 4px;
+      transition: $transition-fast;
+      box-shadow: 0 0 12px $green-glow;
+    }
+
+    &:hover {
+      background: $gray-light;
+      color: $white;
+
+      .sidebar__nav-icon {
+        color: $green;
+        transform: scale(1.1);
+      }
+    }
+
+    // Active state
+    &--active {
+      background: $green-light;
+      color: $green;
+      border-radius: 0;
+
+      &::before {
+        height: 100%;
+      }
+
+      .sidebar__nav-icon {
+        color: $green;
+      }
+    }
+  }
+
+  &__nav-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    transition: $transition-fast;
+  }
+
+  &__nav-label {
+    white-space: nowrap;
+    transition: $transition-base;
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // Footer Section (Logout)
+  // ══════════════════════════════════════════════════════════
+  &__footer {
+    padding: 1.5rem 0;
+    border-top: 1px solid $gray-medium;
+  }
+
+  &__logout {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #ff4757;
+    text-decoration: none;
+    font-family: $font-arabic-only;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: $transition-fast;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(255, 71, 87, 0.1);
+
+      .sidebar__logout-icon {
+        transform: translateX(-4px);
+      }
+    }
+  }
+
+  &__logout-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    transition: $transition-fast;
+  }
+
+  &__logout-label {
+    white-space: nowrap;
+    transition: $transition-base;
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // Toggle Button - FIXED POSITIONING
+  // ══════════════════════════════════════════════════════════
+  &__toggle {
+    position: fixed;
+    right: 210px; // Inside sidebar when open
+    top: 2rem;
+    width: 40px;
+    height: 40px;
+    background: $bg-secondary;
+    border: 1px solid $green-border;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: $transition-base;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1002;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      color: $green;
+    }
+
+    &:hover {
+      background: $green-light;
+      border-color: $green;
+      box-shadow: 0 0 16px $green-glow;
+      transform: scale(1.1);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  // Toggle position when sidebar is closed (Desktop)
+  &--closed &__toggle {
+    right: calc($sidebar-collapsed - 20px); // Inside collapsed sidebar
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// Responsive Design
+// ══════════════════════════════════════════════════════════
+@media (max-width: 1024px) {
+  .sidebar {
+    // On tablets, slide sidebar off-screen when closed
+    &--closed {
+      .sidebar__container {
+        transform: translateX(100%);
+      }
+
+      // When closed on tablet, show toggle on left side
+      .sidebar__toggle {
+        right: auto;
+        left: 1rem;
+      }
+    }
+
+    // When open on tablet, toggle stays inside sidebar
+    &__toggle {
+      right: calc($sidebar-width - 20px);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    &__container {
+      width: 100%;
+      max-width: $sidebar-width;
+    }
+
+    &--closed {
+      .sidebar__container {
+        transform: translateX(100%);
+        width: 100%;
+        max-width: $sidebar-width;
+      }
+
+      // When closed on mobile, show toggle on left
+      .sidebar__toggle {
+        right: auto;
+        left: 1rem;
+        top: 1rem;
+      }
+    }
+
+    // When open on mobile, toggle is inside sidebar
+    &__toggle {
+      right: calc($sidebar-width - 20px);
+      top: 2rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    &__container {
+      width: 85vw;
+      max-width: $sidebar-width;
+    }
+
+    &--closed {
+      .sidebar__container {
+        width: 85vw;
+      }
+
+      // When closed on small mobile, toggle on left
+      .sidebar__toggle {
+        right: auto;
+        left: 1rem;
+        top: 1rem;
+      }
+    }
+
+    // When open on small mobile, calculate based on actual width
+    &__toggle {
+      right: calc(85vw - 20px);
+      top: 2rem;
+    }
+  }
+}
+// ══════════════════════════════════════════════════════════
+// Hide toggle button on large screens (Desktop)
+// ══════════════════════════════════════════════════════════
+@media (min-width: 1025px) {
+  .sidebar__toggle {
+    display: none;
+  }
+}

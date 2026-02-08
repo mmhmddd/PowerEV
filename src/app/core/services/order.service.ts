@@ -18,10 +18,15 @@ export interface CreateOrderRequest {
   }>;
   sessionId?: string;
   notes?: string;
+  paymentMethod: 'cash' | 'instapay' | 'vodafonecash';
 }
 
 export interface UpdateOrderStatusRequest {
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+}
+
+export interface UpdatePaymentStatusRequest {
+  paymentStatus: 'pending' | 'paid' | 'failed';
 }
 
 @Injectable({
@@ -32,7 +37,7 @@ export class OrderService {
 
   /**
    * Create order from cart or direct items
-   * Required: name, phone, address
+   * Required: name, phone, address, paymentMethod
    * Optional: email, notes
    * Either provide sessionId (to get items from cart) OR items array
    * Backend generates order number automatically
@@ -86,7 +91,7 @@ export class OrderService {
 
   /**
    * Update order status (Admin only)
-   * Valid statuses: pending, processing, shipped, delivered, cancelled
+   * Valid statuses: pending, confirmed, processing, shipped, delivered, cancelled
    * @param id - Order ID
    * @param status - New status
    * @returns Observable of order response
@@ -99,8 +104,22 @@ export class OrderService {
   }
 
   /**
+   * Update payment status (Admin only)
+   * Valid statuses: pending, paid, failed
+   * @param id - Order ID
+   * @param paymentStatus - New payment status
+   * @returns Observable of order response
+   */
+  updatePaymentStatus(id: string, paymentStatus: string): Observable<OrderResponse> {
+    return this.http.put<OrderResponse>(
+      ApiEndpoints.orders.updatePaymentStatus(id),
+      { paymentStatus }
+    );
+  }
+
+  /**
    * Update order details (Admin only)
-   * Can update: name, phone, email, address, status, notes
+   * Can update: name, phone, email, address, status, notes, paymentMethod, paymentStatus
    * @param id - Order ID
    * @param data - Updated order data
    * @returns Observable of order response
@@ -122,6 +141,7 @@ export class OrderService {
    * Helper: Create order from cart
    * @param customerInfo - Customer information
    * @param sessionId - Cart session ID
+   * @param paymentMethod - Payment method
    * @returns Observable of order response
    */
   createOrderFromCart(customerInfo: {
@@ -130,10 +150,11 @@ export class OrderService {
     email?: string;
     address: string;
     notes?: string;
-  }, sessionId: string): Observable<OrderResponse> {
+  }, sessionId: string, paymentMethod: 'cash' | 'instapay' | 'vodafonecash'): Observable<OrderResponse> {
     return this.createOrder({
       ...customerInfo,
-      sessionId
+      sessionId,
+      paymentMethod
     });
   }
 
@@ -141,6 +162,7 @@ export class OrderService {
    * Helper: Create order with direct items (no cart)
    * @param customerInfo - Customer information
    * @param items - Order items
+   * @param paymentMethod - Payment method
    * @returns Observable of order response
    */
   createOrderDirect(customerInfo: {
@@ -154,10 +176,11 @@ export class OrderService {
     productType: string;
     quantity: number;
     price: number;
-  }>): Observable<OrderResponse> {
+  }>, paymentMethod: 'cash' | 'instapay' | 'vodafonecash'): Observable<OrderResponse> {
     return this.createOrder({
       ...customerInfo,
-      items
+      items,
+      paymentMethod
     });
   }
 }

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard, noAuthGuard, adminGuard } from './core/guards/auth.guard';
 
 // Public / marketing pages (most users land here first)
 export const routes: Routes = [
@@ -48,7 +49,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/product-details/product-details.component')
       .then(c => c.ProductDetailsComponent),
     title: 'Product Details'
-
   },
 
   {
@@ -61,10 +61,13 @@ export const routes: Routes = [
     path: 'checkout',
     loadComponent: () => import('./pages/checkout/checkout.component')
       .then(c => c.CheckoutComponent),
+    // Uncomment to require authentication for checkout:
+    // canActivate: [authGuard],
     title: 'Checkout'
   },
 
   // ── Auth ────────────────────────────────────────────────
+  // noAuthGuard prevents logged-in users from accessing these pages
   {
     path: 'login',
     loadComponent: () => import('./auth/login/login.component')
@@ -79,8 +82,10 @@ export const routes: Routes = [
   },
 
   // ── Admin area ──────────────────────────────────────────
+  // Protected by adminGuard - requires admin/employee role
   {
     path: 'admin',
+    canActivate: [adminGuard],
     children: [
       {
         path: '',
@@ -98,9 +103,26 @@ export const routes: Routes = [
         loadComponent: () => import('./admin/user-control/user-control.component')
           .then(c => c.UserControlComponent),
         title: 'User Management'
+      },
+      {
+        path: 'orders',
+        loadComponent: () => import('./admin/order-control/order-control.component')
+          .then(c => c.OrderControlComponent),
+        title: 'Order Management'
+      },
+      {
+        path: 'adapters',
+        loadComponent: () => import('./admin/adapter-control/adapter-control.component')
+          .then(c => c.AdapterControlComponent),
+        title: 'Adapter Management'
+      },
+      {
+        path: 'boxes',
+        loadComponent: () => import('./admin/box-control/box-control.component')
+          .then(c => c.BoxControlComponent),
+        title: 'Box Management'
       }
     ]
-    // You can later protect this whole branch with canMatch / canActivate guard
   },
 
   // ── 404 ─────────────────────────────────────────────────

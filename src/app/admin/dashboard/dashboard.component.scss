@@ -1,0 +1,756 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap');
+
+// ══════════════════════════════════════════════════════════
+// Variables
+// ══════════════════════════════════════════════════════════
+$green:          rgb(0, 255, 65);
+$green-light:    rgba(0, 255, 65, 0.10);
+$green-border:   rgba(0, 255, 65, 0.30);
+
+$white:          #ffffff;
+$white-dim:      rgba(255, 255, 255, 0.78);
+$gray-dark:      #1a1a1a;
+$gray-medium:    rgba(255, 255, 255, 0.09);
+$gray-light:     rgba(255, 255, 255, 0.07);
+
+$bg-body:        #f5f7fa;
+$bg-card:        #ffffff;
+$bg-header:      #ffffff;
+
+$text-primary:   #1f2937;
+$text-secondary: #6b7280;
+$text-muted:     #9ca3af;
+
+$border-color:   #e5e7eb;
+
+$font-arabic:    'Cairo', sans-serif;
+
+$transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$transition-fast: all 0.2s ease;
+
+$sidebar-width:  280px;
+$sidebar-collapsed: 80px;
+
+// Status colors
+$status-success: #10b981;
+$status-warning: #f59e0b;
+$status-info:    #3b82f6;
+$status-danger:  #ef4444;
+
+// ══════════════════════════════════════════════════════════
+// Dashboard Layout
+// ══════════════════════════════════════════════════════════
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  background: $bg-body;
+  font-family: $font-arabic;
+  direction: rtl;
+
+  // ══════════════════════════════════════════════════════════
+  // Main Content Area
+  // ══════════════════════════════════════════════════════════
+  &__content {
+    flex: 1;
+    margin-right: $sidebar-width;
+    transition: $transition-base;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // Header / Top Navigation
+  // ══════════════════════════════════════════════════════════
+  &__header {
+    background: $bg-header;
+    border-bottom: 1px solid $border-color;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  &__header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0;
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // Dashboard Body
+  // ══════════════════════════════════════════════════════════
+  &__body {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// Search Bar
+// ══════════════════════════════════════════════════════════
+.search-bar {
+  position: relative;
+  width: 400px;
+
+  &__input {
+    width: 100%;
+    padding: 0.75rem 3rem 0.75rem 1rem;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    font-family: $font-arabic;
+    font-size: 0.95rem;
+    color: $text-primary;
+    background: $bg-body;
+    transition: $transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: $green;
+      box-shadow: 0 0 0 3px rgba(0, 255, 65, 0.1);
+    }
+
+    &::placeholder {
+      color: $text-muted;
+    }
+  }
+
+  &__icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    color: $text-muted;
+    pointer-events: none;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// Notification Button
+// ══════════════════════════════════════════════════════════
+.notification-btn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid $border-color;
+  background: $bg-card;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    color: $text-secondary;
+  }
+
+  &:hover {
+    background: $bg-body;
+    border-color: $green;
+  }
+}
+
+.notification-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background: $status-danger;
+  border-radius: 50%;
+  border: 2px solid $bg-card;
+}
+
+// ══════════════════════════════════════════════════════════
+// User Profile
+// ══════════════════════════════════════════════════════════
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  background: $bg-body;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  &:hover {
+    background: darken($bg-body, 2%);
+  }
+
+  &__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    svg {
+      width: 24px;
+      height: 24px;
+      color: $white;
+    }
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  &__name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: $text-primary;
+    line-height: 1.2;
+  }
+
+  &__role {
+    font-size: 0.8rem;
+    color: $text-muted;
+    line-height: 1.2;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// Statistics Grid
+// ══════════════════════════════════════════════════════════
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  background: $bg-card;
+  border-radius: 16px;
+  padding: 1.75rem;
+  display: flex;
+  gap: 1.25rem;
+  border: 1px solid $border-color;
+  transition: $transition-fast;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, $green, transparent);
+    opacity: 0;
+    transition: $transition-fast;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  &__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    svg {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  &__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: $text-secondary;
+    margin: 0;
+  }
+
+  &__value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  &__change {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: $status-success;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    &--negative {
+      color: $status-danger;
+    }
+  }
+
+  &__change-label {
+    color: $text-muted;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// Section Styling
+// ══════════════════════════════════════════════════════════
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0;
+}
+
+.section-subtitle {
+  font-size: 0.9rem;
+  color: $text-secondary;
+  margin: 0.25rem 0 0;
+}
+
+.section-action {
+  padding: 0.625rem 1.25rem;
+  background: transparent;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  font-family: $font-arabic;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  &:hover {
+    background: $bg-body;
+    color: $green;
+    border-color: $green;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// Chart Section
+// ══════════════════════════════════════════════════════════
+.chart-section {
+  background: $bg-card;
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid $border-color;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  margin-top: 2rem;
+}
+
+.chart {
+  width: 100%;
+  height: 280px;
+
+  &__area {
+    fill: url(#chartGradient);
+    opacity: 0.3;
+  }
+
+  &__line {
+    fill: none;
+    stroke: $green;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.chart__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding: 0 1rem;
+}
+
+.chart__label {
+  font-size: 0.85rem;
+  color: $text-muted;
+  font-weight: 500;
+}
+
+// Add gradient definition
+.chart-section::before {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+// ══════════════════════════════════════════════════════════
+// Orders Section
+// ══════════════════════════════════════════════════════════
+.orders-section {
+  background: $bg-card;
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid $border-color;
+}
+
+.orders-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &__header {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1.2fr 1.2fr 1.2fr 0.8fr;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: $bg-body;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: $text-secondary;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1.2fr 1.2fr 1.2fr 0.8fr;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    transition: $transition-fast;
+    align-items: center;
+
+    &:hover {
+      background: $bg-body;
+      border-color: $green-border;
+    }
+  }
+
+  &__cell {
+    font-size: 0.9rem;
+    color: $text-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// Status Badges
+// ══════════════════════════════════════════════════════════
+.status-badge {
+  display: inline-flex;
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &--success {
+    background: rgba($status-success, 0.1);
+    color: $status-success;
+  }
+
+  &--warning {
+    background: rgba($status-warning, 0.1);
+    color: $status-warning;
+  }
+
+  &--info {
+    background: rgba($status-info, 0.1);
+    color: $status-info;
+  }
+
+  &--danger {
+    background: rgba($status-danger, 0.1);
+    color: $status-danger;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// Action Button
+// ══════════════════════════════════════════════════════════
+.action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    color: $text-secondary;
+  }
+
+  &:hover {
+    background: $bg-body;
+    border-color: $green;
+
+    svg {
+      color: $green;
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// Departments Section
+// ══════════════════════════════════════════════════════════
+.departments-section {
+  background: $bg-card;
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid $border-color;
+}
+
+.departments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.department-card {
+  background: $bg-body;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  border: 1px solid transparent;
+  transition: $transition-fast;
+  cursor: pointer;
+
+  &:hover {
+    background: $bg-card;
+    border-color: $green-border;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+
+    .department-card__icon {
+      transform: scale(1.1);
+    }
+  }
+
+  &__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: $transition-fast;
+
+    svg {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+  }
+
+  &__count {
+    font-size: 0.85rem;
+    color: $text-muted;
+    margin: 0;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// Responsive Design
+// ══════════════════════════════════════════════════════════
+@media (max-width: 1400px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .departments-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  .dashboard__content {
+    margin-right: $sidebar-collapsed;
+  }
+
+  .dashboard__header {
+    padding: 1rem 1.5rem;
+  }
+
+  .dashboard__body {
+    padding: 1.5rem;
+  }
+
+  .search-bar {
+    width: 280px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .orders-table__header,
+  .orders-table__row {
+    grid-template-columns: 1fr 1fr 1fr;
+
+    .orders-table__cell:nth-child(4),
+    .orders-table__cell:nth-child(5),
+    .orders-table__cell:nth-child(6) {
+      display: none;
+    }
+  }
+
+  .departments-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard__content {
+    margin-right: 0;
+  }
+
+  .dashboard__header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .dashboard__header-right {
+    justify-content: space-between;
+  }
+
+  .search-bar {
+    width: 100%;
+  }
+
+  .user-profile__info {
+    display: none;
+  }
+
+  .dashboard__title {
+    font-size: 1.5rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .chart-container {
+    height: 240px;
+  }
+
+  .orders-table__header,
+  .orders-table__row {
+    grid-template-columns: 1fr 1fr;
+
+    .orders-table__cell:nth-child(n+3) {
+      display: none;
+    }
+  }
+
+  .departments-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+
+  .department-card {
+    padding: 1.25rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard__body {
+    padding: 1rem;
+  }
+
+  .stat-card {
+    padding: 1.25rem;
+  }
+
+  .chart-section,
+  .orders-section,
+  .departments-section {
+    padding: 1.25rem;
+  }
+
+  .departments-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

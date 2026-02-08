@@ -10,6 +10,23 @@ import {
   ApiResponse
 } from '../models/product.models';
 
+// Backend-compatible adapter data type (images as string[])
+export interface AdapterBackendData {
+  _id?: string;
+  name?: string;
+  price?: number;
+  type?: string;
+  brand?: string;
+  stock?: number;
+  efficiency?: number;
+  voltage?: number;
+  current?: number;
+  description?: string;
+  images?: string[]; // Backend expects string[] not ImageObject[]
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -37,10 +54,10 @@ export class AdapterService {
    * Create new adapter (Admin only)
    * Required fields: name, price
    * Optional fields: type, brand, stock, efficiency, voltage, current, description, images
-   * @param adapter - Adapter data
+   * @param adapter - Adapter data (images should be string[] of URLs or base64)
    * @returns Observable of created adapter response
    */
-  createAdapter(adapter: Partial<Adapter>): Observable<AdapterResponse> {
+  createAdapter(adapter: Partial<AdapterBackendData>): Observable<AdapterResponse> {
     return this.http.post<AdapterResponse>(ApiEndpoints.adapters.create, adapter);
   }
 
@@ -48,10 +65,10 @@ export class AdapterService {
    * Update adapter (Admin only)
    * All fields are optional
    * @param id - Adapter ID
-   * @param adapter - Updated adapter data
+   * @param adapter - Updated adapter data (images should be string[] of URLs or base64)
    * @returns Observable of updated adapter response
    */
-  updateAdapter(id: string, adapter: Partial<Adapter>): Observable<AdapterResponse> {
+  updateAdapter(id: string, adapter: Partial<AdapterBackendData>): Observable<AdapterResponse> {
     return this.http.put<AdapterResponse>(ApiEndpoints.adapters.update(id), adapter);
   }
 
@@ -71,7 +88,7 @@ export class AdapterService {
    * @param adapter - Adapter data with base64 images
    * @returns Observable of created adapter response
    */
-  createAdapterWithImages(adapter: Partial<Adapter> & { images: string[] }): Observable<AdapterResponse> {
+  createAdapterWithImages(adapter: Partial<AdapterBackendData>): Observable<AdapterResponse> {
     return this.http.post<AdapterResponse>(ApiEndpoints.adapters.create, adapter);
   }
 
@@ -82,7 +99,7 @@ export class AdapterService {
    * @param adapter - Updated adapter data with base64 images
    * @returns Observable of updated adapter response
    */
-  updateAdapterWithImages(id: string, adapter: Partial<Adapter> & { images: string[] }): Observable<AdapterResponse> {
+  updateAdapterWithImages(id: string, adapter: Partial<AdapterBackendData>): Observable<AdapterResponse> {
     return this.http.put<AdapterResponse>(ApiEndpoints.adapters.update(id), adapter);
   }
 }

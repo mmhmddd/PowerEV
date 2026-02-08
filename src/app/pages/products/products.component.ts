@@ -9,6 +9,18 @@ import { Product, ProductService } from '../../core/services/product.service';
 import { CartService, AddToCartRequest } from '../../core/services/cart.service';
 import { ToastService } from '../../core/services/toast.service';
 
+interface ImageSliderState {
+  currentIndex: number;
+  interval?: any;
+}
+
+interface TouchState {
+  startX: number;
+  startY: number;
+  currentX: number;
+  moved: boolean;
+}
+
 @Component({
   selector: 'app-products',
   standalone: true,
@@ -23,6 +35,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
   mobileFiltersOpen: boolean = false;
   isLoading: boolean = false;
   addingToCartProductId: string | null = null;
+
+  // Image slider states
+  private imageSliderStates: Map<string, ImageSliderState> = new Map();
+  private touchStates: Map<string, TouchState> = new Map();
 
   // Filter states
   searchQuery: string = '';
@@ -93,12 +109,28 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.applyFilters();
       });
 
-    // Check for category in route params
+    // Check for category in query params (from navigation)
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(queryParams => {
+        const category = queryParams['category'];
+        if (category && category !== this.selectedCategory) {
+          this.selectedCategory = category;
+          this.applyFilters();
+
+          // Scroll to top of products when category changes
+          if (typeof window !== 'undefined') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }
+      });
+
+    // Also check for category in route params (for backwards compatibility)
     this.route.params
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
         const category = params['category'];
-        if (category) {
+        if (category && category !== this.selectedCategory) {
           this.selectedCategory = category;
           this.applyFilters();
         }
@@ -114,6 +146,132 @@ export class ProductsComponent implements OnInit, OnDestroy {
       .subscribe(query => {
         this.applyFilters();
       });
+  }
+
+  /**
+   * Image slider methods
+   */
+  startImageSlider(productId: string): void {
+    const product = this.products.find(p => p.id === productId);
+    if (!product || product.images.length <= 1) {
+      return;
+    }
+
+    // Initialize state if not exists
+    if (!this.imageSliderStates.has(productId)) {
+      this.imageSliderStates.set(productId, { currentIndex: 0 });
+    }
+
+    const state = this.imageSliderStates.get(productId)!;
+
+    // Clear any existing interval
+    if (state.interval) {
+      clearInterval(state.interval);
+    }
+
+    // Start automatic sliding
+    state.interval = setInterval(() => {
+      state.currentIndex = (state.currentIndex + 1) % product.images.length;
+      this.imageSliderStates.set(productId, state);
+    }, 1500); // Change image every 1.5 seconds
+  }
+
+  stopImageSlider(productId: string): void {
+    const state = this.imageSliderStates.get(productId);
+    if (state?.interval) {
+      clearInterval(state.interval);
+      state.interval = undefined;
+      // Reset to first image
+      state.currentIndex = 0;
+      this.imageSliderStates.set(productId, state);
+    }
+  }
+
+  getCurrentImage(product: Product): any {
+    const state = this.imageSliderStates.get(product.id);
+    const index = state?.currentIndex || 0;
+    return product.images[index] || product.images[0];
+  }
+
+  getCurrentImageIndex(productId: string): number {
+    const state = this.imageSliderStates.get(productId);
+    return state?.currentIndex || 0;
+  }
+
+  /**
+   * Touch gesture methods for mobile swipe
+   */
+  onTouchStart(event: TouchEvent, productId: string): void {
+    const product = this.products.find(p => p.id === productId);
+    if (!product || product.images.length <= 1) {
+      return;
+    }
+
+    const touch = event.touches[0];
+    this.touchStates.set(productId, {
+      startX: touch.clientX,
+      startY: touch.clientY,
+      currentX: touch.clientX,
+      moved: false
+    });
+  }
+
+  onTouchMove(event: TouchEvent, productId: string): void {
+    const touchState = this.touchStates.get(productId);
+    if (!touchState) {
+      return;
+    }
+
+    const touch = event.touches[0];
+    touchState.currentX = touch.clientX;
+
+    // Check if user is swiping horizontally (not scrolling vertically)
+    const deltaX = Math.abs(touch.clientX - touchState.startX);
+    const deltaY = Math.abs(touch.clientY - touchState.startY);
+
+    if (deltaX > deltaY && deltaX > 10) {
+      touchState.moved = true;
+      // Prevent scrolling when swiping
+      event.preventDefault();
+    }
+  }
+
+  onTouchEnd(productId: string): void {
+    const touchState = this.touchStates.get(productId);
+    if (!touchState || !touchState.moved) {
+      this.touchStates.delete(productId);
+      return;
+    }
+
+    const product = this.products.find(p => p.id === productId);
+    if (!product) {
+      this.touchStates.delete(productId);
+      return;
+    }
+
+    const deltaX = touchState.currentX - touchState.startX;
+    const minSwipeDistance = 50;
+
+    // Initialize state if not exists
+    if (!this.imageSliderStates.has(productId)) {
+      this.imageSliderStates.set(productId, { currentIndex: 0 });
+    }
+
+    const state = this.imageSliderStates.get(productId)!;
+
+    // Swipe right (show previous image) - RTL direction
+    if (deltaX > minSwipeDistance) {
+      state.currentIndex = state.currentIndex === 0
+        ? product.images.length - 1
+        : state.currentIndex - 1;
+    }
+    // Swipe left (show next image) - RTL direction
+    else if (deltaX < -minSwipeDistance) {
+      state.currentIndex = (state.currentIndex + 1) % product.images.length;
+    }
+
+    this.imageSliderStates.set(productId, state);
+    this.touchStates.delete(productId);
   }
 
   /**
@@ -203,6 +361,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
     return this.categories.find(c => c.id === categoryId)?.icon || '';
   }
 
+  // Get count of in-stock products
+  getInStockCount(): number {
+    return this.allProducts.filter(p => p.inStock).length;
+  }
+
   // Get active filters count
   getActiveFiltersCount(): number {
     let count = 0;
@@ -215,6 +378,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   selectCategory(categoryId: string): void {
     this.selectedCategory = categoryId;
+    // Update URL query params when category changes
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { category: categoryId === 'all' ? null : categoryId },
+      queryParamsHandling: 'merge'
+    });
     this.applyFilters();
     this.mobileFiltersOpen = false;
   }
@@ -324,6 +493,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.showInStockOnly = false;
     this.selectedSort = 'name-asc';
     this.selectedCategory = 'all';
+
+    // Clear query params
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {},
+    });
+
     this.applyFilters();
   }
 
@@ -336,6 +512,15 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Clear all image slider intervals
+    this.imageSliderStates.forEach((state) => {
+      if (state.interval) {
+        clearInterval(state.interval);
+      }
+    });
+    this.imageSliderStates.clear();
+    this.touchStates.clear();
+
     this.destroy$.next();
     this.destroy$.complete();
   }

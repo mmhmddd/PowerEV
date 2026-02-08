@@ -1,8 +1,8 @@
 // src/app/core/services/cart.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap, map } from 'rxjs/operators';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { tap, map, catchError } from 'rxjs/operators';
 import { ApiEndpoints } from '../constants/api-endpoints';
 import { Cart, CartResponse } from '../models/product.models';
 
@@ -34,7 +34,6 @@ export class CartService {
   private getOrCreateSessionId(): string {
     let sessionId = localStorage.getItem('cartSessionId');
     if (!sessionId) {
-      // Generate UUID v4 manually to avoid dependency
       sessionId = this.generateUUID();
       localStorage.setItem('cartSessionId', sessionId);
     }
@@ -57,10 +56,17 @@ export class CartService {
    * Backend sends totalAmount, frontend expects totalPrice
    */
   private normalizeCart(cart: any): Cart {
-    return {
+    const normalized = {
       ...cart,
       totalPrice: cart.totalAmount || cart.totalPrice || 0
     };
+
+    // Ensure items is always an array
+    if (!normalized.items || !Array.isArray(normalized.items)) {
+      normalized.items = [];
+    }
+
+    return normalized as Cart;
   }
 
   /**
@@ -78,6 +84,13 @@ export class CartService {
       },
       error: (error) => {
         console.error('Error loading cart:', error);
+        // Create empty cart on error
+        this.cartSubject.next({
+          _id: '',
+          sessionId: this.sessionId,
+          items: [],
+          totalPrice: 0
+        });
       }
     });
   }
@@ -95,6 +108,10 @@ export class CartService {
           response.data = this.normalizeCart(response.data);
         }
         return response;
+      }),
+      catchError(error => {
+        console.error('Get cart error:', error);
+        return throwError(() => error);
       })
     );
   }
@@ -124,6 +141,10 @@ export class CartService {
         if (response.success && response.data) {
           this.cartSubject.next(response.data);
         }
+      }),
+      catchError(error => {
+        console.error('Add to cart error:', error);
+        return throwError(() => error);
       })
     );
   }
@@ -152,6 +173,10 @@ export class CartService {
         if (response.success && response.data) {
           this.cartSubject.next(response.data);
         }
+      }),
+      catchError(error => {
+        console.error('Update cart item error:', error);
+        return throwError(() => error);
       })
     );
   }
@@ -176,6 +201,10 @@ export class CartService {
         if (response.success && response.data) {
           this.cartSubject.next(response.data);
         }
+      }),
+      catchError(error => {
+        console.error('Remove from cart error:', error);
+        return throwError(() => error);
       })
     );
   }
@@ -199,6 +228,10 @@ export class CartService {
         if (response.success && response.data) {
           this.cartSubject.next(response.data);
         }
+      }),
+      catchError(error => {
+        console.error('Clear cart error:', error);
+        return throwError(() => error);
       })
     );
   }

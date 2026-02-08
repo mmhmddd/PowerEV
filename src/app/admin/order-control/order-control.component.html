@@ -1,0 +1,584 @@
+<app-sidebar></app-sidebar>
+<div class="order-control">
+  <!-- Page Header -->
+  <header class="order-control__header">
+    <div class="order-control__header-left">
+      <h1 class="order-control__title">الطلبات</h1>
+      <p class="order-control__subtitle">إدارة ومتابعة الطلبات والمبيعات</p>
+    </div>
+    <div class="order-control__header-right">
+      <!-- <button class="btn btn--primary" (click)="openAddOrderModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        <span>إضافة طلب</span>
+      </button> -->
+    </div>
+  </header>
+
+  <!-- Search and Filter Section -->
+  <section class="order-control__filters">
+    <div class="search-box">
+      <input
+        type="text"
+        class="search-box__input"
+        placeholder="بحث برقم الطلب، الاسم أو رقم الهاتف..."
+        [(ngModel)]="searchTerm"
+        (input)="filterOrders()"
+      >
+      <svg class="search-box__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+    </div>
+
+    <div class="filter-group">
+      <select class="filter-select" [(ngModel)]="selectedStatus" (change)="filterOrders()">
+        <option value="">جميع الحالات</option>
+        <option *ngFor="let status of statusOptions" [value]="status.value">
+          {{ status.label }}
+        </option>
+      </select>
+
+      <select class="filter-select" [(ngModel)]="selectedPaymentStatus" (change)="filterOrders()">
+        <option value="">حالة الدفع</option>
+        <option *ngFor="let status of paymentStatusOptions" [value]="status.value">
+          {{ status.label }}
+        </option>
+      </select>
+
+      <select class="filter-select" [(ngModel)]="selectedPaymentMethod" (change)="filterOrders()">
+        <option value="">طريقة الدفع</option>
+        <option *ngFor="let method of paymentMethodOptions" [value]="method.value">
+          {{ method.label }}
+        </option>
+      </select>
+    </div>
+  </section>
+
+  <!-- Stats Cards -->
+  <section class="stats-section">
+    <div class="stat-card">
+      <div class="stat-card__icon stat-card__icon--primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="9" cy="21" r="1"/>
+          <circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+      </div>
+      <div class="stat-card__content">
+        <h3 class="stat-card__value">{{ orders.length }}</h3>
+        <p class="stat-card__label">إجمالي الطلبات</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card__icon stat-card__icon--warning">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div class="stat-card__content">
+        <h3 class="stat-card__value">{{ getOrdersByStatus('pending').length }}</h3>
+        <p class="stat-card__label">قيد الانتظار</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card__icon stat-card__icon--success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <div class="stat-card__content">
+        <h3 class="stat-card__value">{{ getOrdersByStatus('delivered').length }}</h3>
+        <p class="stat-card__label">تم التسليم</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card__icon stat-card__icon--info">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+      </div>
+      <div class="stat-card__content">
+        <h3 class="stat-card__value">{{ getOrdersByPaymentStatus('paid').length }}</h3>
+        <p class="stat-card__label">مدفوع</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>جاري التحميل...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error && !isLoading">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <p>{{ error }}</p>
+    <button class="btn btn--secondary" (click)="loadOrders()">إعادة المحاولة</button>
+  </div>
+
+  <!-- Orders Table -->
+  <section class="orders-table-section" *ngIf="!isLoading && !error">
+    <div class="orders-table">
+      <!-- Table Header -->
+      <div class="orders-table__header">
+        <div class="orders-table__cell orders-table__cell--checkbox">
+          <input
+            type="checkbox"
+            class="checkbox"
+            [checked]="allSelected"
+            (change)="toggleSelectAll()"
+          >
+        </div>
+        <div class="orders-table__cell">رقم الطلب</div>
+        <div class="orders-table__cell">العميل</div>
+        <div class="orders-table__cell">الهاتف</div>
+        <div class="orders-table__cell">المبلغ</div>
+        <div class="orders-table__cell">حالة الطلب</div>
+        <div class="orders-table__cell">حالة الدفع</div>
+        <div class="orders-table__cell">التاريخ</div>
+        <div class="orders-table__cell orders-table__cell--actions">إجراءات</div>
+      </div>
+
+      <!-- Table Body -->
+      <div class="orders-table__body" *ngIf="filteredOrders.length > 0">
+        <div class="orders-table__row" *ngFor="let order of filteredOrders">
+          <div class="orders-table__cell orders-table__cell--checkbox">
+            <input
+              type="checkbox"
+              class="checkbox"
+              [(ngModel)]="order.selected"
+              (change)="updateSelectAll()"
+            >
+          </div>
+
+          <div class="orders-table__cell">
+            <div class="order-number">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+              <span>{{ order.orderNumber }}</span>
+            </div>
+          </div>
+
+          <div class="orders-table__cell">
+            <div class="customer-info">
+              <div class="customer-info__avatar">
+                {{ (order.name || 'مستخدم').charAt(0) }}
+              </div>
+              <span>{{ order.name || 'مستخدم' }}</span>
+            </div>
+          </div>
+
+          <div class="orders-table__cell">
+            <span class="phone-text">{{ order.phone }}</span>
+          </div>
+
+          <div class="orders-table__cell">
+            <span class="amount-text">{{ getTotalAmount(order) }} ج.م</span>
+          </div>
+
+          <div class="orders-table__cell">
+            <span class="status-badge" [class]="'status-badge--' + getStatusColor(order.status)">
+              {{ getStatusLabel(order.status) }}
+            </span>
+          </div>
+
+          <div class="orders-table__cell">
+            <span class="status-badge" [class]="'status-badge--' + getPaymentStatusColor(order.paymentStatus)">
+              {{ getPaymentStatusLabel(order.paymentStatus) }}
+            </span>
+          </div>
+
+          <div class="orders-table__cell">
+            <span class="date-text">{{ order.createdAt }}</span>
+          </div>
+
+          <div class="orders-table__cell orders-table__cell--actions">
+            <div class="action-buttons">
+              <button
+                class="action-btn action-btn--view"
+                (click)="openViewModal(order)"
+                [title]="'عرض التفاصيل'"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+
+              <button
+                class="action-btn action-btn--edit"
+                (click)="openEditOrderModal(order)"
+                [title]="'تعديل'"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+
+              <button
+                class="action-btn action-btn--delete"
+                (click)="confirmDeleteOrder(order)"
+                [title]="'حذف'"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredOrders.length === 0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="9" cy="21" r="1"/>
+          <circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        <h3>لا يوجد طلبات</h3>
+        <p>{{ searchTerm ? 'لم يتم العثور على نتائج' : 'لا توجد طلبات بعد' }}</p>
+      </div>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class="bulk-actions" *ngIf="selectedCount > 0">
+      <span class="bulk-actions__count">تم تحديد {{ selectedCount }} طلب</span>
+      <button class="btn btn--danger-outline" (click)="confirmBulkDelete()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+        حذف المحددين
+      </button>
+    </div>
+  </section>
+
+  <!-- View Order Modal -->
+  <div class="modal-overlay" *ngIf="showViewModal" (click)="closeViewModal()">
+    <div class="modal modal--large" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2>تفاصيل الطلب - {{ selectedOrder?.orderNumber }}</h2>
+        <button class="modal__close" (click)="closeViewModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal__body" *ngIf="selectedOrder">
+        <!-- Customer Info -->
+        <div class="order-details-section">
+          <h3 class="section-title">معلومات العميل</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>الاسم:</label>
+              <span>{{ selectedOrder.name }}</span>
+            </div>
+            <div class="info-item">
+              <label>الهاتف:</label>
+              <span>{{ selectedOrder.phone }}</span>
+            </div>
+            <div class="info-item" *ngIf="selectedOrder.email">
+              <label>البريد الإلكتروني:</label>
+              <span>{{ selectedOrder.email }}</span>
+            </div>
+            <div class="info-item">
+              <label>العنوان:</label>
+              <span>{{ selectedOrder.address }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Info -->
+        <div class="order-details-section">
+          <h3 class="section-title">معلومات الطلب</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>حالة الطلب:</label>
+              <span class="status-badge" [class]="'status-badge--' + getStatusColor(selectedOrder.status)">
+                {{ getStatusLabel(selectedOrder.status) }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>حالة الدفع:</label>
+              <span class="status-badge" [class]="'status-badge--' + getPaymentStatusColor(selectedOrder.paymentStatus)">
+                {{ getPaymentStatusLabel(selectedOrder.paymentStatus) }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>طريقة الدفع:</label>
+              <span>{{ getPaymentMethodLabel(selectedOrder.paymentMethod) }}</span>
+            </div>
+            <div class="info-item">
+              <label>التاريخ:</label>
+              <span>{{ selectedOrder.createdAt }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="order-details-section" *ngIf="selectedOrder.items && selectedOrder.items.length > 0">
+          <h3 class="section-title">المنتجات ({{ getItemsCount(selectedOrder) }})</h3>
+          <div class="items-list">
+            <div class="item-card" *ngFor="let item of selectedOrder.items">
+              <div class="item-card__image" *ngIf="item.image">
+                <img [src]="item.image" [alt]="item.name">
+              </div>
+              <div class="item-card__image item-card__image--placeholder" *ngIf="!item.image">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+              </div>
+              <div class="item-card__content">
+                <h4>{{ item.name }}</h4>
+                <p class="item-card__type">{{ item.productType }}</p>
+                <div class="item-card__details">
+                  <span class="item-card__quantity">الكمية: {{ item.quantity }}</span>
+                  <span class="item-card__price">{{ item.price }} ج.م</span>
+                </div>
+              </div>
+              <div class="item-card__total">
+                {{ item.price * item.quantity }} ج.م
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="order-details-section" *ngIf="selectedOrder.notes">
+          <h3 class="section-title">ملاحظات</h3>
+          <p class="notes-text">{{ selectedOrder.notes }}</p>
+        </div>
+
+        <!-- Total -->
+        <div class="order-total">
+          <div class="order-total__label">الإجمالي</div>
+          <div class="order-total__amount">{{ getTotalAmount(selectedOrder) }} ج.م</div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <div class="quick-actions__group">
+            <label>تحديث حالة الطلب:</label>
+            <div class="quick-actions__buttons">
+              <button
+                *ngFor="let status of statusOptions"
+                class="quick-action-btn"
+                [class.active]="selectedOrder.status === status.value"
+                (click)="updateOrderStatus(selectedOrder, status.value)"
+              >
+                {{ status.label }}
+              </button>
+            </div>
+          </div>
+
+          <div class="quick-actions__group">
+            <label>تحديث حالة الدفع:</label>
+            <div class="quick-actions__buttons">
+              <button
+                *ngFor="let status of paymentStatusOptions"
+                class="quick-action-btn"
+                [class.active]="selectedOrder.paymentStatus === status.value"
+                (click)="updatePaymentStatus(selectedOrder, status.value)"
+              >
+                {{ status.label }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Order Modal -->
+  <div class="modal-overlay" *ngIf="showOrderModal" (click)="closeOrderModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2>{{ isEditMode ? 'تعديل الطلب' : 'إضافة طلب جديد' }}</h2>
+        <button class="modal__close" (click)="closeOrderModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <form class="modal__body" (ngSubmit)="saveOrder()">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">اسم العميل *</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="orderForm.name"
+              name="name"
+              placeholder="أدخل اسم العميل"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">رقم الهاتف *</label>
+            <input
+              type="tel"
+              class="form-input"
+              [(ngModel)]="orderForm.phone"
+              name="phone"
+              placeholder="01XXXXXXXXX"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">البريد الإلكتروني</label>
+          <input
+            type="email"
+            class="form-input"
+            [(ngModel)]="orderForm.email"
+            name="email"
+            placeholder="example@domain.com"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">العنوان *</label>
+          <textarea
+            class="form-textarea"
+            [(ngModel)]="orderForm.address"
+            name="address"
+            placeholder="أدخل العنوان بالتفصيل"
+            rows="3"
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">طريقة الدفع *</label>
+            <select class="form-select" [(ngModel)]="orderForm.paymentMethod" name="paymentMethod" required>
+              <option *ngFor="let method of paymentMethodOptions" [value]="method.value">
+                {{ method.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group" *ngIf="isEditMode">
+            <label class="form-label">حالة الطلب</label>
+            <select class="form-select" [(ngModel)]="orderForm.status" name="status">
+              <option *ngFor="let status of statusOptions" [value]="status.value">
+                {{ status.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="isEditMode">
+          <label class="form-label">حالة الدفع</label>
+          <select class="form-select" [(ngModel)]="orderForm.paymentStatus" name="paymentStatus">
+            <option *ngFor="let status of paymentStatusOptions" [value]="status.value">
+              {{ status.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">ملاحظات</label>
+          <textarea
+            class="form-textarea"
+            [(ngModel)]="orderForm.notes"
+            name="notes"
+            placeholder="أي ملاحظات إضافية..."
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn--secondary" (click)="closeOrderModal()">
+            إلغاء
+          </button>
+          <button type="submit" class="btn btn--primary" [disabled]="isSaving">
+            <span *ngIf="!isSaving">{{ isEditMode ? 'حفظ التغييرات' : 'إضافة الطلب' }}</span>
+            <span *ngIf="isSaving">جاري الحفظ...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+    <div class="modal modal--small" (click)="$event.stopPropagation()">
+      <div class="modal__header modal__header--danger">
+        <h2>تأكيد الحذف</h2>
+        <button class="modal__close" (click)="closeDeleteModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <div class="delete-warning">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p>
+            هل أنت متأكد من حذف
+            <strong>{{ ordersToDelete.length === 1 ? ('الطلب ' + selectedOrder?.orderNumber) : ordersToDelete.length + ' طلبات' }}</strong>؟
+          </p>
+          <p class="warning-text">هذا الإجراء لا يمكن التراجع عنه!</p>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn--secondary" (click)="closeDeleteModal()">
+            إلغاء
+          </button>
+          <button type="button" class="btn btn--danger" (click)="deleteOrders()" [disabled]="isDeleting">
+            <span *ngIf="!isDeleting">نعم، احذف</span>
+            <span *ngIf="isDeleting">جاري الحذف...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" [class.toast--show]="showToast" [class]="'toast--' + toastType">
+    <svg *ngIf="toastType === 'success'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+      <polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+    <svg *ngIf="toastType === 'error'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="15" y1="9" x2="9" y2="15"/>
+      <line x1="9" y1="9" x2="15" y2="15"/>
+    </svg>
+    <span>{{ toastMessage }}</span>
+  </div>
+</div>

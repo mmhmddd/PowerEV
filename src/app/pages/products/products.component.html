@@ -8,19 +8,25 @@
 
   <!-- Main Content -->
   <div *ngIf="!isLoading">
-    <!-- Header with Search and Sort -->
-    <div class="products-header">
-      <div class="header-top">
-        <h1 class="products-title">
-          <i class="bi bi-bag-check"></i>
-          <span>منتجاتنا</span>
-        </h1>
-        <div class="header-badge">
-          <i class="bi bi-box-seam"></i>
-          <span>{{ products.length }} منتج</span>
+    <!-- Hero Banner Section -->
+    <div class="hero-banner">
+      <div class="banner-overlay"></div>
+      <div class="banner-content">
+        <div class="banner-icon">
+          <i class="bi bi-lightning-charge-fill"></i>
         </div>
+        <h1 class="banner-title">اكتشف منتجاتنا الكهربائية</h1>
+        <p class="banner-subtitle">جودة عالية، أسعار منافسة، وخدمة متميزة</p>
       </div>
+      <div class="banner-decoration">
+        <div class="decoration-circle circle-1"></div>
+        <div class="decoration-circle circle-2"></div>
+        <div class="decoration-circle circle-3"></div>
+      </div>
+    </div>
 
+    <!-- Search and Controls Section -->
+    <div class="controls-section">
       <div class="header-controls">
         <!-- Search Bar -->
         <div class="search-container">
@@ -209,8 +215,8 @@
 
       <!-- Products Grid -->
       <div class="products-main">
-        <!-- Results Count (Desktop Only) -->
-        <div class="results-header desktop-only">
+        <!-- Results Count -->
+        <div class="results-header">
           <p class="results-count">
             <i class="bi bi-box-seam"></i>
             <span class="count-number">{{ products.length }}</span>
@@ -220,22 +226,33 @@
 
         <div class="products-grid">
           <!-- Product Card -->
-          <div *ngFor="let product of products" class="product-card" (click)="viewProductDetails(product)">
+          <div *ngFor="let product of products" class="product-card">
             <!-- Image Container -->
-            <div class="product-image-container">
-              <img
-                [src]="product.images[0]?.url"
-                [alt]="product.images[0]?.alt"
-                class="product-image"
-                loading="lazy"
-              />
+            <div
+              class="product-image-container"
+              (mouseenter)="startImageSlider(product.id)"
+              (mouseleave)="stopImageSlider(product.id)"
+              (touchstart)="onTouchStart($event, product.id)"
+              (touchmove)="onTouchMove($event, product.id)"
+              (touchend)="onTouchEnd(product.id)"
+            >
+              <!-- Image Slider -->
+              <div class="image-slider">
+                <img
+                  [src]="getCurrentImage(product).url"
+                  [alt]="getCurrentImage(product).alt"
+                  class="product-image"
+                  loading="lazy"
+                />
+              </div>
 
               <div class="offer-badge" *ngIf="product.offer?.enabled">
                 <i class="bi bi-tag-fill"></i>
                 -{{ product.offer?.discountPercentage }}%
               </div>
 
-              <div class="image-overlay">
+              <!-- Desktop Hover Overlay -->
+              <div class="image-overlay desktop-only">
                 <button
                   class="action-btn add-to-cart-btn"
                   title="إضافة إلى السلة"
@@ -255,15 +272,20 @@
                 </button>
               </div>
 
-              <!-- Image Counter -->
-              <div class="image-counter" *ngIf="product.images.length > 1">
-                <i class="bi bi-images"></i>
-                <span>{{ product.images.length }}</span>
+              <!-- Image Counter & Dots -->
+              <div class="image-navigation" *ngIf="product.images.length > 1">
+                <div class="image-dots">
+                  <span
+                    *ngFor="let img of product.images; let i = index"
+                    class="dot"
+                    [class.active]="i === getCurrentImageIndex(product.id)"
+                  ></span>
+                </div>
               </div>
             </div>
 
             <!-- Product Info -->
-            <div class="product-info">
+            <div class="product-info" (click)="viewProductDetails(product)">
               <span class="product-category">
                 <i class="bi bi-bookmark"></i>
                 {{ product.category }}
@@ -286,6 +308,26 @@
                   {{ product.inStock ? 'متوفر' : 'غير متوفر' }}
                 </span>
               </div>
+            </div>
+
+            <!-- Mobile Action Buttons -->
+            <div class="mobile-actions">
+              <button
+                class="mobile-action-btn cart-btn"
+                (click)="addToCart($event, product)"
+                [disabled]="!product.inStock || isAddingToCart(product.id)"
+              >
+                <i class="bi bi-cart-plus" *ngIf="!isAddingToCart(product.id)"></i>
+                <i class="bi bi-hourglass-split" *ngIf="isAddingToCart(product.id)"></i>
+                <span>{{ isAddingToCart(product.id) ? 'جاري الإضافة...' : 'أضف للسلة' }}</span>
+              </button>
+              <button
+                class="mobile-action-btn view-btn"
+                (click)="viewProductDetails(product)"
+              >
+                <i class="bi bi-eye"></i>
+                <span>عرض التفاصيل</span>
+              </button>
             </div>
           </div>
         </div>

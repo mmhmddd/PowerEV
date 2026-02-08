@@ -17,6 +17,29 @@
       <p>جاري إنشاء الطلب...</p>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div *ngIf="confirmationModal.show" class="modal-overlay" (click)="closeConfirmation()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3 class="modal-title">{{ confirmationModal.title }}</h3>
+          <button class="modal-close" (click)="closeConfirmation()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-message">{{ confirmationModal.message }}</p>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn modal-btn-cancel" (click)="closeConfirmation()">
+            {{ confirmationModal.cancelText }}
+          </button>
+          <button class="modal-btn modal-btn-confirm" (click)="confirmAction()">
+            {{ confirmationModal.confirmText }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="checkout-grid">
       <!-- Shipping Form Section -->
       <div class="shipping-section">
@@ -124,6 +147,37 @@
                 [disabled]="isSubmitting"></textarea>
             </div>
 
+            <!-- Payment Method Selection -->
+            <div class="form-group">
+              <label class="form-label">
+                <i class="bi bi-credit-card"></i>
+                طريقة الدفع *
+              </label>
+              <div class="payment-methods">
+                <div
+                  *ngFor="let method of paymentMethods"
+                  class="payment-method"
+                  [class.selected]="shippingData.paymentMethod === method.value"
+                  (click)="selectPaymentMethod(method.value)">
+                  <div class="payment-method-header">
+                    <i [class]="method.icon"></i>
+                    <span class="payment-method-label">{{ method.label }}</span>
+                    <div class="payment-radio">
+                      <input
+                        type="radio"
+                        [id]="method.value"
+                        name="paymentMethod"
+                        [value]="method.value"
+                        [(ngModel)]="shippingData.paymentMethod"
+                        [disabled]="isSubmitting">
+                      <span class="radio-checkmark"></span>
+                    </div>
+                  </div>
+                  <p class="payment-method-description">{{ method.description }}</p>
+                </div>
+              </div>
+            </div>
+
             <!-- Submit Button -->
             <button
               type="submit"
@@ -142,7 +196,9 @@
             <!-- Payment Info -->
             <div class="payment-info">
               <i class="bi bi-info-circle"></i>
-              <p>سيتم الدفع عند الاستلام</p>
+              <p *ngIf="shippingData.paymentMethod === 'cash'">سيتم الدفع عند الاستلام</p>
+              <p *ngIf="shippingData.paymentMethod === 'instapay'">سيتم التواصل معك لإكمال الدفع عبر إنستاباي</p>
+              <p *ngIf="shippingData.paymentMethod === 'vodafonecash'">سيتم التواصل معك لإكمال الدفع عبر فودافون كاش</p>
             </div>
           </form>
         </div>
@@ -196,8 +252,8 @@
             </div>
 
             <div class="payment-note">
-              <i class="bi bi-cash-coin"></i>
-              <p>الدفع عند الاستلام متاح لجميع المحافظات</p>
+              <i class="bi bi-shield-check"></i>
+              <p>جميع طرق الدفع آمنة ومضمونة</p>
             </div>
           </div>
         </div>

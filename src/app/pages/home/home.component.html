@@ -174,11 +174,11 @@
       <div class="products-grid" [@listAnimation]="products.length">
 
         <!-- Product Card -->
-        <a
+        <div
           *ngFor="let product of products; trackBy: trackByProductId"
-          [routerLink]="product.link"
           class="product-card"
           [attr.aria-label]="product.ariaLabel"
+          (click)="navigateToCategory(product.categoryId)"
         >
           <!-- Product Image Container -->
           <div class="product-image-wrapper">
@@ -225,7 +225,7 @@
 
           <!-- Hover Effect Overlay -->
           <div class="hover-glow"></div>
-        </a>
+        </div>
 
       </div>
 

@@ -19,12 +19,13 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
-// ============= USER & AUTH TYPES =============
 export interface User {
   _id: string;
-  username: string;
+  name: string;
+  username?: string;
   email: string;
   role: 'admin' | 'employee' | 'customer';
+  isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -39,7 +40,13 @@ export interface AuthResponse {
 export interface UserResponse {
   success: boolean;
   message?: string;
+  data?: User | User[];
   user?: User;
+  users?: User[];
+}
+
+export interface UserWithSelection extends User {
+  selected?: boolean;
 }
 
 // ============= ADAPTER =============
@@ -333,36 +340,39 @@ export type CartResponse = ApiResponse<Cart>;
 export interface OrderItem {
   productId: string;
   productType: string;
-  quantity: number;
-  price: number;
   name: string;
-}
-
-export interface ShippingAddress {
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
+  price: number;
+  quantity: number;
+  image?: string;
 }
 
 export interface Order {
   _id: string;
   orderNumber: string;
   userId?: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
+  name: string;
+  phone: string;
+  email?: string;
+  address: string;
   items: OrderItem[];
-  totalPrice: number;
-  shippingAddress: ShippingAddress;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  paymentMethod: 'cash' | 'card' | 'online';
+  totalAmount: number;
+  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  paymentMethod: 'cash' | 'instapay' | 'vodafonecash';
   paymentStatus: 'pending' | 'paid' | 'failed';
   notes?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type OrdersResponse = ApiResponse<Order[]>;
-export type OrderResponse = ApiResponse<Order>;
+export interface OrderResponse {
+  success: boolean;
+  message?: string;
+  data: Order;
+}
+
+export interface OrdersResponse {
+  success: boolean;
+  message?: string;
+  count?: number;
+  data: Order[];
+}

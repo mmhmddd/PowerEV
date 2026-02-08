@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiEndpoints } from '../constants/api-endpoints';
-import { User, UsersResponse, UserResponse, ApiResponse } from '../models/product.models';
+import { User, UserResponse, ApiResponse } from '../models/product.models';
 
 export interface CreateUserRequest {
   name: string;
@@ -33,8 +33,8 @@ export class UserService {
    * Returns users without password field
    * @returns Observable of users response
    */
-  getAllUsers(): Observable<UsersResponse> {
-    return this.http.get<UsersResponse>(ApiEndpoints.users.getAll);
+  getAllUsers(): Observable<UserResponse> {
+    return this.http.get<UserResponse>(ApiEndpoints.users.getAll);
   }
 
   /**

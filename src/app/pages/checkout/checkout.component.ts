@@ -7,7 +7,10 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CartService } from '../../core/services/cart.service';
 import { OrderService } from '../../core/services/order.service';
+import { ToastService } from '../../core/services/toast.service';
 import { Cart, CartItem } from '../../core/models/product.models';
+
+type PaymentMethodType = 'cash' | 'instapay' | 'vodafonecash';
 
 interface ShippingForm {
   name: string;
@@ -16,6 +19,23 @@ interface ShippingForm {
   address: string;
   governorate: string;
   notes: string;
+  paymentMethod: PaymentMethodType;
+}
+
+interface PaymentMethod {
+  value: PaymentMethodType;
+  label: string;
+  icon: string;
+  description: string;
+}
+
+interface ConfirmationModal {
+  show: boolean;
+  title: string;
+  message: string;
+  confirmText: string;
+  cancelText: string;
+  onConfirm: () => void;
 }
 
 @Component({
@@ -37,7 +57,17 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     email: '',
     address: '',
     governorate: 'القاهرة',
-    notes: ''
+    notes: '',
+    paymentMethod: 'cash'
+  };
+
+  confirmationModal: ConfirmationModal = {
+    show: false,
+    title: '',
+    message: '',
+    confirmText: 'تأكيد',
+    cancelText: 'إلغاء',
+    onConfirm: () => {}
   };
 
   governorates: string[] = [
@@ -70,9 +100,31 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     'مطروح'
   ];
 
+  paymentMethods: PaymentMethod[] = [
+    {
+      value: 'cash',
+      label: 'الدفع عند الاستلام',
+      icon: 'bi-cash-coin',
+      description: 'ادفع نقداً عند استلام طلبك'
+    },
+    {
+      value: 'instapay',
+      label: 'إنستاباي',
+      icon: 'bi-phone',
+      description: 'الدفع عبر إنستاباي'
+    },
+    {
+      value: 'vodafonecash',
+      label: 'فودافون كاش',
+      icon: 'bi-wallet2',
+      description: 'الدفع عبر فودافون كاش'
+    }
+  ];
+
   constructor(
     private cartService: CartService,
     private orderService: OrderService,
+    private toastService: ToastService,
     private router: Router
   ) {}
 
@@ -86,12 +138,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
           // Redirect to cart if empty
           if (!cart || cart.items.length === 0) {
-            alert('السلة فارغة. الرجاء إضافة منتجات أولاً.');
+            this.toastService.warning('الرجاء إضافة منتجات أولاً', 'السلة فارغة');
             this.router.navigate(['/cart']);
           }
         },
         error: (error) => {
           console.error('Error loading cart:', error);
+          this.toastService.error('حدث خطأ أثناء تحميل السلة');
         }
       });
 
@@ -112,19 +165,75 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Select payment method
+   */
+  selectPaymentMethod(method: PaymentMethodType): void {
+    this.shippingData.paymentMethod = method;
+  }
+
+  /**
+   * Get payment method label
+   */
+  getPaymentMethodLabel(): string {
+    const method = this.paymentMethods.find(m => m.value === this.shippingData.paymentMethod);
+    return method ? method.label : 'اختر طريقة الدفع';
+  }
+
+  /**
+   * Show confirmation modal
+   */
+  private showConfirmation(title: string, message: string, onConfirm: () => void): void {
+    this.confirmationModal = {
+      show: true,
+      title,
+      message,
+      confirmText: 'تأكيد',
+      cancelText: 'إلغاء',
+      onConfirm
+    };
+  }
+
+  /**
+   * Close confirmation modal
+   */
+  closeConfirmation(): void {
+    this.confirmationModal.show = false;
+  }
+
+  /**
+   * Confirm action in modal
+   */
+  confirmAction(): void {
+    this.confirmationModal.onConfirm();
+    this.closeConfirmation();
+  }
+
+  /**
    * Submit order
    */
   onSubmit(): void {
     // Validate form
-    if (!this.validateForm()) {
+    const validationError = this.validateForm();
+    if (validationError) {
+      this.toastService.error(validationError, 'خطأ في البيانات');
       return;
     }
 
     // Confirm order
-    if (!confirm('هل أنت متأكد من إتمام الطلب؟')) {
-      return;
-    }
+    const paymentMethodLabel = this.getPaymentMethodLabel();
+    const confirmMessage = `طريقة الدفع: ${paymentMethodLabel}\nالإجمالي: ${this.totalAmount} ج.م`;
 
+    this.showConfirmation(
+      'تأكيد الطلب',
+      confirmMessage,
+      () => this.submitOrder()
+    );
+  }
+
+  /**
+   * Submit order after confirmation
+   */
+  private submitOrder(): void {
     this.isSubmitting = true;
 
     // Create order from cart
@@ -136,7 +245,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         address: `${this.shippingData.address}, ${this.shippingData.governorate}`,
         notes: this.shippingData.notes || undefined
       },
-      this.cartService.getSessionId()
+      this.cartService.getSessionId(),
+      this.shippingData.paymentMethod
     ).subscribe({
       next: (response) => {
         this.isSubmitting = false;
@@ -144,16 +254,26 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         if (response.success && response.data) {
           console.log('Order created successfully:', response.data);
 
-          // Show success message
-          alert(`تم إنشاء طلبك بنجاح!\nرقم الطلب: ${response.data.orderNumber}\nسيتم التواصل معك قريباً.`);
+          // Build success message based on payment method
+          let successMessage = `رقم الطلب: ${response.data.orderNumber}`;
 
-          // Navigate to order confirmation or home
-          this.router.navigate(['/']);
+          if (this.shippingData.paymentMethod === 'cash') {
+            successMessage += ' - سيتم التواصل معك قريباً';
+          } else {
+            successMessage += ' - سيتم التواصل معك لإكمال عملية الدفع';
+          }
+
+          this.toastService.success(successMessage, 'تم إنشاء الطلب بنجاح!', 5000);
+
+          // Navigate to home
+          setTimeout(() => {
+            this.router.navigate(['/']);
+          }, 1500);
 
           // Clear form
           this.resetForm();
         } else {
-          alert('حدث خطأ أثناء إنشاء الطلب. الرجاء المحاولة مرة أخرى.');
+          this.toastService.error('حدث خطأ أثناء إنشاء الطلب. الرجاء المحاولة مرة أخرى', 'فشل إنشاء الطلب');
         }
       },
       error: (error) => {
@@ -161,8 +281,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.isSubmitting = false;
 
         // Show error message
-        const errorMessage = error.error?.message || 'حدث خطأ أثناء إنشاء الطلب. الرجاء المحاولة مرة أخرى.';
-        alert(errorMessage);
+        const errorMessage = error.error?.message || 'حدث خطأ أثناء إنشاء الطلب. الرجاء المحاولة مرة أخرى';
+        this.toastService.error(errorMessage);
       }
     });
   }
@@ -170,44 +290,42 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   /**
    * Validate form data
    */
-  private validateForm(): boolean {
+  private validateForm(): string | null {
     if (!this.shippingData.name.trim()) {
-      alert('الرجاء إدخال الاسم');
-      return false;
+      return 'الرجاء إدخال الاسم';
     }
 
     if (!this.shippingData.phone.trim()) {
-      alert('الرجاء إدخال رقم الهاتف');
-      return false;
+      return 'الرجاء إدخال رقم الهاتف';
     }
 
     // Validate Egyptian phone number format
     const phoneRegex = /^(01)[0-9]{9}$/;
     if (!phoneRegex.test(this.shippingData.phone.replace(/[\s\-]/g, ''))) {
-      alert('الرجاء إدخال رقم هاتف صحيح (يبدأ بـ 01 ويتكون من 11 رقم)');
-      return false;
+      return 'الرجاء إدخال رقم هاتف صحيح (يبدأ بـ 01 ويتكون من 11 رقم)';
     }
 
     if (!this.shippingData.address.trim()) {
-      alert('الرجاء إدخال العنوان');
-      return false;
+      return 'الرجاء إدخال العنوان';
     }
 
     if (!this.shippingData.governorate) {
-      alert('الرجاء اختيار المحافظة');
-      return false;
+      return 'الرجاء اختيار المحافظة';
+    }
+
+    if (!this.shippingData.paymentMethod) {
+      return 'الرجاء اختيار طريقة الدفع';
     }
 
     // Validate email if provided
     if (this.shippingData.email.trim()) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.shippingData.email)) {
-        alert('الرجاء إدخال بريد إلكتروني صحيح');
-        return false;
+        return 'الرجاء إدخال بريد إلكتروني صحيح';
       }
     }
 
-    return true;
+    return null;
   }
 
   /**
@@ -220,7 +338,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       email: '',
       address: '',
       governorate: 'القاهرة',
-      notes: ''
+      notes: '',
+      paymentMethod: 'cash'
     };
   }
 
