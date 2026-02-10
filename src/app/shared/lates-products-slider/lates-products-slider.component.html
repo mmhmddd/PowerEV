@@ -24,7 +24,7 @@
         <button
           class="nav-button nav-button-prev"
           (click)="prevSlide()"
-          [disabled]="isTransitioning()"
+          [disabled]="isTransitioning() || isLoading()"
           aria-label="المنتجات السابقة"
           type="button"
         >
@@ -48,7 +48,7 @@
         <button
           class="nav-button nav-button-next"
           (click)="nextSlide()"
-          [disabled]="isTransitioning()"
+          [disabled]="isTransitioning() || isLoading()"
           aria-label="المنتجات التالية"
           type="button"
         >
@@ -71,8 +71,39 @@
       </div>
     </div>
 
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">جاري تحميل المنتجات...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading() && products.length === 0" class="empty-state">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="64"
+        height="64"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="empty-icon"
+      >
+        <circle cx="8" cy="21" r="1"></circle>
+        <circle cx="19" cy="21" r="1"></circle>
+        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+      </svg>
+      <p class="empty-text">لا توجد منتجات متاحة حالياً</p>
+      <button class="retry-button" (click)="refreshProducts()">
+        إعادة المحاولة
+      </button>
+    </div>
+
     <!-- Products Scroll Container -->
     <div
+      *ngIf="!isLoading() && products.length > 0"
       class="products-scroll-container"
       role="region"
       aria-label="أحدث المنتجات"

@@ -36,9 +36,9 @@ $sidebar-width:  280px;
 $sidebar-collapsed: 80px;
 
 // ══════════════════════════════════════════════════════════
-// Box Control Container
+// Wire Control Container
 // ══════════════════════════════════════════════════════════
-.box-control {
+.wire-control {
   padding: 2rem;
   font-family: $font-arabic;
   direction: rtl;
@@ -295,19 +295,19 @@ $sidebar-collapsed: 80px;
 }
 
 // ══════════════════════════════════════════════════════════
-// Boxes Table Section
+// Wires Table Section
 // ══════════════════════════════════════════════════════════
-.boxes-table-section {
+.wires-table-section {
   background: $bg-card;
   border-radius: 16px;
   border: 1px solid $border-color;
   overflow: hidden;
 }
 
-.boxes-table {
+.wires-table {
   &__header {
     display: grid;
-    grid-template-columns: 50px 2fr 1fr 1fr 1.2fr 0.8fr 0.8fr 1fr 120px;
+    grid-template-columns: 50px 2fr 1fr 1fr 1.2fr 0.8fr 0.8fr 0.8fr 120px;
     gap: 1rem;
     padding: 1.25rem 1.5rem;
     background: $bg-body;
@@ -324,7 +324,7 @@ $sidebar-collapsed: 80px;
 
   &__row {
     display: grid;
-    grid-template-columns: 50px 2fr 1fr 1fr 1.2fr 0.8fr 0.8fr 1fr 120px;
+    grid-template-columns: 50px 2fr 1fr 1fr 1.2fr 0.8fr 0.8fr 0.8fr 120px;
     gap: 1rem;
     padding: 1.25rem 1.5rem;
     border-bottom: 1px solid $border-color;
@@ -484,7 +484,7 @@ $sidebar-collapsed: 80px;
 }
 
 // ══════════════════════════════════════════════════════════
-// Stock Badge
+// Stock Badge (In Stock / Low Stock / Out of Stock)
 // ══════════════════════════════════════════════════════════
 .stock-badge {
   display: inline-flex;
@@ -655,7 +655,7 @@ $sidebar-collapsed: 80px;
   }
 
   &--large {
-    max-width: 700px;
+    max-width: 800px;
   }
 
   &__header {
@@ -709,16 +709,6 @@ $sidebar-collapsed: 80px;
 
   &__body {
     padding: 1.5rem;
-  }
-
-  &__description {
-    color: $text-secondary;
-    margin: 0 0 1.5rem;
-    line-height: 1.6;
-
-    strong {
-      color: $text-primary;
-    }
   }
 }
 
@@ -796,10 +786,9 @@ $sidebar-collapsed: 80px;
 // Offer Section
 // ══════════════════════════════════════════════════════════
 .offer-section {
-  background: rgba($status-info, 0.05);
-  border: 1px solid rgba($status-info, 0.2);
+  background: $bg-body;
+  padding: 1.25rem;
   border-radius: 12px;
-  padding: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
@@ -1110,16 +1099,16 @@ $sidebar-collapsed: 80px;
 }
 
 // ══════════════════════════════════════════════════════════
-// Responsive Design - FIXED FOR SMALL SCREENS
+// Responsive Design
 // ══════════════════════════════════════════════════════════
 @media (max-width: 1400px) {
-  .boxes-table {
+  .wires-table {
     &__header,
     &__row {
       grid-template-columns: 50px 2fr 1fr 1.2fr 0.8fr 0.8fr 120px;
 
-      .boxes-table__cell:nth-child(4),
-      .boxes-table__cell:nth-child(8) {
+      .wires-table__cell:nth-child(4),
+      .wires-table__cell:nth-child(8) {
         display: none;
       }
     }
@@ -1127,14 +1116,14 @@ $sidebar-collapsed: 80px;
 }
 
 @media (max-width: 1200px) {
-  .boxes-table {
+  .wires-table {
     &__header,
     &__row {
-      grid-template-columns: 50px 2fr 1fr 1.2fr 0.8fr 120px;
+      grid-template-columns: 50px 2fr 1.2fr 0.8fr 0.8fr 120px;
 
-      .boxes-table__cell:nth-child(4),
-      .boxes-table__cell:nth-child(7),
-      .boxes-table__cell:nth-child(8) {
+      .wires-table__cell:nth-child(3),
+      .wires-table__cell:nth-child(4),
+      .wires-table__cell:nth-child(8) {
         display: none;
       }
     }
@@ -1142,23 +1131,23 @@ $sidebar-collapsed: 80px;
 }
 
 @media (max-width: 1024px) {
-  .box-control {
-    margin-right: 0; // Remove sidebar margin on tablet/mobile
+  .wire-control {
+    margin-right: 0;
     padding: 1.5rem;
   }
 }
 
 @media (max-width: 992px) {
-  .boxes-table {
+  .wires-table {
     &__header,
     &__row {
       grid-template-columns: 50px 2fr 1.2fr 100px;
 
-      .boxes-table__cell:nth-child(3),
-      .boxes-table__cell:nth-child(4),
-      .boxes-table__cell:nth-child(6),
-      .boxes-table__cell:nth-child(7),
-      .boxes-table__cell:nth-child(8) {
+      .wires-table__cell:nth-child(3),
+      .wires-table__cell:nth-child(4),
+      .wires-table__cell:nth-child(6),
+      .wires-table__cell:nth-child(7),
+      .wires-table__cell:nth-child(8) {
         display: none;
       }
     }
@@ -1166,7 +1155,7 @@ $sidebar-collapsed: 80px;
 }
 
 @media (max-width: 768px) {
-  .box-control {
+  .wire-control {
     padding: 1rem;
     margin-right: 0;
 
@@ -1214,7 +1203,7 @@ $sidebar-collapsed: 80px;
     grid-template-columns: 1fr;
   }
 
-  .boxes-table {
+  .wires-table {
     &__header {
       display: none;
     }
@@ -1225,7 +1214,7 @@ $sidebar-collapsed: 80px;
       padding: 1rem;
       position: relative;
 
-      .boxes-table__cell {
+      .wires-table__cell {
         display: block !important;
 
         &--checkbox {
@@ -1261,7 +1250,7 @@ $sidebar-collapsed: 80px;
 }
 
 @media (max-width: 480px) {
-  .box-control {
+  .wire-control {
     &__title {
       font-size: 1.25rem;
     }

@@ -1,0 +1,490 @@
+<app-sidebar></app-sidebar>
+
+<div class="wire-control">
+  <!-- Page Header -->
+  <header class="wire-control__header">
+    <div class="wire-control__header-left">
+      <h1 class="wire-control__title">الأسلاك</h1>
+      <p class="wire-control__subtitle">إدارة الأسلاك الكهربائية</p>
+    </div>
+    <div class="wire-control__header-right">
+      <button class="btn btn--primary" (click)="openAddWireModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        <span>إضافة سلك</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Search and Filter Section -->
+  <section class="wire-control__filters">
+    <div class="search-box">
+      <input
+        type="text"
+        class="search-box__input"
+        placeholder="بحث بالاسم أو الوصف..."
+        [(ngModel)]="searchTerm"
+        (input)="filterWires()"
+      >
+      <svg class="search-box__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+    </div>
+
+    <div class="filter-group">
+      <select class="filter-select" [(ngModel)]="selectedBrand" (change)="filterWires()">
+        <option value="">جميع الماركات</option>
+        <option *ngFor="let brand of brands" [value]="brand">{{ brand }}</option>
+      </select>
+
+      <select class="filter-select" [(ngModel)]="selectedType" (change)="filterWires()">
+        <option value="">جميع الأنواع</option>
+        <option *ngFor="let type of types" [value]="type">{{ type }}</option>
+      </select>
+
+      <select class="filter-select" [(ngModel)]="stockFilter" (change)="filterWires()">
+        <option *ngFor="let option of stockOptions" [value]="option.value">{{ option.label }}</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>جاري التحميل...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error && !isLoading">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <p>{{ error }}</p>
+    <button class="btn btn--secondary" (click)="loadWires()">إعادة المحاولة</button>
+  </div>
+
+  <!-- Wires Table -->
+  <section class="wires-table-section" *ngIf="!isLoading && !error">
+    <div class="wires-table">
+      <!-- Table Header -->
+      <div class="wires-table__header">
+        <div class="wires-table__cell wires-table__cell--checkbox">
+          <input
+            type="checkbox"
+            class="checkbox"
+            [checked]="allSelected"
+            (change)="toggleSelectAll()"
+          >
+        </div>
+        <div class="wires-table__cell">السلك</div>
+        <div class="wires-table__cell">النوع</div>
+        <div class="wires-table__cell">الطول</div>
+        <div class="wires-table__cell">السعر</div>
+        <div class="wires-table__cell">المخزون</div>
+        <div class="wires-table__cell">الحالة</div>
+        <div class="wires-table__cell">العرض</div>
+        <div class="wires-table__cell wires-table__cell--actions">إجراءات</div>
+      </div>
+
+      <!-- Table Body -->
+      <div class="wires-table__body" *ngIf="filteredWires.length > 0">
+        <div class="wires-table__row" *ngFor="let wire of filteredWires">
+          <div class="wires-table__cell wires-table__cell--checkbox">
+            <input
+              type="checkbox"
+              class="checkbox"
+              [(ngModel)]="wire.selected"
+              (change)="updateSelectAll()"
+            >
+          </div>
+
+          <div class="wires-table__cell">
+            <div class="product-info">
+              <div class="product-info__image" (click)="wire.images && wire.images.length > 0 && openImageViewer(0)">
+                <img
+                  *ngIf="wire.images && wire.images.length > 0"
+                  [src]="wire.images[0]"
+                  [alt]="wire.name"
+                >
+                <svg *ngIf="!wire.images || wire.images.length === 0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                </svg>
+              </div>
+              <div class="product-info__details">
+                <span class="product-info__name">{{ wire.name }}</span>
+                <span class="product-info__description" *ngIf="wire.brand || wire.type">
+                  {{ wire.brand || '' }} {{ wire.type ? '- ' + wire.type : '' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="wires-table__cell">
+            <span class="text-secondary">{{ wire.type || '-' }}</span>
+          </div>
+
+          <div class="wires-table__cell">
+            <span class="text-secondary" *ngIf="wire.length">{{ wire.length }} م</span>
+            <span class="text-secondary" *ngIf="!wire.length">-</span>
+          </div>
+
+          <div class="wires-table__cell">
+            <div class="price-container">
+              <span class="price-text" [class.price-text--discounted]="wire.offer?.enabled">
+                {{ formatPrice(wire.price) }}
+              </span>
+              <span class="price-text price-text--final" *ngIf="wire.offer?.enabled">
+                {{ formatPrice(calculateDiscountedPrice(wire.price, wire.offer)) }}
+              </span>
+            </div>
+          </div>
+
+          <div class="wires-table__cell">
+            <span class="text-secondary">{{ wire.stock }}</span>
+          </div>
+
+          <div class="wires-table__cell">
+            <span [ngClass]="getStockClass(wire.stock)">
+              {{ getStockStatus(wire.stock) }}
+            </span>
+          </div>
+
+          <div class="wires-table__cell">
+            <span class="offer-badge" *ngIf="wire.offer?.enabled">
+              {{ wire.offer?.discountPercentage }}% خصم
+            </span>
+            <span class="text-secondary" *ngIf="!wire.offer?.enabled">-</span>
+          </div>
+
+          <div class="wires-table__cell wires-table__cell--actions">
+            <div class="action-buttons">
+              <button
+                class="action-btn action-btn--edit"
+                (click)="openEditWireModal(wire)"
+                [title]="'تعديل'"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+
+              <button
+                class="action-btn action-btn--delete"
+                (click)="confirmDeleteWire(wire)"
+                [title]="'حذف'"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                  <line x1="10" y1="11" x2="10" y2="17"/>
+                  <line x1="14" y1="11" x2="14" y2="17"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredWires.length === 0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        </svg>
+        <h3>لا يوجد أسلاك</h3>
+        <p>{{ searchTerm ? 'لم يتم العثور على نتائج' : 'ابدأ بإضافة أسلاك جديدة' }}</p>
+      </div>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class="bulk-actions" *ngIf="selectedCount > 0">
+      <span class="bulk-actions__count">تم تحديد {{ selectedCount }} سلك</span>
+      <button class="btn btn--danger-outline" (click)="confirmBulkDelete()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+        حذف المحددين
+      </button>
+    </div>
+  </section>
+
+  <!-- Add/Edit Wire Modal -->
+  <div class="modal-overlay" *ngIf="showWireModal" (click)="closeWireModal()">
+    <div class="modal modal--large" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2>{{ isEditMode ? 'تعديل السلك' : 'إضافة سلك جديد' }}</h2>
+        <button class="modal__close" (click)="closeWireModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <form class="modal__body" (ngSubmit)="saveWire()">
+        <!-- Basic Info -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">اسم السلك *</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="wireForm.name"
+              name="name"
+              placeholder="أدخل اسم السلك"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">السعر (جنيه) *</label>
+            <input
+              type="number"
+              class="form-input"
+              [(ngModel)]="wireForm.price"
+              name="price"
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">المخزون *</label>
+            <input
+              type="number"
+              class="form-input"
+              [(ngModel)]="wireForm.stock"
+              name="stock"
+              placeholder="0"
+              min="0"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">الطول (متر)</label>
+            <input
+              type="number"
+              class="form-input"
+              [(ngModel)]="wireForm.length"
+              name="length"
+              placeholder="مثال: 10, 25, 50"
+              min="0"
+              step="0.01"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">الماركة</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="wireForm.brand"
+              name="brand"
+              placeholder="مثال: Elsewedy, Kablo, Nexans"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">النوع</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="wireForm.type"
+              name="type"
+              placeholder="مثال: NYY, NYCY, NYM"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">الوصف</label>
+          <textarea
+            class="form-textarea"
+            [(ngModel)]="wireForm.description"
+            name="description"
+            placeholder="أدخل وصف السلك..."
+            rows="3"
+          ></textarea>
+        </div>
+
+        <!-- Offer Section -->
+        <div class="offer-section">
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                class="checkbox"
+                [(ngModel)]="wireForm.offer!.enabled"
+                name="offerEnabled"
+              >
+              <span>تفعيل العرض</span>
+            </label>
+          </div>
+
+          <div class="form-group" *ngIf="wireForm.offer?.enabled">
+            <label class="form-label">نسبة الخصم (%)</label>
+            <input
+              type="number"
+              class="form-input"
+              [(ngModel)]="wireForm.offer!.discountPercentage"
+              name="discountPercentage"
+              placeholder="0-100"
+              min="0"
+              max="100"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">الصور</label>
+          <div class="image-upload">
+            <input
+              type="file"
+              class="image-upload__input"
+              id="imageInput"
+              (change)="onImageSelect($event)"
+              accept="image/*"
+              multiple
+            >
+            <label for="imageInput" class="image-upload__label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <span>اختر صور</span>
+            </label>
+          </div>
+
+          <div class="image-preview" *ngIf="imagePreview.length > 0">
+            <div class="image-preview__item" *ngFor="let img of imagePreview; let i = index">
+              <img [src]="img" [alt]="'صورة ' + (i + 1)">
+              <button type="button" class="image-preview__remove" (click)="removeImage(i)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn--secondary" (click)="closeWireModal()">
+            إلغاء
+          </button>
+          <button type="submit" class="btn btn--primary" [disabled]="isSaving">
+            <span *ngIf="!isSaving">{{ isEditMode ? 'حفظ التغييرات' : 'إضافة السلك' }}</span>
+            <span *ngIf="isSaving">جاري الحفظ...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+    <div class="modal modal--small" (click)="$event.stopPropagation()">
+      <div class="modal__header modal__header--danger">
+        <h2>تأكيد الحذف</h2>
+        <button class="modal__close" (click)="closeDeleteModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <div class="delete-warning">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p>
+            هل أنت متأكد من حذف
+            <strong *ngIf="wiresToDelete.length === 1">{{ selectedWire?.name }}</strong>
+            <strong *ngIf="wiresToDelete.length > 1">{{ wiresToDelete.length }} أسلاك</strong>؟
+          </p>
+          <p class="warning-text">هذا الإجراء لا يمكن التراجع عنه!</p>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn--secondary" (click)="closeDeleteModal()">
+            إلغاء
+          </button>
+          <button type="button" class="btn btn--danger" (click)="deleteWires()" [disabled]="isDeleting">
+            <span *ngIf="!isDeleting">نعم، احذف</span>
+            <span *ngIf="isDeleting">جاري الحذف...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Viewer Modal -->
+  <div class="modal-overlay" *ngIf="showImageModal" (click)="closeImageViewer()">
+    <div class="image-viewer" (click)="$event.stopPropagation()">
+      <button class="image-viewer__close" (click)="closeImageViewer()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+
+      <button
+        class="image-viewer__nav image-viewer__nav--prev"
+        (click)="previousImage()"
+        [disabled]="currentImageIndex === 0"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+
+      <img [src]="imagePreview[currentImageIndex]" [alt]="'صورة ' + (currentImageIndex + 1)">
+
+      <button
+        class="image-viewer__nav image-viewer__nav--next"
+        (click)="nextImage()"
+        [disabled]="currentImageIndex === imagePreview.length - 1"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+
+      <div class="image-viewer__counter">
+        {{ currentImageIndex + 1 }} / {{ imagePreview.length }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" [class.toast--show]="showToast" [class]="'toast--' + toastType">
+    <svg *ngIf="toastType === 'success'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+      <polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+    <svg *ngIf="toastType === 'error'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="15" y1="9" x2="9" y2="15"/>
+      <line x1="9" y1="9" x2="15" y2="15"/>
+    </svg>
+    <span>{{ toastMessage }}</span>
+  </div>
+</div>

@@ -1,8 +1,11 @@
 import { Component, OnInit, OnDestroy, PLATFORM_ID, Inject, signal } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
-// Product interface
+import { ProductService, Product as BackendProduct } from '../../core/services/product.service';
+
+// Frontend Product interface for slider
 export interface Product {
   id: string;
   title: string;
@@ -24,77 +27,30 @@ export class LatestProductsSliderComponent implements OnInit, OnDestroy {
   // Signals for reactive state management
   currentIndex = signal(0);
   isTransitioning = signal(false);
+  isLoading = signal(true);
 
   // Section title
   sectionTitle = 'أحدث المنتجات';
 
   // Products data
-  products: Product[] = [
-    {
-      id: 'p1',
-      title: 'شاحن منزلي ذكي 7kW',
-      category: 'شواحن منزلية',
-      price: 4500,
-      image: './assets/images/products/home-charger-7kw.webp',
-      alt: 'شاحن منزلي ذكي 7kW - PowerEV',
-      link: '/products/home-charger-7kw'
-    },
-    {
-      id: 'p2',
-      title: 'كابل شحن Type 2',
-      category: 'كابلات',
-      price: 1200,
-      image: './assets/images/products/type2-cable.webp',
-      alt: 'كابل شحن Type 2 - PowerEV',
-      link: '/products/type2-cable'
-    },
-    {
-      id: 'p3',
-      title: 'محول شحن محمول',
-      category: 'محولات',
-      price: 800,
-      image: './assets/images/products/portable-adapter.webp',
-      alt: 'محول شحن محمول - PowerEV',
-      link: '/products/portable-adapter'
-    },
-    {
-      id: 'p4',
-      title: 'شاحن سريع 22kW',
-      category: 'شواحن سريعة',
-      price: 12000,
-      image: './assets/images/products/fast-charger-22kw.webp',
-      alt: 'شاحن سريع 22kW - PowerEV',
-      link: '/products/fast-charger-22kw'
-    },
-    {
-      id: 'p5',
-      title: 'قاطع كهربائي 32A',
-      category: 'اكسسوارات',
-      price: 350,
-      image: './assets/images/products/circuit-breaker-32a.webp',
-      alt: 'قاطع كهربائي 32A - PowerEV',
-      link: '/products/circuit-breaker-32a'
-    },
-    {
-      id: 'p6',
-      title: 'شاحن جداري AC',
-      category: 'شواحن منزلية',
-      price: 5500,
-      image: './assets/images/products/wall-charger-ac.webp',
-      alt: 'شاحن جداري AC - PowerEV',
-      link: '/products/wall-charger-ac'
-    }
-  ];
+  products: Product[] = [];
 
   // Scroll container reference
   private scrollContainer: HTMLElement | null = null;
   private isBrowser: boolean;
+  private destroy$ = new Subject<void>();
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private productService: ProductService
+  ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
   ngOnInit(): void {
+    // Load products from backend
+    this.loadLatestProducts();
+
     // Only run in browser
     if (this.isBrowser) {
       // Get scroll container after view init
@@ -105,23 +61,85 @@ export class LatestProductsSliderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Cleanup if needed
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**
-   * Navigate to previous products
+   * Load latest products from backend
    */
+  private loadLatestProducts(): void {
+    this.isLoading.set(true);
+
+    this.productService.getAllProducts()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (backendProducts) => {
+          // Transform backend products to frontend format
+          this.products = this.transformProducts(backendProducts);
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Error loading products:', error);
+          this.isLoading.set(false);
+          // Optionally show error message to user
+        }
+      });
+  }
+
+  /**
+   * Transform backend products to frontend Product interface
+   * Gets the latest 10 products sorted by ID (newest first)
+   */
+  private transformProducts(backendProducts: BackendProduct[]): Product[] {
+    // Filter only in-stock products and get latest 10
+    const latestProducts = backendProducts
+      .filter(product => product.inStock)
+      .slice(0, 10); // Get first 10 products (latest)
+
+    return latestProducts.map(product => ({
+      id: product.id,
+      title: product.name,
+      category: product.category,
+      price: product.finalPrice || product.price,
+      image: product.images && product.images.length > 0
+        ? product.images[0].url
+        : 'assets/images/placeholder.jpg',
+      alt: product.images && product.images.length > 0
+        ? product.images[0].alt
+        : product.name,
+      link: `/products/${this.getCategorySlug(product.categoryType)}/${product.id}`
+    }));
+  }
+
+  /**
+   * Get category slug for routing
+   */
+  private getCategorySlug(categoryType: string): string {
+    const categoryMap: { [key: string]: string } = {
+      'adapter': 'adapters',
+      'box': 'boxes',
+      'breaker': 'breakers',
+      'cable': 'cables',
+      'charger': 'chargers',
+      'other': 'others',
+      'plug': 'plugs',
+      'station': 'stations',
+      'wire': 'wires'
+    };
+
+    return categoryMap[categoryType] || 'products';
+  }
+
+
   prevSlide(): void {
     if (this.isTransitioning() || !this.scrollContainer) return;
 
     this.isTransitioning.set(true);
 
-    // Calculate scroll position
-    const cardWidth = this.getCardWidth();
-    const gap = 24; // 1.5rem = 24px
-    const scrollAmount = cardWidth + gap;
+    const containerWidth = this.scrollContainer.offsetWidth;
+    const scrollAmount = containerWidth;
 
-    // Smooth scroll
     this.scrollContainer.scrollBy({
       left: scrollAmount,
       behavior: 'smooth'
@@ -132,18 +150,14 @@ export class LatestProductsSliderComponent implements OnInit, OnDestroy {
     }, 300);
   }
 
-  /**
-   * Navigate to next products
-   */
+
   nextSlide(): void {
     if (this.isTransitioning() || !this.scrollContainer) return;
 
     this.isTransitioning.set(true);
 
-    // Calculate scroll position
-    const cardWidth = this.getCardWidth();
-    const gap = 24;
-    const scrollAmount = cardWidth + gap;
+    const containerWidth = this.scrollContainer.offsetWidth;
+    const scrollAmount = containerWidth;
 
     // Smooth scroll
     this.scrollContainer.scrollBy({
@@ -156,47 +170,25 @@ export class LatestProductsSliderComponent implements OnInit, OnDestroy {
     }, 300);
   }
 
-  /**
-   * Add product to cart
-   */
+
   addToCart(product: Product, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
 
     console.log('Adding to cart:', product);
-    // TODO: Implement cart service
-    // this.cartService.addToCart(product);
-
-    // Optional: Show toast notification
-    // this.toastService.show(`تم إضافة ${product.title} إلى السلة`);
   }
 
-  /**
-   * Track by function for ngFor optimization
-   */
+
   trackByProductId(index: number, product: Product): string {
     return product.id;
   }
 
-  /**
-   * Get card width based on screen size
-   */
-  private getCardWidth(): number {
-    if (!this.isBrowser) return 320;
-
-    const width = window.innerWidth;
-
-    if (width >= 768) {
-      return 320; // md:min-w-[320px]
-    } else {
-      return 280; // min-w-[280px]
-    }
+  formatPrice(price: number): string {
+    return `${price.toLocaleString('en-US')} LE`;
   }
 
-  /**
-   * Format price with Egyptian Pound
-   */
-  formatPrice(price: number): string {
-    return `${price.toLocaleString('ar-EG')} ج.م`;
+  refreshProducts(): void {
+    this.productService.refreshProducts();
+    this.loadLatestProducts();
   }
 }

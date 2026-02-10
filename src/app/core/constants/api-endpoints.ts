@@ -103,6 +103,15 @@ export const ApiEndpoints = {
     delete: (id: string) => `${API_BASE}/others/${id}`
   },
 
+  // Gallery Endpoints
+  gallery: {
+    getAll: `${API_BASE}/gallery`,
+    getById: (id: string) => `${API_BASE}/gallery/${id}`,
+    create: `${API_BASE}/gallery`,
+    update: (id: string) => `${API_BASE}/gallery/${id}`,
+    delete: (id: string) => `${API_BASE}/gallery/${id}`
+  },
+
   // Cart Endpoints
   cart: {
     get: (sessionId: string) => `${API_BASE}/cart/${sessionId}`,

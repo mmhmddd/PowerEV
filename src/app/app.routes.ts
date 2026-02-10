@@ -121,6 +121,54 @@ export const routes: Routes = [
         loadComponent: () => import('./admin/box-control/box-control.component')
           .then(c => c.BoxControlComponent),
         title: 'Box Management'
+      },
+      {
+        path: 'breakers',
+        loadComponent: () => import('./admin/breaker-control/breaker-control.component')
+          .then(c => c.BreakerControlComponent),
+        title: 'Breaker Management'
+      },
+      {
+        path: 'cables',
+        loadComponent: () => import('./admin/cable-control/cable-control.component')
+          .then(c => c.CableControlComponent),
+        title: 'Cable Management'
+      },
+      {
+        path: 'chargers',
+        loadComponent: () => import('./admin/charger-control/charger-control.component')
+          .then(c => c.ChargerControlComponent),
+        title: 'Charger Management'
+      },
+      {
+        path: 'others',
+        loadComponent: () => import('./admin/other-control/other-control.component')
+          .then(c => c.OtherControlComponent),
+        title: 'Other Management'
+      },
+      {
+        path: 'plugs',
+        loadComponent: () => import('./admin/plug-control/plug-control.component')
+          .then(c => c.PlugControlComponent),
+        title: 'Plug Management'
+      },
+      {
+        path: 'wires',
+        loadComponent: () => import('./admin/wires-control/wires-control.component')
+          .then(c => c.WiresControlComponent),
+        title: 'Wires Management'
+      },
+      {
+        path: 'gallery',
+        loadComponent: () => import('./admin/gallery-control/gallery-control.component')
+          .then(c => c.GalleryControlComponent),
+        title: 'Gallery Management'
+      },
+      {
+        path: 'stations',
+        loadComponent: () => import('./admin/station-control/station-control.component')
+          .then(c => c.StationControlComponent),
+        title: 'Station Management'
       }
     ]
   },

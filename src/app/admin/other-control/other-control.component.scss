@@ -36,9 +36,9 @@ $sidebar-width:  280px;
 $sidebar-collapsed: 80px;
 
 // ══════════════════════════════════════════════════════════
-// Box Control Container
+// Other Control Container
 // ══════════════════════════════════════════════════════════
-.box-control {
+.other-control {
   padding: 2rem;
   font-family: $font-arabic;
   direction: rtl;
@@ -47,9 +47,6 @@ $sidebar-collapsed: 80px;
   margin-right: $sidebar-width;
   transition: $transition-base;
 
-  // ══════════════════════════════════════════════════════════
-  // Header
-  // ══════════════════════════════════════════════════════════
   &__header {
     display: flex;
     justify-content: space-between;
@@ -83,9 +80,6 @@ $sidebar-collapsed: 80px;
     gap: 1rem;
   }
 
-  // ══════════════════════════════════════════════════════════
-  // Filters Section
-  // ══════════════════════════════════════════════════════════
   &__filters {
     background: $bg-card;
     border-radius: 16px;
@@ -179,7 +173,7 @@ $sidebar-collapsed: 80px;
   min-width: 300px;
 
   &__input {
-    width: 80%;
+    width: 100%;
     padding: 0.875rem 3rem 0.875rem 1rem;
     border: 1px solid $border-color;
     border-radius: 12px;
@@ -295,19 +289,19 @@ $sidebar-collapsed: 80px;
 }
 
 // ══════════════════════════════════════════════════════════
-// Boxes Table Section
+// Others Table Section
 // ══════════════════════════════════════════════════════════
-.boxes-table-section {
+.others-table-section {
   background: $bg-card;
   border-radius: 16px;
   border: 1px solid $border-color;
   overflow: hidden;
 }
 
-.boxes-table {
+.others-table {
   &__header {
     display: grid;
-    grid-template-columns: 50px 2fr 1fr 1fr 1.2fr 0.8fr 0.8fr 1fr 120px;
+    grid-template-columns: 50px 2fr 1fr 1fr 1.2fr 0.8fr 1fr 120px;
     gap: 1rem;
     padding: 1.25rem 1.5rem;
     background: $bg-body;
@@ -324,7 +318,7 @@ $sidebar-collapsed: 80px;
 
   &__row {
     display: grid;
-    grid-template-columns: 50px 2fr 1fr 1fr 1.2fr 0.8fr 0.8fr 1fr 120px;
+    grid-template-columns: 50px 2fr 1fr 1fr 1.2fr 0.8fr 1fr 120px;
     gap: 1rem;
     padding: 1.25rem 1.5rem;
     border-bottom: 1px solid $border-color;
@@ -710,16 +704,6 @@ $sidebar-collapsed: 80px;
   &__body {
     padding: 1.5rem;
   }
-
-  &__description {
-    color: $text-secondary;
-    margin: 0 0 1.5rem;
-    line-height: 1.6;
-
-    strong {
-      color: $text-primary;
-    }
-  }
 }
 
 @keyframes slideUp {
@@ -793,14 +777,13 @@ $sidebar-collapsed: 80px;
 }
 
 // ══════════════════════════════════════════════════════════
-// Offer Section
+// Form Actions
 // ══════════════════════════════════════════════════════════
-.offer-section {
-  background: rgba($status-info, 0.05);
-  border: 1px solid rgba($status-info, 0.2);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
 }
 
 // ══════════════════════════════════════════════════════════
@@ -888,6 +871,40 @@ $sidebar-collapsed: 80px;
       transform: scale(1.1);
     }
   }
+}
+
+// ══════════════════════════════════════════════════════════
+// Delete Warning
+// ══════════════════════════════════════════════════════════
+.delete-warning {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  padding: 1rem 0;
+
+  svg {
+    width: 56px;
+    height: 56px;
+    color: $status-danger;
+  }
+
+  p {
+    color: $text-secondary;
+    margin: 0;
+    line-height: 1.6;
+
+    strong {
+      color: $text-primary;
+    }
+  }
+}
+
+.warning-text {
+  color: $status-danger !important;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1003,50 +1020,6 @@ $sidebar-collapsed: 80px;
 }
 
 // ══════════════════════════════════════════════════════════
-// Form Actions
-// ══════════════════════════════════════════════════════════
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 2rem;
-}
-
-// ══════════════════════════════════════════════════════════
-// Delete Warning
-// ══════════════════════════════════════════════════════════
-.delete-warning {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  text-align: center;
-  padding: 1rem 0;
-
-  svg {
-    width: 56px;
-    height: 56px;
-    color: $status-danger;
-  }
-
-  p {
-    color: $text-secondary;
-    margin: 0;
-    line-height: 1.6;
-
-    strong {
-      color: $text-primary;
-    }
-  }
-}
-
-.warning-text {
-  color: $status-danger !important;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-// ══════════════════════════════════════════════════════════
 // Toast Notification
 // ══════════════════════════════════════════════════════════
 .toast {
@@ -1110,55 +1083,51 @@ $sidebar-collapsed: 80px;
 }
 
 // ══════════════════════════════════════════════════════════
-// Responsive Design - FIXED FOR SMALL SCREENS
+// Responsive Design
 // ══════════════════════════════════════════════════════════
 @media (max-width: 1400px) {
-  .boxes-table {
+  .others-table {
     &__header,
     &__row {
-      grid-template-columns: 50px 2fr 1fr 1.2fr 0.8fr 0.8fr 120px;
+      grid-template-columns: 50px 2fr 1fr 1.2fr 0.8fr 1fr 120px;
 
-      .boxes-table__cell:nth-child(4),
-      .boxes-table__cell:nth-child(8) {
-        display: none;
+      .others-table__cell:nth-child(4) {
+        display: none; // Hide "النوع" (Type)
       }
     }
   }
 }
 
 @media (max-width: 1200px) {
-  .boxes-table {
+  .others-table {
     &__header,
     &__row {
-      grid-template-columns: 50px 2fr 1fr 1.2fr 0.8fr 120px;
+      grid-template-columns: 50px 2fr 1.2fr 0.8fr 1fr 120px;
 
-      .boxes-table__cell:nth-child(4),
-      .boxes-table__cell:nth-child(7),
-      .boxes-table__cell:nth-child(8) {
-        display: none;
+      .others-table__cell:nth-child(3),
+      .others-table__cell:nth-child(4) {
+        display: none; // Hide "الماركة" and "النوع"
       }
     }
   }
 }
 
 @media (max-width: 1024px) {
-  .box-control {
-    margin-right: 0; // Remove sidebar margin on tablet/mobile
+  .other-control {
+    margin-right: 0;
     padding: 1.5rem;
   }
 }
 
 @media (max-width: 992px) {
-  .boxes-table {
+  .others-table {
     &__header,
     &__row {
-      grid-template-columns: 50px 2fr 1.2fr 100px;
+      grid-template-columns: 50px 2fr 1.2fr 1fr 100px;
 
-      .boxes-table__cell:nth-child(3),
-      .boxes-table__cell:nth-child(4),
-      .boxes-table__cell:nth-child(6),
-      .boxes-table__cell:nth-child(7),
-      .boxes-table__cell:nth-child(8) {
+      .others-table__cell:nth-child(3),
+      .others-table__cell:nth-child(4),
+      .others-table__cell:nth-child(6) {
         display: none;
       }
     }
@@ -1166,7 +1135,7 @@ $sidebar-collapsed: 80px;
 }
 
 @media (max-width: 768px) {
-  .box-control {
+  .other-control {
     padding: 1rem;
     margin-right: 0;
 
@@ -1214,7 +1183,7 @@ $sidebar-collapsed: 80px;
     grid-template-columns: 1fr;
   }
 
-  .boxes-table {
+  .others-table {
     &__header {
       display: none;
     }
@@ -1225,7 +1194,7 @@ $sidebar-collapsed: 80px;
       padding: 1rem;
       position: relative;
 
-      .boxes-table__cell {
+      .others-table__cell {
         display: block !important;
 
         &--checkbox {
@@ -1261,7 +1230,7 @@ $sidebar-collapsed: 80px;
 }
 
 @media (max-width: 480px) {
-  .box-control {
+  .other-control {
     &__title {
       font-size: 1.25rem;
     }

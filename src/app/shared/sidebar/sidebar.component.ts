@@ -1,6 +1,7 @@
 import { Component, signal, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -14,13 +15,25 @@ export class SidebarComponent implements OnInit {
   isMobile = signal(false);
 
   menuItems = [
-    { label: 'لوحة التحكم', icon: 'grid', route: '/admin/dashboard', active: true },
-    { label: 'المنتجات', icon: 'package', route: '/products', active: false },
-    { label: 'المستخدمون', icon: 'users', route: '/admin/users', active: false },
-    { label: 'الطلبات', icon: 'shopping-cart', route: '/checkout', active: false },
-    { label: 'معرض الصور', icon: 'image', route: '/gallery', active: false },
-    { label: 'الإعدادات', icon: 'settings', route: '/admin', active: false }
+    { label: 'لوحة التحكم',       icon: 'grid',            route: '/admin/dashboard', active: false },
+    { label: 'الطلبات',           icon: 'shopping-cart',   route: '/admin/orders',    active: false },
+    { label: 'المستخدمون',        icon: 'users',           route: '/admin/users',     active: false },
+    { label: 'شواحن',             icon: 'battery',         route: '/admin/chargers',  active: false },
+    { label: 'محطات شحن',         icon: 'charging-station',route: '/admin/stations',  active: false },
+    { label: 'كابلات',            icon: 'cable',           route: '/admin/cables',    active: false },
+    { label: 'أسلاك',             icon: 'cable',           route: '/admin/wires',     active: false },
+    { label: 'محولات',            icon: 'plug',            route: '/admin/adapters',  active: false },
+    { label: 'قوابس',             icon: 'plug',            route: '/admin/plugs',     active: false },
+    { label: 'صناديق توزيع',      icon: 'box',             route: '/admin/boxes',     active: false },
+    { label: 'قواطع كهربائية',    icon: 'switch',          route: '/admin/breakers',  active: false },
+    { label: 'منتجات أخرى',       icon: 'tool',            route: '/admin/others',    active: false },
+    { label: 'معرض الصور',        icon: 'image',           route: '/admin/gallery',   active: false },
   ];
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.checkScreenSize();
@@ -36,12 +49,9 @@ export class SidebarComponent implements OnInit {
     const wasMobile = this.isMobile();
     this.isMobile.set(width <= 1024);
 
-    // Auto-close sidebar on mobile, auto-open on desktop
     if (this.isMobile() && !wasMobile) {
-      // Switched to mobile view - close sidebar
       this.isOpen.set(false);
     } else if (!this.isMobile() && wasMobile) {
-      // Switched to desktop view - open sidebar
       this.isOpen.set(true);
     }
   }
@@ -50,10 +60,14 @@ export class SidebarComponent implements OnInit {
     this.isOpen.update(value => !value);
   }
 
-  // Close sidebar when clicking on a menu item (mobile only)
   onMenuItemClick() {
     if (this.isMobile()) {
       this.isOpen.set(false);
     }
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

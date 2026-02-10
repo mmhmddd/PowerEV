@@ -3,12 +3,70 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiEndpoints } from '../constants/api-endpoints';
-import {
-  Charger,
-  ChargersResponse,
-  ChargerResponse,
-  ApiResponse
-} from '../models/product.models';
+
+// ═══════════════════════════════════════════════════════
+// Type Definitions - Matches Backend Models
+// ═══════════════════════════════════════════════════════
+
+/**
+ * Offer structure for Charger
+ */
+export interface ChargerOffer {
+  enabled: boolean;
+  discountPercentage: number;
+}
+
+/**
+ * Image object structure
+ */
+export interface ImageObject {
+  url: string;
+  publicId?: string;
+}
+
+/**
+ * Charger model - matches backend schema
+ */
+export interface Charger {
+  _id: string;
+  name: string;
+  price: number;
+  quantity: 'in stock' | 'out of stock'; // String enum, not number
+  voltage?: number;
+  amperage?: number;
+  brand?: string;
+  stock?: number;
+  offer?: ChargerOffer; // Object with enabled and discountPercentage
+  connectorType?: string;
+  phase?: string;
+  efficiency?: number;
+  description?: string;
+  images?: (string | ImageObject)[]; // Can be string URLs or objects
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+/**
+ * API Response structures
+ */
+export interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
+export interface ChargerResponse extends ApiResponse<Charger> {
+  charger: Charger;
+}
+
+export interface ChargersResponse extends ApiResponse<Charger[]> {
+  count: number;
+  chargers: Charger[];
+}
+
+// ═══════════════════════════════════════════════════════
+// Charger Service
+// ═══════════════════════════════════════════════════════
 
 @Injectable({
   providedIn: 'root'
@@ -89,7 +147,6 @@ export class ChargerService {
 
   /**
    * Calculate final price after discount
-   * Note: Backend returns finalPrice as a virtual field
    * @param charger - Charger with offer
    * @returns Final price after discount
    */

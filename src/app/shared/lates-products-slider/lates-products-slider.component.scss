@@ -177,6 +177,92 @@ $transition-smooth: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ==========================================
+// Loading State
+// ==========================================
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1.5rem;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top-color: $green;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 1.125rem;
+  color: $white-dim;
+  margin: 0;
+  text-align: center;
+}
+
+// ==========================================
+// Empty State
+// ==========================================
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1.5rem;
+
+  .empty-icon {
+    color: $white-dimmer;
+    opacity: 0.5;
+  }
+
+  .empty-text {
+    font-size: 1.25rem;
+    color: $white-dim;
+    margin: 0;
+    text-align: center;
+  }
+
+  .retry-button {
+    background: $green;
+    color: $black;
+    border: none;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: $transition-base;
+    margin-top: 1rem;
+
+    &:hover {
+      background: $green-dark;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 255, 65, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $green;
+      outline-offset: 3px;
+    }
+  }
+}
+
+// ==========================================
 // Products Scroll Container
 // ==========================================
 .products-scroll-container {
@@ -195,8 +281,12 @@ $transition-smooth: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
     display: none;
   }
 
-  @media (max-width: 575px) {
+  @media (max-width: 991px) {
     gap: 1.25rem;
+  }
+
+  @media (max-width: 575px) {
+    gap: 1rem;
     padding: 0.75rem 0.25rem 1.75rem;
     margin: 0 -0.25rem;
   }
@@ -207,12 +297,22 @@ $transition-smooth: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 // ==========================================
 .product-card {
   flex: 0 0 auto;
-  min-width: 280px;
+  width: calc((100% - (1.5rem * 3)) / 4); // 4 cards with gaps
+  min-width: 250px;
   scroll-snap-align: start;
   scroll-snap-stop: always;
 
-  @media (min-width: 768px) {
-    min-width: 320px;
+  @media (max-width: 1200px) {
+    width: calc((100% - (1.5rem * 2)) / 3); // 3 cards
+  }
+
+  @media (max-width: 991px) {
+    width: calc((100% - 1.5rem) / 2); // 2 cards
+  }
+
+  @media (max-width: 575px) {
+    width: calc(100% - 1rem); // 1 card
+    min-width: 260px;
   }
 }
 
@@ -435,7 +535,7 @@ $transition-smooth: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ==========================================
-// Loading State
+// Image Loading State
 // ==========================================
 .product-image {
   background: linear-gradient(
@@ -473,7 +573,8 @@ $transition-smooth: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   .product-title,
   .cart-button,
   .nav-button,
-  .hover-glow {
+  .hover-glow,
+  .loading-spinner {
     transition-duration: 0.01ms !important;
     animation: none !important;
   }
@@ -504,6 +605,11 @@ $transition-smooth: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .nav-controls {
+    display: none;
+  }
+
+  .loading-container,
+  .empty-state {
     display: none;
   }
 

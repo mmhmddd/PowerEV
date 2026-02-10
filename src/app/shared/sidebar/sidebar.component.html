@@ -1,11 +1,13 @@
 <aside class="sidebar" [class.sidebar--closed]="!isOpen()">
-  <!-- Mobile Backdrop Overlay (only shows on mobile when sidebar is open) -->
+
+  <!-- Mobile Backdrop -->
   <div class="sidebar__backdrop"
        *ngIf="isOpen() && isMobile()"
        (click)="toggleSidebar()"></div>
 
-  <!-- Sidebar Container -->
+  <!-- Sidebar Panel -->
   <div class="sidebar__container">
+
     <!-- Header -->
     <div class="sidebar__header">
       <div class="sidebar__logo">
@@ -19,55 +21,102 @@
       </div>
     </div>
 
-    <!-- Navigation Menu -->
+    <!-- Navigation -->
     <nav class="sidebar__nav">
       <a
         *ngFor="let item of menuItems"
         [routerLink]="item.route"
         routerLinkActive="sidebar__nav-item--active"
         class="sidebar__nav-item"
-        [class.sidebar__nav-item--active]="item.active"
         (click)="onMenuItemClick()"
       >
         <svg class="sidebar__nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <!-- Grid icon -->
-          <rect *ngIf="item.icon === 'grid'" x="3" y="3" width="7" height="7"/>
-          <rect *ngIf="item.icon === 'grid'" x="14" y="3" width="7" height="7"/>
-          <rect *ngIf="item.icon === 'grid'" x="14" y="14" width="7" height="7"/>
-          <rect *ngIf="item.icon === 'grid'" x="3" y="14" width="7" height="7"/>
 
-          <!-- Package icon -->
-          <path *ngIf="item.icon === 'package'" d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-          <polyline *ngIf="item.icon === 'package'" points="3.27 6.96 12 12.01 20.73 6.96"/>
-          <line *ngIf="item.icon === 'package'" x1="12" y1="22.08" x2="12" y2="12"/>
+          <!-- grid / dashboard -->
+          <ng-container *ngIf="item.icon === 'grid'">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+          </ng-container>
 
-          <!-- Users icon -->
-          <path *ngIf="item.icon === 'users'" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-          <circle *ngIf="item.icon === 'users'" cx="9" cy="7" r="4"/>
-          <path *ngIf="item.icon === 'users'" d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-          <path *ngIf="item.icon === 'users'" d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          <!-- shopping-cart / orders -->
+          <ng-container *ngIf="item.icon === 'shopping-cart'">
+            <circle cx="9" cy="21" r="1"/>
+            <circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </ng-container>
 
-          <!-- Shopping cart icon -->
-          <circle *ngIf="item.icon === 'shopping-cart'" cx="9" cy="21" r="1"/>
-          <circle *ngIf="item.icon === 'shopping-cart'" cx="20" cy="21" r="1"/>
-          <path *ngIf="item.icon === 'shopping-cart'" d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          <!-- users -->
+          <ng-container *ngIf="item.icon === 'users'">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </ng-container>
 
-          <!-- Image icon -->
-          <rect *ngIf="item.icon === 'image'" x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-          <circle *ngIf="item.icon === 'image'" cx="8.5" cy="8.5" r="1.5"/>
-          <polyline *ngIf="item.icon === 'image'" points="21 15 16 10 5 21"/>
+          <!-- battery / chargers -->
+          <ng-container *ngIf="item.icon === 'battery'">
+            <rect x="2" y="7" width="16" height="10" rx="2" ry="2"/>
+            <line x1="22" y1="11" x2="22" y2="13"/>
+            <line x1="6" y1="12" x2="14" y2="12"/>
+          </ng-container>
 
-          <!-- Settings icon -->
-          <circle *ngIf="item.icon === 'settings'" cx="12" cy="12" r="3"/>
-          <path *ngIf="item.icon === 'settings'" d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
+          <!-- charging-station / stations -->
+          <ng-container *ngIf="item.icon === 'charging-station'">
+            <path d="M18 11V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a3 3 0 0 0 6 0v-1h4v1a3 3 0 0 0 6 0v-4"/>
+            <line x1="6" y1="6" x2="10" y2="6"/>
+            <line x1="18" y1="11" x2="22" y2="11"/>
+          </ng-container>
+
+          <!-- cable / cables & wires -->
+          <ng-container *ngIf="item.icon === 'cable'">
+            <path d="M4 9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9z"/>
+            <path d="M8 7V5a2 2 0 0 1 4 0v2"/>
+            <path d="M12 7V5a2 2 0 0 1 4 0v2"/>
+            <path d="M8 15v4"/>
+            <path d="M16 15v4"/>
+          </ng-container>
+
+          <!-- plug / adapters & plugs -->
+          <ng-container *ngIf="item.icon === 'plug'">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </ng-container>
+
+          <!-- box / boxes -->
+          <ng-container *ngIf="item.icon === 'box'">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+            <line x1="12" y1="22.08" x2="12" y2="12"/>
+          </ng-container>
+
+          <!-- switch / breakers -->
+          <ng-container *ngIf="item.icon === 'switch'">
+            <path d="M18 20V10"/>
+            <path d="M12 20V4"/>
+            <path d="M6 20v-6"/>
+          </ng-container>
+
+          <!-- tool / others -->
+          <ng-container *ngIf="item.icon === 'tool'">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </ng-container>
+
+          <!-- image / gallery -->
+          <ng-container *ngIf="item.icon === 'image'">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </ng-container>
+
         </svg>
         <span class="sidebar__nav-label" *ngIf="isOpen()">{{ item.label }}</span>
       </a>
     </nav>
 
-    <!-- Logout Button -->
+    <!-- Footer / Logout -->
     <div class="sidebar__footer">
-      <button class="sidebar__logout" (click)="onMenuItemClick()">
+      <button class="sidebar__logout" (click)="logout()">
         <svg class="sidebar__logout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
           <polyline points="16 17 21 12 16 7"/>
@@ -76,20 +125,20 @@
         <span class="sidebar__logout-label" *ngIf="isOpen()">تسجيل الخروج</span>
       </button>
     </div>
+
   </div>
 
-  <!-- Toggle Button - Shows on mobile, changes icon based on state -->
+  <!-- Toggle Button (mobile only) -->
   <button class="sidebar__toggle" (click)="toggleSidebar()" aria-label="Toggle Sidebar">
-    <!-- X icon when open -->
     <svg *ngIf="isOpen()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <line x1="18" y1="6" x2="6" y2="18"/>
       <line x1="6" y1="6" x2="18" y2="18"/>
     </svg>
-    <!-- Menu icon when closed -->
     <svg *ngIf="!isOpen()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <line x1="3" y1="12" x2="21" y2="12"/>
       <line x1="3" y1="6" x2="21" y2="6"/>
       <line x1="3" y1="18" x2="21" y2="18"/>
     </svg>
   </button>
+
 </aside>
