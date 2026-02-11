@@ -1,26 +1,59 @@
 <section class="gallery-section" dir="rtl" lang="ar">
   <div class="container">
+
     <!-- Page Header -->
     <header class="page-header">
       <h1 class="page-title">معرض الصور</h1>
       <p class="page-description">لقطات من تركيباتنا ومنتجاتنا على أرض الواقع</p>
     </header>
 
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading" aria-live="polite" aria-busy="true">
+      <div class="spinner" aria-label="جاري التحميل..."></div>
+      <p>جاري تحميل الصور...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-state" *ngIf="!isLoading && errorMessage" role="alert">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <p>{{ errorMessage }}</p>
+      <button class="retry-btn" (click)="retryLoad()" type="button">
+        إعادة المحاولة
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && !errorMessage && galleryItems.length === 0" role="status">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+        <polyline points="21 15 16 10 5 21"></polyline>
+      </svg>
+      <p>لا توجد صور في المعرض حالياً</p>
+    </div>
+
     <!-- Gallery Grid -->
-    <div class="gallery-grid">
+    <div class="gallery-grid" *ngIf="!isLoading && !errorMessage && galleryItems.length > 0"
+      role="list" aria-label="معرض الصور">
       <article
         class="gallery-item"
-        *ngFor="let image of galleryImages; let i = index"
-        (click)="openLightbox(image, i)"
-        [attr.aria-label]="'فتح صورة ' + image.alt"
-        role="button"
+        *ngFor="let item of galleryItems; let i = index"
+        (click)="openLightbox(item, i)"
+        [attr.aria-label]="'فتح صورة: ' + (item.title || item.description || 'صورة ' + (i + 1))"
+        role="listitem button"
         tabindex="0"
-        (keydown.enter)="openLightbox(image, i)"
-        (keydown.space)="openLightbox(image, i)">
+        (keydown.enter)="openLightbox(item, i)"
+        (keydown.space)="$event.preventDefault(); openLightbox(item, i)">
         <div class="image-wrapper">
           <img
-            [src]="image.src"
-            [alt]="image.alt"
+            [src]="item.image"
+            [alt]="item.title || item.description || 'صورة من المعرض'"
             class="gallery-image"
             loading="lazy"
             width="800"
@@ -29,8 +62,14 @@
             <span class="zoom-badge">تكبير الصورة</span>
           </div>
         </div>
+        <!-- Optional card caption under the image -->
+        <div class="item-caption" *ngIf="item.title || item.description">
+          <p class="item-title" *ngIf="item.title">{{ item.title }}</p>
+          <p class="item-desc" *ngIf="item.description">{{ item.description }}</p>
+        </div>
       </article>
     </div>
+
   </div>
 
   <!-- Lightbox Modal -->
@@ -41,7 +80,7 @@
     [@fadeIn]
     role="dialog"
     aria-modal="true"
-    [attr.aria-label]="'عرض صورة ' + selectedImage.alt">
+    [attr.aria-label]="'عرض الصورة: ' + (selectedImage.title || 'صورة ' + (selectedIndex + 1))">
 
     <!-- Close Button -->
     <button
@@ -49,16 +88,8 @@
       (click)="closeLightbox()"
       aria-label="إغلاق"
       type="button">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="32"
-        height="32"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
@@ -70,16 +101,8 @@
       (click)="previousImage()"
       aria-label="الصورة السابقة"
       type="button">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="32"
-        height="32"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"></polyline>
       </svg>
     </button>
@@ -90,33 +113,27 @@
       (click)="nextImage()"
       aria-label="الصورة التالية"
       type="button">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="32"
-        height="32"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="9 18 15 12 9 6"></polyline>
       </svg>
     </button>
 
     <!-- Image Container -->
-    <div class="lightbox-content" (click)="onBackdropClick($event)">
+    <div class="lightbox-content" (click)="$event.stopPropagation()">
       <img
-        [src]="selectedImage.src"
-        [alt]="selectedImage.alt"
+        [src]="selectedImage.image"
+        [alt]="selectedImage.title || selectedImage.description || 'صورة من المعرض'"
         class="lightbox-image"
         [@zoomIn]>
 
-      <!-- Image Counter & Title -->
+      <!-- Counter, Title & Description -->
       <div class="lightbox-info">
-        <p class="image-counter">{{ selectedIndex + 1 }} / {{ galleryImages.length }}</p>
+        <p class="image-counter">{{ selectedIndex + 1 }} / {{ galleryItems.length }}</p>
         <p class="image-title" *ngIf="selectedImage.title">{{ selectedImage.title }}</p>
+        <p class="image-description" *ngIf="selectedImage.description">{{ selectedImage.description }}</p>
       </div>
     </div>
+
   </div>
 </section>

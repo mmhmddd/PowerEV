@@ -29,6 +29,7 @@ export class AdapterControlComponent implements OnInit {
   searchTerm = '';
   selectedBrand = '';
   selectedType = '';
+  stockFilter = ''; // New stock filter
 
   // Modals
   showAdapterModal = false;
@@ -67,6 +68,11 @@ export class AdapterControlComponent implements OnInit {
   // Lists for filters
   brands: string[] = [];
   types: string[] = [];
+  stockOptions = [
+    { label: 'الكل', value: '' },
+    { label: 'متوفر', value: 'in-stock' },
+    { label: 'غير متوفر', value: 'out-of-stock' }
+  ];
 
   constructor(private adapterService: AdapterService) {}
 
@@ -135,7 +141,15 @@ export class AdapterControlComponent implements OnInit {
       // Type filter
       const matchesType = !this.selectedType || adapter.type === this.selectedType;
 
-      return matchesSearch && matchesBrand && matchesType;
+      // Stock filter
+      let matchesStock = true;
+      if (this.stockFilter === 'in-stock') {
+        matchesStock = adapter.stock > 0;
+      } else if (this.stockFilter === 'out-of-stock') {
+        matchesStock = adapter.stock === 0;
+      }
+
+      return matchesSearch && matchesBrand && matchesType && matchesStock;
     });
   }
 
@@ -272,16 +286,18 @@ export class AdapterControlComponent implements OnInit {
     this.isSaving = true;
 
     // Convert images to base64 if new images were selected
-    let imagesToSave: ImageObject[] = [];
+    let imagesToSave: string[] = [];
     if (this.selectedImages.length > 0) {
       const base64Images = await this.convertImagesToBase64();
-      imagesToSave = base64Images.map(img => ({ url: img }));
+      imagesToSave = base64Images;
     } else if (this.isEditMode && this.adapterForm.images) {
       // Keep existing images if no new images selected
-      imagesToSave = this.adapterForm.images;
+      imagesToSave = this.adapterForm.images.map((img: any) =>
+        typeof img === 'string' ? img : img.url
+      );
     }
 
-    const adapterData: Partial<Adapter> = {
+    const adapterData: Partial<AdapterBackendData> = {
       name: this.adapterForm.name,
       type: this.adapterForm.type || undefined,
       brand: this.adapterForm.brand || undefined,
@@ -291,17 +307,12 @@ export class AdapterControlComponent implements OnInit {
       voltage: this.adapterForm.voltage || undefined,
       current: this.adapterForm.current || undefined,
       description: this.adapterForm.description || undefined,
-      images: imagesToSave
+      images: imagesToSave.length > 0 ? imagesToSave : undefined
     };
 
     if (this.isEditMode && this.adapterForm._id) {
-      // Update adapter - send images as string URLs for backend
-      const adapterDataForBackend: Partial<AdapterBackendData> = {
-        ...adapterData,
-        images: imagesToSave.map(img => img.url)
-      };
-
-      this.adapterService.updateAdapter(this.adapterForm._id, adapterDataForBackend).subscribe({
+      // Update adapter
+      this.adapterService.updateAdapter(this.adapterForm._id, adapterData).subscribe({
         next: (response) => {
           this.showToastMessage('تم تحديث المحول بنجاح', 'success');
           this.loadAdapters();
@@ -318,13 +329,8 @@ export class AdapterControlComponent implements OnInit {
         }
       });
     } else {
-      // Create adapter - send images as string URLs for backend
-      const adapterDataForBackend: Partial<AdapterBackendData> = {
-        ...adapterData,
-        images: imagesToSave.map(img => img.url)
-      };
-
-      this.adapterService.createAdapter(adapterDataForBackend).subscribe({
+      // Create adapter
+      this.adapterService.createAdapter(adapterData).subscribe({
         next: (response) => {
           this.showToastMessage('تم إضافة المحول بنجاح', 'success');
           this.loadAdapters();
@@ -479,5 +485,13 @@ export class AdapterControlComponent implements OnInit {
       style: 'currency',
       currency: 'EGP'
     }).format(price);
+  }
+
+  getStockStatus(stock: number): string {
+    return stock > 0 ? 'متوفر' : 'غير متوفر';
+  }
+
+  getStockClass(stock: number): string {
+    return stock > 0 ? 'stock-badge stock-badge--in' : 'stock-badge stock-badge--out';
   }
 }

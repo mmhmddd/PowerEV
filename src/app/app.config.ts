@@ -5,6 +5,7 @@ import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth';
+import { withViewTransitions } from '@angular/router';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,7 +14,12 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([authInterceptor])
     ),
     provideClientHydration(),
-    provideAnimations()
-    // Removed provideCharts - we'll use Chart.js directly
+    provideAnimations(),
+        provideRouter(
+      routes,
+      withViewTransitions(), // Optional: smooth transitions
+  
+    )
+
   ]
 };

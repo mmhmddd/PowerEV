@@ -110,86 +110,114 @@
     >
 
       <!-- Product Card -->
-      <article
+      <div
         *ngFor="let product of products; trackBy: trackByProductId"
         class="product-card"
-        [attr.aria-label]="product.title + ' - ' + formatPrice(product.price)"
       >
-        <a
-          [routerLink]="product.link"
-          class="product-link"
-          [attr.aria-label]="'عرض تفاصيل ' + product.title"
+        <!-- Image Container -->
+        <div
+          class="product-image-container"
+          (mouseenter)="startImageSlider(product.id)"
+          (mouseleave)="stopImageSlider(product.id)"
+          (touchstart)="onTouchStart($event, product.id)"
+          (touchmove)="onTouchMove($event, product.id)"
+          (touchend)="onTouchEnd(product.id)"
         >
-
-          <!-- Product Image Container -->
-          <div class="product-image-wrapper">
+          <!-- Image Slider -->
+          <div class="image-slider">
             <img
-              [src]="product.image"
-              [alt]="product.alt"
+              [src]="getCurrentImage(product).url"
+              [alt]="getCurrentImage(product).alt"
               class="product-image"
               loading="lazy"
-              width="320"
-              height="320"
             />
-
-            <!-- Dark Overlay -->
-            <div class="product-overlay"></div>
-
-            <!-- Cart Button (Appears on Hover) -->
-            <div class="cart-overlay">
-              <button
-                class="cart-button"
-                (click)="addToCart(product, $event)"
-                [attr.aria-label]="'أضف ' + product.title + ' إلى السلة'"
-                type="button"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <circle cx="8" cy="21" r="1"></circle>
-                  <circle cx="19" cy="21" r="1"></circle>
-                  <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
-                </svg>
-              </button>
-            </div>
           </div>
 
-          <!-- Product Content -->
-          <div class="product-content">
+          <!-- Offer Badge -->
+          <div class="offer-badge" *ngIf="product.offer?.enabled">
+            <i class="bi bi-tag-fill"></i>
+            -{{ product.offer?.discountPercentage }}%
+          </div>
 
-            <!-- Category Badge -->
-            <div class="product-category">
-              {{ product.category }}
+          <!-- Desktop Hover Overlay -->
+          <div class="image-overlay desktop-only">
+            <button
+              class="action-btn add-to-cart-btn"
+              title="إضافة إلى السلة"
+              (click)="addToCart($event, product)"
+              [disabled]="!product.inStock || isAddingToCart(product.id)"
+            >
+              <i class="bi bi-cart-plus" *ngIf="!isAddingToCart(product.id)"></i>
+              <i class="bi bi-hourglass-split" *ngIf="isAddingToCart(product.id)"></i>
+            </button>
+
+            <button
+              class="action-btn details-btn"
+              title="عرض التفاصيل"
+              (click)="$event.stopPropagation(); viewProductDetails(product)"
+            >
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+
+          <!-- Image Counter & Dots -->
+          <div class="image-navigation" *ngIf="product.images && product.images.length > 1">
+            <div class="image-dots">
+              <span
+                *ngFor="let img of product.images; let i = index"
+                class="dot"
+                [class.active]="i === getCurrentImageIndex(product.id)"
+              ></span>
             </div>
+          </div>
+        </div>
 
-            <!-- Product Title -->
-            <h3 class="product-title">
-              {{ product.title }}
-            </h3>
+        <!-- Product Info -->
+        <div class="product-info" (click)="viewProductDetails(product)">
+          <span class="product-category">
+            <i class="bi bi-bookmark"></i>
+            {{ product.category }}
+          </span>
+          <h3 class="product-name">{{ product.name }}</h3>
+          <p class="product-description">{{ product.description }}</p>
 
-            <!-- Product Price -->
-            <div class="product-footer">
-              <span class="product-price">
+          <div class="product-footer">
+            <div class="price-container">
+              <span class="product-price" *ngIf="!product.offer?.enabled">
                 {{ formatPrice(product.price) }}
               </span>
+              <div class="price-with-offer" *ngIf="product.offer?.enabled">
+                <span class="original-price">{{ formatPrice(product.price) }}</span>
+                <span class="final-price">{{ formatPrice(product.finalPrice || product.price) }}</span>
+              </div>
             </div>
-
+            <span class="stock-badge" [class.in-stock]="product.inStock">
+              <i [class]="product.inStock ? 'bi bi-check-circle-fill' : 'bi bi-x-circle-fill'"></i>
+              {{ product.inStock ? 'متوفر' : 'غير متوفر' }}
+            </span>
           </div>
+        </div>
 
-          <!-- Hover Glow Effect -->
-          <div class="hover-glow"></div>
-
-        </a>
-      </article>
+        <!-- Mobile Action Buttons -->
+        <div class="mobile-actions">
+          <button
+            class="mobile-action-btn cart-btn"
+            (click)="addToCart($event, product)"
+            [disabled]="!product.inStock || isAddingToCart(product.id)"
+          >
+            <i class="bi bi-cart-plus" *ngIf="!isAddingToCart(product.id)"></i>
+            <i class="bi bi-hourglass-split" *ngIf="isAddingToCart(product.id)"></i>
+            <span>{{ isAddingToCart(product.id) ? 'جاري الإضافة...' : 'أضف للسلة' }}</span>
+          </button>
+          <button
+            class="mobile-action-btn view-btn"
+            (click)="viewProductDetails(product)"
+          >
+            <i class="bi bi-eye"></i>
+            <span>عرض التفاصيل</span>
+          </button>
+        </div>
+      </div>
 
     </div>
 

@@ -200,7 +200,7 @@ export class BreakerControlComponent implements OnInit {
   }
 
   // ═══════════════════════════════════════════════════════
-  // Edit Breaker
+  // Edit Breaker - FIXED: Proper image handling
   // ═══════════════════════════════════════════════════════
 
   openEditBreakerModal(breaker: BreakerWithSelection): void {
@@ -221,6 +221,7 @@ export class BreakerControlComponent implements OnInit {
       type: breaker.type || ''
     };
     this.selectedImages = [];
+    // Set imagePreview with existing images
     this.imagePreview = breaker.images || [];
     this.showBreakerModal = true;
   }
@@ -250,7 +251,19 @@ export class BreakerControlComponent implements OnInit {
 
   removeImage(index: number): void {
     this.imagePreview.splice(index, 1);
-    this.selectedImages.splice(index, 1);
+
+    // Calculate how many existing images vs new images
+    const existingImageCount = this.isEditMode && this.breakerForm.images
+      ? this.breakerForm.images.length
+      : 0;
+
+    // If removing a new image (beyond existing count)
+    if (index >= existingImageCount) {
+      const newImageIndex = index - existingImageCount;
+      if (newImageIndex >= 0 && newImageIndex < this.selectedImages.length) {
+        this.selectedImages.splice(newImageIndex, 1);
+      }
+    }
   }
 
   openImageViewer(index: number): void {
@@ -275,7 +288,7 @@ export class BreakerControlComponent implements OnInit {
   }
 
   // ═══════════════════════════════════════════════════════
-  // Save Breaker (Create or Update)
+  // Save Breaker (Create or Update) - FIXED: Proper image handling
   // ═══════════════════════════════════════════════════════
 
   async saveBreaker(): Promise<void> {
@@ -286,16 +299,16 @@ export class BreakerControlComponent implements OnInit {
     this.isSaving = true;
 
     try {
-      // Convert images to base64 if new images were selected
       let imagesToSave: string[] = [];
 
       if (this.selectedImages.length > 0) {
         // New images selected - convert to base64
         imagesToSave = await this.convertImagesToBase64();
-      } else if (this.isEditMode && this.breakerForm.images) {
-        // No new images, keep existing images
-        imagesToSave = this.breakerForm.images;
+      } else if (this.isEditMode && this.imagePreview.length > 0) {
+        // No new images in edit mode - keep existing images from preview
+        imagesToSave = this.imagePreview;
       }
+      // else: no images at all (imagesToSave remains empty array)
 
       // Prepare data for backend (images as string[])
       const breakerData: Partial<BreakerBackendData> = {
@@ -305,7 +318,8 @@ export class BreakerControlComponent implements OnInit {
         stock: this.breakerForm.stock,
         quantity: this.breakerForm.quantity || undefined,
         description: this.breakerForm.description || undefined,
-        images: imagesToSave.length > 0 ? imagesToSave : undefined,
+        // Always send images array (even if empty) to properly handle deletions
+        images: imagesToSave,
         offer: this.breakerForm.offer || undefined,
         ampere: this.breakerForm.ampere || undefined,
         voltage: this.breakerForm.voltage || undefined,

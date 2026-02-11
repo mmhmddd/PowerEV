@@ -220,4 +220,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
     return icons[iconName] || '';
   }
+ctaSection = {
+  buttonText: 'احجز موعد تركيب',
+  buttonLink: 'https://wa.me/201020216898', 
+  buttonAriaLabel: 'احجز موعد تركيب عبر واتساب',
+  features: [
+    'استشارة مجانية',
+    'تركيب احترافي',
+    'ضمان شامل'
+  ]
+};
 }

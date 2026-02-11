@@ -50,6 +50,35 @@
           <span class="phone-number" dir="ltr">010 2021 6898</span>
         </a>
 
+        <!-- Theme Toggle Button -->
+        <button
+          class="theme-toggle"
+          (click)="toggleTheme()"
+          [attr.aria-label]="isDark ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن'"
+          [title]="isDark ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن'"
+          type="button"
+        >
+          <!-- Moon icon (shown in dark mode — click to go light) -->
+          <span class="theme-icon theme-icon-dark" [class.visible]="isDark">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </span>
+          <!-- Sun icon (shown in light mode — click to go dark) -->
+          <span class="theme-icon theme-icon-light" [class.visible]="!isDark">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+            </svg>
+          </span>
+          <!-- Animated track -->
+          <span class="toggle-track">
+            <span class="toggle-thumb" [class.light]="!isDark"></span>
+          </span>
+        </button>
+
         <!-- Cart Link -->
         <a routerLink="/cart" class="cart-link" [class.has-items]="cartCount > 0">
           <svg
@@ -75,7 +104,12 @@
         </a>
 
         <!-- Mobile Menu Toggle -->
-        <button class="mobile-toggle" (click)="toggleMenu()" type="button" [attr.aria-label]="isMenuOpen ? 'إغلاق القائمة' : 'فتح القائمة'">
+        <button
+          class="mobile-toggle"
+          (click)="toggleMenu()"
+          type="button"
+          [attr.aria-label]="isMenuOpen ? 'إغلاق القائمة' : 'فتح القائمة'"
+        >
           <span class="hamburger" [class.open]="isMenuOpen">
             <span class="line"></span>
             <span class="line"></span>
@@ -115,6 +149,30 @@
         </span>
         <span class="mobile-link-text">{{ link.name }}</span>
       </a>
+
+      <div class="mobile-divider"></div>
+
+      <!-- Mobile Theme Toggle -->
+      <button
+        class="mobile-theme-toggle"
+        (click)="toggleTheme()"
+        type="button"
+      >
+        <span class="mobile-theme-icon">
+          <svg *ngIf="isDark" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+          <svg *ngIf="!isDark" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </span>
+        <span class="mobile-theme-text">
+          {{ isDark ? 'الوضع الفاتح' : 'الوضع الداكن' }}
+        </span>
+      </button>
 
       <div class="mobile-divider"></div>
 

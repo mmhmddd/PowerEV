@@ -331,15 +331,16 @@ export class ChargerControlComponent implements OnInit {
   // ═══════════════════════════════════════════════════════
   // Image Handling
   // ═══════════════════════════════════════════════════════
-
   onImageSelect(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files) {
       const files = Array.from(input.files);
-      this.selectedImages.push(...files);
 
-      // Create preview URLs
+      // Add to selected images array
       files.forEach(file => {
+        this.selectedImages.push(file);
+
+        // Create preview URL
         const reader = new FileReader();
         reader.onload = (e) => {
           if (e.target?.result) {
@@ -352,12 +353,20 @@ export class ChargerControlComponent implements OnInit {
   }
 
   removeImage(index: number): void {
+    const removedPreview = this.imagePreview[index];
+
+    // Remove from preview
     this.imagePreview.splice(index, 1);
-    // Only remove from selectedImages if it's a new image
-    if (this.selectedImages.length > 0 && index >= (this.imagePreview.length - this.selectedImages.length)) {
-      const adjustedIndex = index - (this.imagePreview.length - this.selectedImages.length);
-      if (adjustedIndex >= 0) {
-        this.selectedImages.splice(adjustedIndex, 1);
+
+    // If it's a new image (not an existing URL), remove from selectedImages
+    if (removedPreview && removedPreview.startsWith('data:')) {
+      // Find and remove the corresponding file from selectedImages
+      const newImageIndex = this.imagePreview
+        .filter(p => p.startsWith('data:'))
+        .indexOf(removedPreview);
+
+      if (newImageIndex !== -1 && newImageIndex < this.selectedImages.length) {
+        this.selectedImages.splice(newImageIndex, 1);
       }
     }
   }
@@ -387,7 +396,7 @@ export class ChargerControlComponent implements OnInit {
   // Save Charger (Create or Update) - FIXED: Backend expects strings
   // ═══════════════════════════════════════════════════════
 
-  async saveCharger(): Promise<void> {
+async saveCharger(): Promise<void> {
     if (!this.validateChargerForm()) {
       return;
     }
@@ -397,14 +406,32 @@ export class ChargerControlComponent implements OnInit {
     try {
       let imagesToSave: string[] = [];
 
-      if (this.selectedImages.length > 0) {
-        // New images selected - convert to base64
-        imagesToSave = await this.convertImagesToBase64();
-      } else if (this.isEditMode && this.chargerForm.images) {
-        // No new images in edit mode - keep existing images
-        imagesToSave = this.chargerForm.images.map(img =>
-          typeof img === 'string' ? img : (img as ImageObject).url
+      if (this.isEditMode) {
+        // EDIT MODE: Mix existing URLs with new base64 images
+
+        // Get existing image URLs from the original charger
+        const existingImageUrls = this.selectedCharger?.images
+          ?.map(img => typeof img === 'string' ? img : (img as ImageObject).url)
+          .filter(url => url && url.startsWith('http')) || [];
+
+        // Convert newly selected images to base64
+        let newBase64Images: string[] = [];
+        if (this.selectedImages.length > 0) {
+          newBase64Images = await this.convertImagesToBase64();
+        }
+
+        // Determine which existing images are still in imagePreview
+        const retainedExistingUrls = this.imagePreview.filter(previewUrl =>
+          existingImageUrls.includes(previewUrl)
         );
+
+        // Combine retained existing URLs with new base64 images
+        imagesToSave = [...retainedExistingUrls, ...newBase64Images];
+      } else {
+        // CREATE MODE: Only new base64 images
+        if (this.selectedImages.length > 0) {
+          imagesToSave = await this.convertImagesToBase64();
+        }
       }
 
       // Prepare data for backend (images as string[])

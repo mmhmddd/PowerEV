@@ -1,13 +1,9 @@
-import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, PLATFORM_ID, Inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Meta, Title } from '@angular/platform-browser';
 import { trigger, style, animate, transition } from '@angular/animations';
-
-interface GalleryImage {
-  src: string;
-  alt: string;
-  title?: string;
-}
+import { Subject, takeUntil } from 'rxjs';
+import { GalleryService, GalleryItem } from '../../core/services/gallery.service';
 
 @Component({
   selector: 'app-gallery',
@@ -33,70 +29,87 @@ interface GalleryImage {
     ])
   ]
 })
-export class GalleryComponent implements OnInit {
+export class GalleryComponent implements OnInit, OnDestroy {
   isBrowser: boolean;
-  selectedImage: GalleryImage | null = null;
+  selectedImage: GalleryItem | null = null;
   selectedIndex: number = -1;
 
-  galleryImages: GalleryImage[] = [
-    {
-      src: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=800',
-      alt: 'محطة شحن السيارات الكهربائية - Power EV',
-      title: 'محطة شحن عامة'
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1646719000106-963507639034?auto=format&fit=crop&q=80&w=800',
-      alt: 'شاحن سيارة كهربائية حديث',
-      title: 'شاحن منزلي'
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1662446759714-38641957247e?auto=format&fit=crop&q=80&w=800',
-      alt: 'سيارة كهربائية أثناء الشحن',
-      title: 'شحن سريع'
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=800',
-      alt: 'تركيب محطة شحن كهربائية',
-      title: 'تركيبات احترافية'
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1565514020176-db79364b9643?auto=format&fit=crop&q=80&w=800',
-      alt: 'شاحن سيارة كهربائية متطور',
-      title: 'أحدث التقنيات'
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1566093097221-ac2335b09e70?auto=format&fit=crop&q=80&w=800',
-      alt: 'محطة شحن Power EV',
-      title: 'خدمات متكاملة'
-    }
-  ];
+  galleryItems: GalleryItem[] = [];
+  isLoading: boolean = false;
+  errorMessage: string = '';
+
+  private destroy$ = new Subject<void>();
+  private keydownHandler!: (e: KeyboardEvent) => void;
 
   constructor(
     private meta: Meta,
     private title: Title,
+    private galleryService: GalleryService,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 
   ngOnInit(): void {
-    // SEO Meta tags
     this.title.setTitle('معرض الصور - Power EV | صور محطات ومنتجات الشحن');
     this.meta.addTags([
-      { name: 'description', content: 'تصفح معرض صور Power EV لمحطات وأجهزة شحن السيارات الكهربائية. شاهد تركيباتنا ومنتجاتنا على أرض الواقع.' },
-      { name: 'keywords', content: 'معرض صور, محطات شحن, سيارات كهربائية, Power EV, صور تركيبات' },
+      { name: 'description', content: 'تصفح معرض صور Power EV لمحطات وأجهزة شحن السيارات الكهربائية.' },
+      { name: 'keywords', content: 'معرض صور, محطات شحن, سيارات كهربائية, Power EV' },
       { property: 'og:title', content: 'معرض الصور - Power EV' },
       { property: 'og:description', content: 'لقطات من تركيباتنا ومنتجاتنا على أرض الواقع' },
       { property: 'og:type', content: 'website' },
-      { property: 'og:image', content: this.galleryImages[0].src },
       { name: 'twitter:card', content: 'summary_large_image' }
     ]);
 
-    // Add keyboard navigation
+    this.loadGalleryItems();
+
     if (this.isBrowser) {
       this.addKeyboardNavigation();
-      this.addStructuredData();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+
+    // Clean up keyboard listener to avoid memory leaks
+    if (this.isBrowser && this.keydownHandler) {
+      document.removeEventListener('keydown', this.keydownHandler);
+    }
+
+    // Restore scroll if component is destroyed while lightbox is open
+    if (this.isBrowser) {
+      document.body.style.overflow = '';
+    }
+  }
+
+  private loadGalleryItems(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.galleryService.getAllGalleryItems()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (response.success && response.galleryItems) {
+            this.galleryItems = response.galleryItems;
+
+            if (this.isBrowser && this.galleryItems.length > 0) {
+              this.addStructuredData();
+              // Update og:image meta tag with first image
+              this.meta.updateTag({ property: 'og:image', content: this.galleryItems[0].image });
+            }
+          } else {
+            this.errorMessage = response.message || 'حدث خطأ أثناء تحميل الصور';
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.errorMessage = 'تعذر الاتصال بالخادم. يرجى المحاولة لاحقاً.';
+          console.error('Gallery load error:', err);
+        }
+      });
   }
 
   private addStructuredData(): void {
@@ -107,31 +120,38 @@ export class GalleryComponent implements OnInit {
       '@type': 'ImageGallery',
       name: 'معرض صور Power EV',
       description: 'لقطات من تركيباتنا ومنتجاتنا على أرض الواقع',
-      image: this.galleryImages.map(img => ({
+      image: this.galleryItems.map(item => ({
         '@type': 'ImageObject',
-        url: img.src,
-        description: img.alt
+        url: item.image,
+        name: item.title || '',
+        description: item.description || ''
       }))
     });
     document.head.appendChild(script);
   }
 
   private addKeyboardNavigation(): void {
-    document.addEventListener('keydown', (e) => {
-      if (this.selectedImage) {
-        if (e.key === 'Escape') {
+    this.keydownHandler = (e: KeyboardEvent) => {
+      if (!this.selectedImage) return;
+
+      switch (e.key) {
+        case 'Escape':
           this.closeLightbox();
-        } else if (e.key === 'ArrowRight') {
+          break;
+        case 'ArrowRight':
           this.nextImage();
-        } else if (e.key === 'ArrowLeft') {
+          break;
+        case 'ArrowLeft':
           this.previousImage();
-        }
+          break;
       }
-    });
+    };
+
+    document.addEventListener('keydown', this.keydownHandler);
   }
 
-  openLightbox(image: GalleryImage, index: number): void {
-    this.selectedImage = image;
+  openLightbox(item: GalleryItem, index: number): void {
+    this.selectedImage = item;
     this.selectedIndex = index;
 
     if (this.isBrowser) {
@@ -149,31 +169,23 @@ export class GalleryComponent implements OnInit {
   }
 
   nextImage(): void {
-    if (this.selectedIndex < this.galleryImages.length - 1) {
-      this.selectedIndex++;
-      this.selectedImage = this.galleryImages[this.selectedIndex];
-    } else {
-      // Loop back to first image
-      this.selectedIndex = 0;
-      this.selectedImage = this.galleryImages[0];
-    }
+    this.selectedIndex = (this.selectedIndex + 1) % this.galleryItems.length;
+    this.selectedImage = this.galleryItems[this.selectedIndex];
   }
 
   previousImage(): void {
-    if (this.selectedIndex > 0) {
-      this.selectedIndex--;
-      this.selectedImage = this.galleryImages[this.selectedIndex];
-    } else {
-      // Loop to last image
-      this.selectedIndex = this.galleryImages.length - 1;
-      this.selectedImage = this.galleryImages[this.selectedIndex];
-    }
+    this.selectedIndex =
+      (this.selectedIndex - 1 + this.galleryItems.length) % this.galleryItems.length;
+    this.selectedImage = this.galleryItems[this.selectedIndex];
   }
 
   onBackdropClick(event: MouseEvent): void {
-    // Close lightbox when clicking on backdrop (not the image)
     if (event.target === event.currentTarget) {
       this.closeLightbox();
     }
+  }
+
+  retryLoad(): void {
+    this.loadGalleryItems();
   }
 }

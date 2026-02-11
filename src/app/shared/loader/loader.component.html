@@ -1,0 +1,53 @@
+<!-- Loader overlay -->
+<div class="loader-overlay" [class.fade-out]="!isLoading">
+  <div class="loader-content">
+    <!-- Logo with enhanced fill animation and magical effects -->
+    <div class="logo-wrapper">
+      <!-- Enhanced glow effect background -->
+      <div class="logo-glow"></div>
+
+      <!-- Logo container with mask animation and sparkles -->
+      <div class="logo-container">
+        <!-- Base logo (grayscale/dark) -->
+        <div class="logo-base">
+          <img [src]="logoPath" alt="Power EV" loading="eager">
+        </div>
+
+        <!-- Colored logo with ultra-smooth fill mask (fills from bottom to top) -->
+        <div class="logo-fill" [style.height.%]="fillPercentage">
+          <img [src]="logoPath" alt="Power EV" loading="eager">
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading text with animated dots -->
+    <div class="loading-text">
+      <span>Charging</span>
+      <span class="dots">
+        <span class="dot">.</span>
+        <span class="dot">.</span>
+        <span class="dot">.</span>
+      </span>
+    </div>
+
+    <!-- Enhanced progress bar with percentage and shimmer -->
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="fillPercentage">
+          <div class="progress-shimmer"></div>
+        </div>
+      </div>
+      <div class="percentage">{{ fillPercentage }}%</div>
+    </div>
+
+    <!-- Battery charging indicator with dynamic fill -->
+    <div class="battery-indicator">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="7" width="16" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+        <path d="M19 10h2v4h-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <rect class="battery-level" x="5" y="9" [attr.width]="fillPercentage / 8" height="6" rx="1" fill="currentColor"/>
+      </svg>
+      <span class="battery-text">Power Up</span>
+    </div>
+  </div>
+</div>

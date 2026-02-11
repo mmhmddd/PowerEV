@@ -256,6 +256,7 @@ export interface PlugResponse {
 
 // ============= STATION =============
 export interface Station {
+  stockStatus: string;
   _id: string;
   name: string;
   price: number;

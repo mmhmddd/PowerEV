@@ -1,58 +1,53 @@
+// ==========================================
+// FOOTER COMPONENT — Theme-aware styles
+// Uses CSS custom properties from global styles
+// ==========================================
 
-$green:          rgb(0, 255, 65);
-$green-light:    rgba(0, 255, 65, 0.10);
-$green-border:   rgba(0, 255, 65, 0.30);
-$green-glow:     rgba(0, 255, 65, 0.15);
-
-$white:          #ffffff;
-$white-dim:      rgba(255, 255, 255, 0.78);
-$white-dimmer:   rgba(255, 255, 255, 0.50);
-$gray-medium:    rgba(255, 255, 255, 0.09);
-$gray-light:     rgba(255, 255, 255, 0.07);
-
-// ── Transitions (shared) ───────────────────────────────
+$font-arabic-only: 'Cairo', sans-serif;
 $transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 $transition-fast: all 0.2s ease;
 
-
+// ==========================================
+// FOOTER SECTION
+// ==========================================
 .footer-section {
-  background: linear-gradient(
-    135deg,
-    rgba(15, 23, 42, 0.92) 0%,
-    rgba(26, 34, 56, 0.90) 50%,
-    rgba(15, 23, 44, 0.92) 100%
-  );
-
+  background: var(--bg-glass);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
 
-  color: $white-dim;
+  color: var(--text-secondary);
   padding: 4rem 0 0;
-  border-top: 1px solid $gray-light;
+  border-top: 1px solid var(--border-light);
   position: relative;
   overflow: hidden;
-  box-shadow:
-    0 -10px 40px rgba(0, 0, 0, 0.35),
-    0 -4px 20px rgba(0, 0, 0, 0.2);
+  font-family: $font-arabic-only;
 
+  box-shadow:
+    0 -10px 40px rgba(0, 0, 0, 0.12),
+    0 -4px 20px rgba(0, 0, 0, 0.08);
+
+  transition: background 0.4s ease, border-color 0.4s ease;
+
+  // Subtle radial accent glows
   &::before,
   &::after {
     content: '';
     position: absolute;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(0, 255, 65, 0.03), transparent 70%);
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--green-light), transparent 70%);
     pointer-events: none;
+    opacity: 0.5;
   }
 
   &::before {
     top: -30%;
-    inset-inline-end: -20%;
+    inset-inline-end: -15%;
   }
 
   &::after {
     bottom: -30%;
-    inset-inline-start: -20%;
+    inset-inline-start: -15%;
   }
 
   .container {
@@ -66,8 +61,14 @@ $transition-fast: all 0.2s ease;
       padding-inline: 1rem;
     }
   }
+
+  @media (max-width: 991px) { padding: 3rem 0 0; }
+  @media (max-width: 575px) { padding: 2.5rem 0 0; }
 }
 
+// ==========================================
+// FOOTER CONTENT GRID
+// ==========================================
 .footer-content {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -77,16 +78,18 @@ $transition-fast: all 0.2s ease;
   @media (max-width: 991px) {
     grid-template-columns: repeat(2, 1fr);
     gap: 2.5rem;
+    padding-bottom: 2.5rem;
   }
 
   @media (max-width: 575px) {
     grid-template-columns: 1fr;
     gap: 2rem;
+    padding-bottom: 2rem;
   }
 }
 
 // ==========================================
-// Footer Column
+// FOOTER COLUMN
 // ==========================================
 .footer-column {
   display: flex;
@@ -109,180 +112,199 @@ $transition-fast: all 0.2s ease;
 }
 
 // ==========================================
-// Titles
+// FOOTER TITLE
 // ==========================================
 .footer-title {
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-bottom: 1.75rem;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  color: $white;
+  color: var(--text-primary);
   position: relative;
 
   .title-text {
     position: relative;
     z-index: 1;
+    white-space: nowrap;
   }
 
   .title-line {
     flex: 1;
     height: 2px;
-    background: linear-gradient(90deg, $green, transparent);
+    background: linear-gradient(to left, var(--green), transparent);
     border-radius: 2px;
+    position: relative;
 
     &::before {
       content: '';
       position: absolute;
-      inset-inline-end: 0;
+      inset-inline-start: 0;
       top: 50%;
       transform: translateY(-50%);
       width: 6px;
       height: 6px;
-      background: $green;
+      background: var(--green);
       border-radius: 50%;
-      box-shadow: 0 0 10px $green;
+      box-shadow: 0 0 10px var(--green-glow);
     }
+  }
+
+  @media (max-width: 991px) {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 575px) {
+    font-size: 1.05rem;
+    margin-bottom: 1.25rem;
   }
 }
 
 // ==========================================
-// Links
+// FOOTER LINKS
 // ==========================================
 .footer-links {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.6rem;
 
   .footer-link {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    color: $white-dim;
+    gap: 0.7rem;
+    color: var(--text-secondary);
     text-decoration: none;
-    font-size: 1rem;
+    font-size: 0.97rem;
+    padding: 0.45rem 0;
+    border-radius: 8px;
     transition: $transition-base;
-    padding: 0.5rem 0;
     position: relative;
 
     .link-icon {
       display: flex;
       align-items: center;
-      color: $green;
+      color: var(--green);
       transition: $transition-fast;
       flex-shrink: 0;
+      opacity: 0.7;
 
-      svg { transform: rotate(180deg); } // RTL
+      svg { transform: rotate(180deg); }
     }
 
     .link-text {
-      position: relative;
       transition: $transition-fast;
     }
 
-    &::before {
-      content: '';
-      position: absolute;
-      inset-inline-end: -0.5rem;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 0;
-      height: 2px;
-      background: $green;
-      transition: width $transition-base;
-      border-radius: 2px;
-    }
-
     &:hover {
-      color: $white;
-      padding-inline-end: 0.5rem;
-
-      &::before { width: 30px; }
+      color: var(--text-primary);
+      padding-inline-end: 0.35rem;
 
       .link-icon {
+        opacity: 1;
         transform: translateX(-3px);
-        filter: drop-shadow(0 0 8px $green);
+        filter: drop-shadow(0 0 6px var(--green-glow));
       }
 
-      .link-text { transform: translateX(-3px); }
+      .link-text {
+        transform: translateX(-3px);
+        color: var(--green);
+      }
     }
 
-    &:active { color: $green; }
+    &:active { color: var(--green); }
+
+    &:focus-visible {
+      outline: 2px solid var(--green);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
   }
 }
 
 // ==========================================
-// Contact Info
+// CONTACT INFO
 // ==========================================
 .contact-info {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.1rem;
 
   .contact-item {
     display: flex;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 0.9rem;
+    padding: 0.75rem;
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    transition: $transition-base;
+
+    &:hover {
+      border-color: var(--green-border);
+      background: var(--green-light);
+
+      .contact-icon {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 6px var(--green-glow));
+      }
+    }
 
     .contact-icon {
       display: flex;
       align-items: center;
       justify-content: center;
-      color: $green;
+      color: var(--green);
       flex-shrink: 0;
-      margin-top: 2px;
+      margin-top: 1px;
       transition: $transition-fast;
     }
 
     .contact-text {
-      color: $white-dimmer;
-      line-height: 1.7;
+      color: var(--text-secondary);
+      line-height: 1.65;
       margin: 0;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       white-space: pre-line;
     }
 
     .contact-link {
-      color: $white-dimmer;
+      color: var(--text-secondary);
       text-decoration: none;
+      font-size: 0.92rem;
       transition: $transition-fast;
-      font-size: 0.95rem;
       position: relative;
 
       &::after {
         content: '';
         position: absolute;
         inset-inline-end: 0;
-        bottom: -2px;
+        bottom: -1px;
         width: 0;
         height: 1px;
-        background: $green;
+        background: var(--green);
         transition: width $transition-base;
+        border-radius: 2px;
       }
 
       &:hover {
-        color: $green;
+        color: var(--green);
 
         &::after { width: 100%; }
       }
-    }
-
-    &:hover .contact-icon {
-      transform: scale(1.1);
-      filter: drop-shadow(0 0 8px $green);
     }
   }
 }
 
 // ==========================================
-// Brand / Logo Area
+// BRAND / LOGO AREA
 // ==========================================
 .footer-brand {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.5rem;
+  gap: 1.25rem;
 
   @media (max-width: 991px) {
     align-items: center;
@@ -296,55 +318,53 @@ $transition-fast: all 0.2s ease;
 
   &:hover {
     transform: scale(1.05);
+    filter: drop-shadow(0 4px 12px var(--green-glow));
   }
 
   .logo-img {
-    height: 60px;
+    height: 58px;
     width: auto;
-    filter: drop-shadow(0 4px 10px rgba(0, 255, 65, 0.2));
     transition: $transition-fast;
 
-    @media (max-width: 767px) {
-      height: 50px;
-    }
-  }
-
-  &:hover .logo-img {
-    filter: drop-shadow(0 6px 15px rgba(0, 255, 65, 0.35));
+    @media (max-width: 767px) { height: 48px; }
   }
 }
 
 .brand-description {
-  color: $white-dimmer;
+  color: var(--text-muted);
   line-height: 1.8;
-  font-size: 0.95rem;
+  font-size: 0.93rem;
   margin: 0;
   max-width: 280px;
 
   @media (max-width: 991px) {
-    max-width: 600px;
+    max-width: 560px;
   }
 }
 
 // ==========================================
-// Social Icons
+// SOCIAL LINKS
 // ==========================================
 .social-links {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-top: 0.5rem;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+
+  @media (max-width: 991px) {
+    justify-content: center;
+  }
 
   .social-link {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 45px;
-    height: 45px;
-    background: $gray-medium;
-    border: 1px solid $gray-light;
+    width: 44px;
+    height: 44px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
     border-radius: 12px;
-    color: $white-dim;
+    color: var(--text-secondary);
     transition: $transition-base;
     position: relative;
     overflow: hidden;
@@ -355,7 +375,7 @@ $transition-fast: all 0.2s ease;
       inset: 50% auto auto 50%;
       width: 0;
       height: 0;
-      background: $green-light;
+      background: var(--green-light);
       border-radius: 50%;
       transform: translate(-50%, -50%);
       transition: width 0.4s ease, height 0.4s ease;
@@ -368,11 +388,11 @@ $transition-fast: all 0.2s ease;
     }
 
     &:hover {
-      background: $green-light;
-      border-color: $green;
-      color: $green;
+      background: var(--green-light);
+      border-color: var(--green-border);
+      color: var(--green);
       transform: translateY(-3px);
-      box-shadow: 0 5px 20px rgba(0, 255, 65, 0.3);
+      box-shadow: 0 6px 20px var(--green-glow);
 
       &::before {
         width: 100px;
@@ -380,18 +400,21 @@ $transition-fast: all 0.2s ease;
       }
 
       svg {
-        transform: scale(1.1) rotate(5deg);
+        transform: scale(1.15) rotate(5deg);
       }
     }
 
-    &:active {
-      transform: translateY(-1px);
+    &:active { transform: translateY(-1px); }
+
+    &:focus-visible {
+      outline: 2px solid var(--green);
+      outline-offset: 3px;
     }
   }
 }
 
 // ==========================================
-// Bottom Bar
+// FOOTER BOTTOM
 // ==========================================
 .footer-bottom {
   padding: 1.5rem 0;
@@ -402,8 +425,8 @@ $transition-fast: all 0.2s ease;
     background: linear-gradient(
       90deg,
       transparent,
-      $gray-light 20%,
-      $gray-light 80%,
+      var(--border-subtle) 20%,
+      var(--border-subtle) 80%,
       transparent
     );
     margin-bottom: 1.5rem;
@@ -413,53 +436,28 @@ $transition-fast: all 0.2s ease;
     text-align: center;
 
     .copyright-text {
-      color: $white-dimmer;
-      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-size: 0.88rem;
       margin: 0;
       letter-spacing: 0.3px;
-
-      @media (max-width: 575px) {
-        font-size: 0.85rem;
-      }
     }
   }
 }
 
 // ==========================================
-// Responsive
-// ==========================================
-@media (max-width: 991px) {
-  .footer-section { padding: 3rem 0 0; }
-  .footer-content { padding-bottom: 2.5rem; }
-  .footer-title {
-    font-size: 1.15rem;
-    margin-bottom: 1.5rem;
-  }
-}
-
-@media (max-width: 575px) {
-  .footer-section { padding: 2.5rem 0 0; }
-  .footer-content {
-    gap: 1.75rem;
-    padding-bottom: 2rem;
-  }
-  .footer-title {
-    font-size: 1.1rem;
-    margin-bottom: 1.25rem;
-  }
-  .social-links { justify-content: center; }
-}
-
-// ==========================================
-// Focus / Accessibility
+// ACCESSIBILITY
 // ==========================================
 .footer-link,
 .contact-link,
 .social-link,
 .footer-logo {
   &:focus-visible {
-    outline: 2px solid $green;
+    outline: 2px solid var(--green);
     outline-offset: 3px;
     border-radius: 4px;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0.01ms !important; }
 }

@@ -1,0 +1,516 @@
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  opacity: 1;
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // GPU acceleration for smooth performance
+  will-change: opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+
+  &.fade-out {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Performance optimization
+  will-change: transform, opacity;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Logo wrapper with enhanced glow
+.logo-wrapper {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // Performance boost
+  will-change: transform;
+}
+
+.logo-glow {
+  position: absolute;
+  width: 140%;
+  height: 140%;
+  background: radial-gradient(
+    circle,
+    rgba(102, 255, 51, 0.25) 0%,
+    rgba(102, 255, 51, 0.15) 25%,
+    rgba(102, 255, 51, 0.08) 50%,
+    transparent 75%
+  );
+  animation: pulseGlow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  filter: blur(50px);
+
+  // GPU acceleration
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    transform: scale(1) translateZ(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.12) translateZ(0);
+    opacity: 0.8;
+  }
+}
+
+// Logo container
+.logo-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+
+  // Magic sparkle effect
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #66ff33;
+    border-radius: 50%;
+    box-shadow: 0 0 20px #66ff33, 0 0 40px #66ff33;
+    opacity: 0;
+    animation: sparkle 3s ease-in-out infinite;
+  }
+
+  &::before {
+    top: 15%;
+    right: 10%;
+    animation-delay: 0.5s;
+  }
+
+  &::after {
+    bottom: 20%;
+    left: 15%;
+    animation-delay: 1.8s;
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5) rotate(180deg);
+  }
+}
+
+.logo-base,
+.logo-fill {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+
+    // Performance optimization
+    will-change: filter;
+    transform: translateZ(0);
+  }
+}
+
+// Base logo (dark/grayscale version)
+.logo-base {
+  img {
+    filter: brightness(0.15) grayscale(1) contrast(1.1);
+  }
+}
+
+// Fill logo (colored version with ultra-smooth fill)
+.logo-fill {
+  bottom: 0;
+  left: 0;
+  height: 0%;
+
+  // Ultra-smooth transition with hardware acceleration
+  transition: height 0.16s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: height;
+  transform: translateZ(0);
+
+  img {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) translateZ(0);
+    filter: drop-shadow(0 0 30px rgba(102, 255, 51, 0.8))
+            drop-shadow(0 0 60px rgba(102, 255, 51, 0.5))
+            brightness(1.1)
+            contrast(1.05);
+  }
+}
+
+// Magical particle effect
+.logo-wrapper::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(102, 255, 51, 0.1) 0%, transparent 30%),
+    radial-gradient(circle at 70% 60%, rgba(102, 255, 51, 0.08) 0%, transparent 25%),
+    radial-gradient(circle at 50% 30%, rgba(102, 255, 51, 0.06) 0%, transparent 20%);
+  animation: particleFloat 8s ease-in-out infinite;
+  pointer-events: none;
+  will-change: transform;
+}
+
+@keyframes particleFloat {
+  0%, 100% {
+    transform: translate(-10%, -10%) rotate(0deg);
+  }
+  33% {
+    transform: translate(5%, 5%) rotate(120deg);
+  }
+  66% {
+    transform: translate(-5%, 10%) rotate(240deg);
+  }
+}
+
+// Loading text with enhanced glow
+.loading-text {
+  font-size: 2rem;
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 20px rgba(102, 255, 51, 0.6),
+    0 0 40px rgba(102, 255, 51, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  // Performance
+  will-change: opacity;
+}
+
+.dots {
+  display: flex;
+  gap: 0.3rem;
+  width: 65px;
+}
+
+.dot {
+  animation: dotPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  color: #66ff33;
+  text-shadow: 0 0 10px currentColor;
+  will-change: opacity, transform;
+
+  &:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  &:nth-child(2) {
+    animation-delay: 0.3s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 0.6s;
+  }
+}
+
+@keyframes dotPulse {
+  0%, 60%, 100% {
+    opacity: 0.25;
+    transform: scale(1) translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.5) translateY(-3px);
+  }
+}
+
+// Progress container
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  width: 350px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(102, 255, 51, 0.25);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.6),
+    0 1px 2px rgba(102, 255, 51, 0.2);
+
+  // Performance
+  will-change: contents;
+  transform: translateZ(0);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg,
+    #66ff33 0%,
+    #7aff47 20%,
+    #8fff5c 40%,
+    #a3ff70 50%,
+    #8fff5c 60%,
+    #7aff47 80%,
+    #66ff33 100%
+  );
+  border-radius: 20px;
+  position: relative;
+  box-shadow:
+    0 0 20px rgba(102, 255, 51, 0.9),
+    0 0 40px rgba(102, 255, 51, 0.5),
+    0 0 60px rgba(102, 255, 51, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+
+  // Ultra-smooth width transition
+  transition: width 0.16s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: width;
+  transform: translateZ(0);
+
+  // Animated gradient for extra magic
+  background-size: 200% 100%;
+  animation: gradientSlide 3s linear infinite;
+}
+
+@keyframes gradientSlide {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.progress-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 40%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.4) 60%,
+    transparent 100%
+  );
+  animation: shimmer 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  will-change: transform;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 200%;
+  }
+}
+
+.percentage {
+  font-size: 1.5rem;
+  color: #66ff33;
+  font-weight: 700;
+  min-width: 65px;
+  text-align: right;
+  font-family: 'Courier New', monospace;
+  text-shadow:
+    0 0 15px rgba(102, 255, 51, 0.8),
+    0 0 30px rgba(102, 255, 51, 0.4);
+
+  // Smooth transition
+  transition: all 0.16s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: contents;
+}
+
+// Battery indicator with pulse
+.battery-indicator {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #66ff33;
+  animation: batteryPulse 2s ease-in-out infinite;
+
+  svg {
+    width: 40px;
+    height: 40px;
+    filter: drop-shadow(0 0 10px rgba(102, 255, 51, 0.7));
+    will-change: filter;
+  }
+
+  .battery-level {
+    transition: width 0.16s cubic-bezier(0.25, 0.1, 0.25, 1);
+    will-change: width;
+  }
+}
+
+@keyframes batteryPulse {
+  0%, 100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.battery-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(102, 255, 51, 0.4);
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .logo-wrapper {
+    width: 300px;
+    height: 300px;
+  }
+
+  .loading-text {
+    font-size: 1.5rem;
+    letter-spacing: 3px;
+  }
+
+  .progress-container {
+    width: 280px;
+  }
+
+  .percentage {
+    font-size: 1.25rem;
+    min-width: 55px;
+  }
+
+  .battery-indicator {
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .battery-text {
+    font-size: 1rem;
+  }
+
+  .loader-content {
+    gap: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-wrapper {
+    width: 220px;
+    height: 220px;
+  }
+
+  .loading-text {
+    font-size: 1.25rem;
+    letter-spacing: 2px;
+  }
+
+  .progress-container {
+    width: 240px;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .progress-bar {
+    width: 100%;
+  }
+
+  .percentage {
+    font-size: 1.125rem;
+  }
+
+  .battery-indicator {
+    svg {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .battery-text {
+    font-size: 0.9rem;
+  }
+
+  .loader-content {
+    gap: 2rem;
+  }
+}
+
+// Performance optimization for reduced motion
+@media (prefers-reduced-motion: reduce) {
+  .loader-overlay,
+  .logo-glow,
+  .dot,
+  .progress-shimmer,
+  .battery-indicator,
+  .progress-fill {
+    animation: none !important;
+  }
+
+  .logo-fill,
+  .progress-fill,
+  .battery-level {
+    transition: none !important;
+  }
+
+  .logo-wrapper::before,
+  .logo-container::before,
+  .logo-container::after {
+    display: none;
+  }
+}

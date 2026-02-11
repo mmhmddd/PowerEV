@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy, HostListener, Inject, PLATFORM_ID } from 
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
+import { ThemeService, Theme } from '../../core/services/theme.service';
+import { CartService } from '../../core/services/cart.service';
 
 interface NavLink {
   name: string;
@@ -17,7 +19,9 @@ interface NavLink {
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   isMenuOpen = false;
-  cartCount = 3; // Bind this to your cart service
+  cartCount = 0; // Will be updated from CartService
+  isDark = true;
+
   private destroy$ = new Subject<void>();
   private isBrowser: boolean;
 
@@ -31,13 +35,35 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
+    private themeService: ThemeService,
+    private cartService: CartService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
   ngOnInit(): void {
-    // Subscribe to route changes to close mobile menu on navigation
+    // Subscribe to theme changes
+    this.themeService.theme$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((theme: Theme) => {
+        this.isDark = theme === 'dark';
+      });
+
+    // Subscribe to cart changes and update cart count dynamically
+    this.cartService.cart$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(cart => {
+        if (cart) {
+          // Calculate total quantity of all items in cart
+          this.cartCount = cart.items.reduce((total, item) => total + item.quantity, 0);
+          console.log('Cart count updated:', this.cartCount);
+        } else {
+          this.cartCount = 0;
+        }
+      });
+
+    // Close mobile menu on navigation
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
@@ -54,18 +80,20 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Toggle theme between dark and light
+   */
+  toggleTheme(): void {
+    this.themeService.toggle();
+  }
+
+  /**
    * Toggle mobile menu open/closed
    */
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
 
-    // Prevent body scroll when menu is open (browser only)
     if (this.isBrowser) {
-      if (this.isMenuOpen) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = '';
-      }
+      document.body.style.overflow = this.isMenuOpen ? 'hidden' : '';
     }
   }
 
@@ -75,15 +103,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   closeMenu(): void {
     this.isMenuOpen = false;
 
-    // Reset body overflow (browser only)
     if (this.isBrowser) {
       document.body.style.overflow = '';
     }
   }
 
-  /**
-   * Close menu when clicking outside on mobile (browser only)
-   */
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if (!this.isBrowser) return;
@@ -95,7 +119,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.closeMenu();
     }
   }
-
 
   @HostListener('document:keydown.escape')
   onEscapeKey(): void {

@@ -45,7 +45,7 @@
         <option *ngFor="let type of connectorTypes" [value]="type">{{ type }}</option>
       </select>
 
-      <select class="filter-select" [(ngModel)]="selectedQuantity" (change)="filterStations()">
+      <select class="filter-select" [(ngModel)]="selectedStockStatus" (change)="filterStations()">
         <option value="">جميع الحالات</option>
         <option value="in stock">متوفر</option>
         <option value="out of stock">غير متوفر</option>
@@ -87,7 +87,7 @@
         <div class="stations-table__cell">الموصل</div>
         <div class="stations-table__cell">الفولتية</div>
         <div class="stations-table__cell">السعر</div>
-        <div class="stations-table__cell">المخزون</div>
+        <div class="stations-table__cell">الكمية</div>
         <div class="stations-table__cell">الحالة</div>
         <div class="stations-table__cell">العرض</div>
         <div class="stations-table__cell stations-table__cell--actions">إجراءات</div>
@@ -147,12 +147,12 @@
           </div>
 
           <div class="stations-table__cell">
-            <span class="text-secondary">{{ station.stock || 0 }}</span>
+            <span class="text-secondary">{{ station.quantity }}</span>
           </div>
 
           <div class="stations-table__cell">
-            <span [ngClass]="getStockClass(station.quantity)">
-              {{ getStockStatus(station.quantity) }}
+            <span [ngClass]="getStockClass(station.stockStatus)">
+              {{ getStockStatusLabel(station.stockStatus) }}
             </span>
           </div>
 
@@ -262,21 +262,22 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">حالة المخزون *</label>
-            <select class="form-select" [(ngModel)]="stationForm.quantity" name="quantity" required>
+            <select class="form-select" [(ngModel)]="stationForm.stockStatus" name="stockStatus" required>
               <option value="in stock">متوفر</option>
               <option value="out of stock">غير متوفر</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label class="form-label">الكمية</label>
+            <label class="form-label">الكمية في المخزن *</label>
             <input
               type="number"
               class="form-input"
-              [(ngModel)]="stationForm.stock"
-              name="stock"
+              [(ngModel)]="stationForm.quantity"
+              name="quantity"
               placeholder="0"
               min="0"
+              required
             >
           </div>
         </div>

@@ -10,11 +10,11 @@ interface StationWithSelection {
   _id: string;
   name: string;
   price: number;
-  quantity: 'in stock' | 'out of stock';
+  stockStatus: 'in stock' | 'out of stock';  // Changed from 'quantity'
+  quantity: number;  // Now represents the actual count in stock
   voltage?: number;
   amperage?: number;
   brand?: string;
-  stock?: number;
   offer?: {
     enabled: boolean;
     discountPercentage: number;
@@ -23,7 +23,7 @@ interface StationWithSelection {
   phase?: string;
   efficiency?: number;
   description?: string;
-  images?: any[]; // Can be ImageObject[] from backend or string[] for preview
+  images?: any[];
   createdAt?: string | Date;
   updatedAt?: string | Date;
   selected?: boolean;
@@ -32,11 +32,11 @@ interface StationWithSelection {
 interface StationBackendData {
   name: string;
   price: number;
-  quantity: 'in stock' | 'out of stock';
+  stockStatus: 'in stock' | 'out of stock';
+  quantity: number;
   voltage?: number;
   amperage?: number;
   brand?: string;
-  stock?: number;
   offer?: {
     enabled: boolean;
     discountPercentage: number;
@@ -68,7 +68,7 @@ export class StationControlComponent implements OnInit {
   searchTerm = '';
   selectedBrand = '';
   selectedConnectorType = '';
-  selectedQuantity = '';
+  selectedStockStatus = '';
 
   // Modals
   showStationModal = false;
@@ -80,11 +80,11 @@ export class StationControlComponent implements OnInit {
   stationForm: Partial<StationWithSelection> & { _id?: string } = {
     name: '',
     price: 0,
-    quantity: 'in stock',
+    stockStatus: 'in stock',
+    quantity: 0,
     voltage: undefined,
     amperage: undefined,
     brand: '',
-    stock: 0,
     connectorType: '',
     phase: '',
     efficiency: undefined,
@@ -113,7 +113,7 @@ export class StationControlComponent implements OnInit {
   // Lists for filters
   brands: string[] = [];
   connectorTypes: string[] = [];
-  quantityOptions = ['in stock', 'out of stock'];
+  stockStatusOptions = ['in stock', 'out of stock'];
 
   constructor(private stationService: StationService) {}
 
@@ -125,38 +125,39 @@ export class StationControlComponent implements OnInit {
   // Data Loading
   // ═══════════════════════════════════════════════════════
 
-loadStations(): void {
-  this.isLoading = true;
-  this.error = null;
+  loadStations(): void {
+    this.isLoading = true;
+    this.error = null;
 
-  this.stationService.getAllStations().subscribe({
-    next: (response) => {
-      this.stations = response.stations.map(station => ({
-        ...station,
-        selected: false,
-        // Convert quantity from number to string format
-        quantity: station.quantity > 0 ? 'in stock' : 'out of stock',
-        // Convert ImageObject[] to string[] for internal use
-        images: station.images?.map((img: any) =>
-          typeof img === 'string' ? img : img.url
-        ) || [],
-        // Ensure offer has proper structure
-        offer: station.offer || {
-          enabled: false,
-          discountPercentage: 0
-        }
-      }));
-      this.filteredStations = [...this.stations];
-      this.extractFilterOptions();
-      this.isLoading = false;
-    },
-    error: (error) => {
-      console.error('Error loading stations:', error);
-      this.error = error.error?.message || 'حدث خطأ أثناء تحميل المحطات';
-      this.isLoading = false;
-    }
-  });
-}
+    this.stationService.getAllStations().subscribe({
+      next: (response) => {
+        this.stations = response.stations.map(station => ({
+          ...station,
+          selected: false,
+          // Ensure stockStatus and quantity are properly typed
+          stockStatus: station.stockStatus || 'in stock',
+          quantity: station.quantity || 0,
+          // Convert ImageObject[] to string[] for internal use
+          images: station.images?.map((img: any) =>
+            typeof img === 'string' ? img : img.url
+          ) || [],
+          // Ensure offer has proper structure
+          offer: station.offer || {
+            enabled: false,
+            discountPercentage: 0
+          }
+        } as StationWithSelection));
+        this.filteredStations = [...this.stations];
+        this.extractFilterOptions();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading stations:', error);
+        this.error = error.error?.message || 'حدث خطأ أثناء تحميل المحطات';
+        this.isLoading = false;
+      }
+    });
+  }
 
   extractFilterOptions(): void {
     // Extract unique brands
@@ -193,10 +194,10 @@ loadStations(): void {
       // Connector type filter
       const matchesConnector = !this.selectedConnectorType || station.connectorType === this.selectedConnectorType;
 
-      // Quantity filter
-      const matchesQuantity = !this.selectedQuantity || station.quantity === this.selectedQuantity;
+      // Stock status filter
+      const matchesStockStatus = !this.selectedStockStatus || station.stockStatus === this.selectedStockStatus;
 
-      return matchesSearch && matchesBrand && matchesConnector && matchesQuantity;
+      return matchesSearch && matchesBrand && matchesConnector && matchesStockStatus;
     });
   }
 
@@ -231,11 +232,11 @@ loadStations(): void {
     this.stationForm = {
       name: '',
       price: 0,
-      quantity: 'in stock',
+      stockStatus: 'in stock',
+      quantity: 0,
       voltage: undefined,
       amperage: undefined,
       brand: '',
-      stock: 0,
       connectorType: '',
       phase: '',
       efficiency: undefined,
@@ -262,11 +263,11 @@ loadStations(): void {
       _id: station._id,
       name: station.name,
       price: station.price,
+      stockStatus: station.stockStatus,
       quantity: station.quantity,
       voltage: station.voltage,
       amperage: station.amperage,
       brand: station.brand || '',
-      stock: station.stock || 0,
       connectorType: station.connectorType || '',
       phase: station.phase || '',
       efficiency: station.efficiency,
@@ -293,10 +294,12 @@ loadStations(): void {
     const input = event.target as HTMLInputElement;
     if (input.files) {
       const files = Array.from(input.files);
-      this.selectedImages.push(...files);
 
-      // Create preview URLs
+      // Add to selected images array
       files.forEach(file => {
+        this.selectedImages.push(file);
+
+        // Create preview URL
         const reader = new FileReader();
         reader.onload = (e) => {
           if (e.target?.result) {
@@ -309,8 +312,22 @@ loadStations(): void {
   }
 
   removeImage(index: number): void {
+    const removedPreview = this.imagePreview[index];
+
+    // Remove from preview
     this.imagePreview.splice(index, 1);
-    this.selectedImages.splice(index, 1);
+
+    // If it's a new image (not an existing URL), remove from selectedImages
+    if (removedPreview && removedPreview.startsWith('data:')) {
+      // Find and remove the corresponding file from selectedImages
+      const newImageIndex = this.imagePreview
+        .filter(p => p.startsWith('data:'))
+        .indexOf(removedPreview);
+
+      if (newImageIndex !== -1 && newImageIndex < this.selectedImages.length) {
+        this.selectedImages.splice(newImageIndex, 1);
+      }
+    }
   }
 
   openImageViewer(index: number): void {
@@ -346,29 +363,44 @@ loadStations(): void {
     this.isSaving = true;
 
     try {
-      // Convert images to base64 if new images were selected
       let imagesToSave: string[] = [];
 
-      if (this.selectedImages.length > 0) {
-        // New images selected - convert to base64
-        imagesToSave = await this.convertImagesToBase64();
-      } else if (this.isEditMode && this.stationForm.images && this.stationForm.images.length > 0) {
-        // No new images, keep existing images
-        // Convert ImageObject[] to string[] if needed
-        imagesToSave = this.stationForm.images.map((img: any) =>
-          typeof img === 'string' ? img : img.url
+      if (this.isEditMode) {
+        // EDIT MODE: Mix existing URLs with new base64 images
+
+        // Get existing image URLs from the original station
+        const existingImageUrls = this.selectedStation?.images
+          ?.filter((url): url is string => typeof url === 'string' && url.startsWith('http')) || [];
+
+        // Convert newly selected images to base64
+        let newBase64Images: string[] = [];
+        if (this.selectedImages.length > 0) {
+          newBase64Images = await this.convertImagesToBase64();
+        }
+
+        // Determine which existing images are still in imagePreview
+        const retainedExistingUrls = this.imagePreview.filter(previewUrl =>
+          existingImageUrls.includes(previewUrl)
         );
+
+        // Combine retained existing URLs with new base64 images
+        imagesToSave = [...retainedExistingUrls, ...newBase64Images];
+      } else {
+        // CREATE MODE: Only new base64 images
+        if (this.selectedImages.length > 0) {
+          imagesToSave = await this.convertImagesToBase64();
+        }
       }
 
       // Prepare data for backend (images as string[])
       const stationData: Partial<StationBackendData> = {
         name: this.stationForm.name,
         price: this.stationForm.price,
-        quantity: this.stationForm.quantity,
+        stockStatus: this.stationForm.stockStatus,
+        quantity: this.stationForm.quantity || 0,
         voltage: this.stationForm.voltage,
         amperage: this.stationForm.amperage,
         brand: this.stationForm.brand || undefined,
-        stock: this.stationForm.stock || 0,
         connectorType: this.stationForm.connectorType || undefined,
         phase: this.stationForm.phase || undefined,
         efficiency: this.stationForm.efficiency,
@@ -378,7 +410,7 @@ loadStations(): void {
       };
 
       if (this.isEditMode && this.stationForm._id) {
-        // Update station - cast to any to bypass type checking for the service call
+        // Update station
         this.stationService.updateStation(this.stationForm._id, stationData as any).subscribe({
           next: (response) => {
             this.showToastMessage('تم تحديث المحطة بنجاح', 'success');
@@ -396,7 +428,7 @@ loadStations(): void {
           }
         });
       } else {
-        // Create station - cast to any to bypass type checking for the service call
+        // Create station
         this.stationService.createStation(stationData as any).subscribe({
           next: (response) => {
             this.showToastMessage('تم إضافة المحطة بنجاح', 'success');
@@ -451,8 +483,13 @@ loadStations(): void {
       return false;
     }
 
-    if (!this.stationForm.quantity) {
+    if (!this.stationForm.stockStatus) {
       this.showToastMessage('يرجى اختيار حالة المخزون', 'error');
+      return false;
+    }
+
+    if (this.stationForm.quantity !== undefined && this.stationForm.quantity < 0) {
+      this.showToastMessage('الكمية لا يمكن أن تكون سالبة', 'error');
       return false;
     }
 
@@ -463,11 +500,6 @@ loadStations(): void {
 
     if (this.stationForm.amperage !== undefined && this.stationForm.amperage < 0) {
       this.showToastMessage('التيار لا يمكن أن يكون سالب', 'error');
-      return false;
-    }
-
-    if (this.stationForm.stock !== undefined && this.stationForm.stock < 0) {
-      this.showToastMessage('الكمية لا يمكن أن تكون سالبة', 'error');
       return false;
     }
 
@@ -581,11 +613,11 @@ loadStations(): void {
     return price - discount;
   }
 
-  getStockStatus(quantity: string): string {
-    return quantity === 'in stock' ? 'متوفر' : 'غير متوفر';
+  getStockStatusLabel(stockStatus: string): string {
+    return stockStatus === 'in stock' ? 'متوفر' : 'غير متوفر';
   }
 
-  getStockClass(quantity: string): string {
-    return quantity === 'in stock' ? 'quantity-badge' : 'quantity-badge quantity-badge--out';
+  getStockClass(stockStatus: string): string {
+    return stockStatus === 'in stock' ? 'stock-badge' : 'stock-badge stock-badge--out';
   }
 }

@@ -289,11 +289,17 @@ export class OtherControlComponent implements OnInit {
 
   removeImage(index: number): void {
     this.imagePreview.splice(index, 1);
-    // Only remove from selectedImages if it's a new image (not from existing)
-    if (this.selectedImages.length > 0 && index >= (this.imagePreview.length - this.selectedImages.length)) {
-      const adjustedIndex = index - (this.imagePreview.length - this.selectedImages.length);
-      if (adjustedIndex >= 0) {
-        this.selectedImages.splice(adjustedIndex, 1);
+
+    // Calculate how many existing images vs new images
+    const existingImageCount = this.isEditMode && this.otherForm.images
+      ? this.otherForm.images.length
+      : 0;
+
+    // If removing a new image (beyond existing count)
+    if (index >= existingImageCount) {
+      const newImageIndex = index - existingImageCount;
+      if (newImageIndex >= 0 && newImageIndex < this.selectedImages.length) {
+        this.selectedImages.splice(newImageIndex, 1);
       }
     }
   }
@@ -320,7 +326,7 @@ export class OtherControlComponent implements OnInit {
   }
 
   // ═══════════════════════════════════════════════════════
-  // Save Other (Create or Update) - FIXED: Backend expects strings
+  // Save Other (Create or Update) - FIXED: Proper image handling
   // ═══════════════════════════════════════════════════════
 
   async saveOther(): Promise<void> {
@@ -336,12 +342,11 @@ export class OtherControlComponent implements OnInit {
       if (this.selectedImages.length > 0) {
         // New images selected - convert to base64
         imagesToSave = await this.convertImagesToBase64();
-      } else if (this.isEditMode && this.otherForm.images) {
-        // No new images in edit mode - keep existing images
-        imagesToSave = this.otherForm.images.map(img =>
-          typeof img === 'string' ? img : (img as ImageObject).url
-        );
+      } else if (this.isEditMode && this.imagePreview.length > 0) {
+        // No new images in edit mode - keep existing images from preview
+        imagesToSave = this.imagePreview;
       }
+      // else: no images at all (imagesToSave remains empty array)
 
       // Prepare data for backend (images as string[])
       const otherData: Partial<OtherBackendData> = {
@@ -351,7 +356,8 @@ export class OtherControlComponent implements OnInit {
         stock: this.otherForm.stock,
         type: this.otherForm.type || undefined,
         description: this.otherForm.description || undefined,
-        images: imagesToSave.length > 0 ? imagesToSave : undefined,
+        // Always send images array (even if empty) to properly handle deletions
+        images: imagesToSave,
         offer: this.otherForm.offer
       };
 

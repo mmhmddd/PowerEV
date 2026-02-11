@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 import { NavbarComponent } from "./shared/navbar/navbar.component";
 import { FooterComponent } from "./shared/footer/footer.component";
 import { ToastComponent } from "./shared/toast/toast.component";
+import { ThemeService } from "./core/services/theme.service";
 
 @Component({
   selector: 'app-root',
@@ -23,7 +24,12 @@ export class AppComponent implements OnInit {
   title = 'PowerEV';
   isAdminRoute = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    // Inject ThemeService here so it initialises early and applies the
+    // saved/system theme before any child component renders.
+    private themeService: ThemeService
+  ) {}
 
   ngOnInit(): void {
     // Check initial route
@@ -36,11 +42,12 @@ export class AppComponent implements OnInit {
       )
       .subscribe((event) => {
         this.checkRoute(event.urlAfterRedirects);
+        // Scroll to top on route change
+        window.scrollTo(0, 0);
       });
   }
 
   private checkRoute(url: string): void {
-    // Check if the current route starts with /admin
     this.isAdminRoute = url.startsWith('/admin');
   }
 }

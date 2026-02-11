@@ -64,10 +64,11 @@ export class CableControlComponent implements OnInit {
   selectedCable: CableWithSelection | null = null;
   cablesToDelete: CableWithSelection[] = [];
 
-  // Image handling
+  // Image handling - FIXED
   selectedImages: File[] = [];
   imagePreview: string[] = [];
   currentImageIndex = 0;
+  imagesChanged = false; // Track if images were modified
 
   // Toast
   showToast = false;
@@ -194,6 +195,7 @@ export class CableControlComponent implements OnInit {
 
   openAddCableModal(): void {
     this.isEditMode = false;
+    this.imagesChanged = false; // Reset flag
     this.cableForm = {
       name: '',
       price: 0,
@@ -226,6 +228,7 @@ export class CableControlComponent implements OnInit {
 
   openEditCableModal(cable: CableWithSelection): void {
     this.isEditMode = true;
+    this.imagesChanged = false; // Reset flag
     this.selectedCable = cable;
     this.cableForm = {
       _id: cable._id,
@@ -255,7 +258,7 @@ export class CableControlComponent implements OnInit {
   }
 
   // ═══════════════════════════════════════════════════════
-  // Image Handling
+  // Image Handling - FIXED
   // ═══════════════════════════════════════════════════════
 
   onImageSelect(event: Event): void {
@@ -263,6 +266,7 @@ export class CableControlComponent implements OnInit {
     if (input.files) {
       const files = Array.from(input.files);
       this.selectedImages.push(...files);
+      this.imagesChanged = true; // Mark images as changed
 
       // Create preview URLs
       files.forEach(file => {
@@ -279,7 +283,13 @@ export class CableControlComponent implements OnInit {
 
   removeImage(index: number): void {
     this.imagePreview.splice(index, 1);
-    this.selectedImages.splice(index, 1);
+
+    // Only remove from selectedImages if it exists there
+    if (index < this.selectedImages.length) {
+      this.selectedImages.splice(index, 1);
+    }
+
+    this.imagesChanged = true; // Mark images as changed
   }
 
   openImageViewer(index: number): void {
@@ -304,7 +314,7 @@ export class CableControlComponent implements OnInit {
   }
 
   // ═══════════════════════════════════════════════════════
-  // Save Cable (Create or Update)
+  // Save Cable (Create or Update) - FIXED
   // ═══════════════════════════════════════════════════════
 
   async saveCable(): Promise<void> {
@@ -315,18 +325,7 @@ export class CableControlComponent implements OnInit {
     this.isSaving = true;
 
     try {
-      // Convert images to base64 if new images were selected
-      let imagesToSave: string[] = [];
-
-      if (this.selectedImages.length > 0) {
-        // New images selected - convert to base64
-        imagesToSave = await this.convertImagesToBase64();
-      } else if (this.isEditMode && this.cableForm.images) {
-        // No new images, keep existing images
-        imagesToSave = this.cableForm.images;
-      }
-
-      // Prepare data for backend (images as string[])
+      // Prepare data for backend
       const cableData: Partial<CableBackendData> = {
         name: this.cableForm.name,
         price: this.cableForm.price,
@@ -342,9 +341,22 @@ export class CableControlComponent implements OnInit {
         cableLength: this.cableForm.cableLength || undefined,
         wireGauge: this.cableForm.wireGauge || undefined,
         description: this.cableForm.description || undefined,
-        images: imagesToSave.length > 0 ? imagesToSave : undefined,
         offer: this.cableForm.offer
       };
+
+      // FIXED: Only include images if they were changed
+      if (this.imagesChanged) {
+        if (this.selectedImages.length > 0) {
+          // New images were selected - convert to base64
+          const imagesToSave = await this.convertImagesToBase64();
+          cableData.images = imagesToSave;
+        } else {
+          // Images were cleared
+          cableData.images = [];
+        }
+      }
+      // If !imagesChanged, don't include images field at all (undefined)
+      // This tells the backend to keep existing images
 
       if (this.isEditMode && this.cableForm._id) {
         // Update cable
@@ -459,6 +471,7 @@ export class CableControlComponent implements OnInit {
     this.selectedCable = null;
     this.selectedImages = [];
     this.imagePreview = [];
+    this.imagesChanged = false;
   }
 
   // ═══════════════════════════════════════════════════════
