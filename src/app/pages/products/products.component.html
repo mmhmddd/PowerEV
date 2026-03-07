@@ -67,17 +67,28 @@
     </div>
 
     <div class="products-content">
+
+      <!-- MOBILE ONLY: backdrop that closes the drawer when tapped -->
+      <div class="mobile-backdrop" *ngIf="mobileFiltersOpen" (click)="toggleMobileFilters()"></div>
+
       <!-- Sidebar Filters -->
       <aside class="filters-sidebar" [class.mobile-open]="mobileFiltersOpen">
+
         <div class="filters-header">
           <div class="filters-title-section">
             <i class="bi bi-funnel-fill"></i>
             <h3>تصفية المنتجات</h3>
           </div>
-          <button class="reset-filters-btn" (click)="resetFilters()" *ngIf="getActiveFiltersCount() > 0">
-            <i class="bi bi-arrow-counterclockwise"></i>
-            إعادة تعيين
-          </button>
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <button class="reset-filters-btn" (click)="resetFilters()" *ngIf="getActiveFiltersCount() > 0">
+              <i class="bi bi-arrow-counterclockwise"></i>
+              إعادة تعيين
+            </button>
+            <!-- MOBILE ONLY: X close button inside sidebar header -->
+            <button class="mobile-header-close" (click)="toggleMobileFilters()">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Categories Filter -->
@@ -206,11 +217,18 @@
           </div>
         </div>
 
-        <!-- Mobile Close Button -->
+        <!-- Mobile Close Button (original — kept for compatibility) -->
         <button class="mobile-close-btn" (click)="toggleMobileFilters()">
           <i class="bi bi-x-circle"></i>
           إغلاق
         </button>
+
+        <!-- MOBILE ONLY: sticky green apply button at bottom of drawer -->
+        <button class="mobile-apply-btn" (click)="toggleMobileFilters()">
+          <i class="bi bi-check-lg"></i>
+          عرض {{ products.length }} منتج
+        </button>
+
       </aside>
 
       <!-- Products Grid -->
