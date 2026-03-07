@@ -45,7 +45,7 @@ export class SliderComponent implements OnInit, OnDestroy {
       id: 2,
       title: 'خدمة تركيب احترافية',
       description: 'فريق فني متخصص لتركيب وصيانة محطات الشحن',
-      image: '/assets/images/home/banner2.jpeg',
+      image: '/assets/images/home/station-img.jpeg',
       buttonText: 'احجز موعدك',
       buttonLink: '/contact',
       buttonAriaLabel: 'احجز موعد تركيب شاحن احترافي'
@@ -54,7 +54,7 @@ export class SliderComponent implements OnInit, OnDestroy {
       id: 3,
       title: 'كابلات شحن عالية الجودة',
       description: 'متوافقة مع جميع أنواع السيارات الكهربائية بضمان شامل',
-      image: '/assets/images/home/banner.webp',
+      image: '/assets/images/home/banner2.jpeg',
       buttonText: 'اكتشف المزيد',
       buttonLink: '/products/cables',
       buttonAriaLabel: 'اكتشف كابلات الشحن عالية الجودة'

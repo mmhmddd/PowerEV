@@ -44,12 +44,12 @@ export class FooterComponent {
   socialLinks: SocialLink[] = [
     {
       name: 'Facebook',
-      url: 'https://facebook.com/powerev',
+      url: 'https://www.facebook.com/profile.php?id=61554147848499',
       icon: 'facebook'
     },
     {
       name: 'Instagram',
-      url: 'https://instagram.com/powerev',
+      url: 'https://www.instagram.com/powerev_1',
       icon: 'instagram'
     }
   ];
@@ -59,7 +59,7 @@ export class FooterComponent {
     address: 'حلوان - برج التطعيش - شارع مصطفى صفوت\nتقاطع شارع عبد الرحمن',
     phone: '010 2021 6898',
     phoneRaw: '01020216898',
-    email: 'info@powerev.com'
+    email: 'powerev588@gmail.com'
   };
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {

@@ -44,8 +44,19 @@ export class CartComponent implements OnInit, OnDestroy {
         }
       });
 
-    // Load cart from backend
-    this.cartService.loadCart();
+    // Load cart from backend (only in browser)
+    if (this.cartService.isInBrowser()) {
+      this.cartService.loadCart();
+    } else {
+      // Set empty cart for SSR
+      this.cart = {
+        _id: '',
+        sessionId: '',
+        items: [],
+        totalPrice: 0
+      };
+      this.isLoading = false;
+    }
   }
 
   get cartItems(): CartItem[] {
@@ -156,6 +167,12 @@ export class CartComponent implements OnInit, OnDestroy {
     // Show warning before clearing
     if (this.cartItems.length === 0) {
       this.toastService.info('السلة فارغة بالفعل', 'تنبيه');
+      return;
+    }
+
+    // Ask for confirmation
+    const confirmed = confirm('هل أنت متأكد من حذف جميع المنتجات من السلة؟');
+    if (!confirmed) {
       return;
     }
 

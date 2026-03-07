@@ -22,6 +22,9 @@ export class ContactComponent implements OnInit {
   isSubmitting = false;
   isBrowser: boolean;
 
+  // WhatsApp phone number (international format without + or spaces)
+  private readonly whatsappNumber = '201020216898';
+
   contactDetails: ContactInfo[] = [
     {
       icon: 'map-pin',
@@ -37,7 +40,7 @@ export class ContactComponent implements OnInit {
     {
       icon: 'mail',
       title: 'البريد الإلكتروني',
-      content: 'info@powerev.com'
+      content: 'powerev588@gmail.com'
     },
     {
       icon: 'clock',
@@ -103,7 +106,7 @@ export class ContactComponent implements OnInit {
         addressCountry: 'EG'
       },
       telephone: '+20-10-2021-6898',
-      email: 'info@powerev.com',
+      email: 'powerev588@gmail.com',
       openingHours: 'Sa-Th 09:00-18:00',
       url: window.location.href
     });
@@ -114,18 +117,51 @@ export class ContactComponent implements OnInit {
     if (this.contactForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
 
-      // Log form data to console
-      console.log('Form Data:', this.contactForm.value);
+      const formData = this.contactForm.value;
 
-      // Show success message
+      // Create WhatsApp message
+      const message = this.createWhatsAppMessage(formData);
+
+      // Log form data to console for debugging
+      console.log('Form Data:', formData);
+      console.log('WhatsApp Message:', message);
+
+      // Open WhatsApp with the message
+      if (this.isBrowser) {
+        this.sendToWhatsApp(message);
+      }
+
+      // Reset form after a short delay
       setTimeout(() => {
-        alert('تم إرسال رسالتك بنجاح!');
         this.contactForm.reset({ inquiryType: 'استفسار عام' });
         this.isSubmitting = false;
-      }, 1500);
+      }, 1000);
     } else {
       this.markFormGroupTouched(this.contactForm);
     }
+  }
+
+  private createWhatsAppMessage(formData: any): string {
+    return `*رسالة جديدة من موقع Power EV*
+
+*الاسم:* ${formData.name}
+*الهاتف:* ${formData.phone}
+*البريد الإلكتروني:* ${formData.email}
+*نوع الاستفسار:* ${formData.inquiryType}
+
+*الرسالة:*
+${formData.message}`;
+  }
+
+  private sendToWhatsApp(message: string): void {
+    // Encode the message for URL
+    const encodedMessage = encodeURIComponent(message);
+
+    // Create WhatsApp URL
+    const whatsappUrl = `https://wa.me/${this.whatsappNumber}?text=${encodedMessage}`;
+
+    // Open WhatsApp in a new window
+    window.open(whatsappUrl, '_blank');
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {

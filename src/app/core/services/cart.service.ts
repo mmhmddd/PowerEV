@@ -1,5 +1,6 @@
 // src/app/core/services/cart.service.ts
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { tap, map, catchError } from 'rxjs/operators';
@@ -25,19 +26,40 @@ export class CartService {
   private sessionId: string;
   private cartSubject = new BehaviorSubject<Cart | null>(null);
   public cart$ = this.cartSubject.asObservable();
+  private isBrowser: boolean;
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
     this.sessionId = this.getOrCreateSessionId();
-    this.loadCart();
+
+    // Delay cart loading to avoid circular dependency during initialization
+    if (this.isBrowser) {
+      // Use setTimeout to break circular dependency chain
+      setTimeout(() => this.loadCart(), 0);
+    }
   }
 
   private getOrCreateSessionId(): string {
-    let sessionId = localStorage.getItem('cartSessionId');
-    if (!sessionId) {
-      sessionId = this.generateUUID();
-      localStorage.setItem('cartSessionId', sessionId);
+    // Return a temporary ID if not in browser (SSR scenario)
+    if (!this.isBrowser) {
+      return 'ssr-temp-session-' + Date.now();
     }
-    return sessionId;
+
+    try {
+      let sessionId = localStorage.getItem('cartSessionId');
+      if (!sessionId) {
+        sessionId = this.generateUUID();
+        localStorage.setItem('cartSessionId', sessionId);
+      }
+      return sessionId;
+    } catch (error) {
+      console.error('Error accessing localStorage:', error);
+      // Fallback if localStorage is restricted
+      return 'fallback-session-' + Date.now();
+    }
   }
 
   /**
@@ -74,6 +96,12 @@ export class CartService {
    * Creates empty cart if doesn't exist
    */
   loadCart(): void {
+    // Skip loading in SSR environment
+    if (!this.isBrowser) {
+      console.log('CartService: Skipping cart load in SSR environment');
+      return;
+    }
+
     this.getCart(this.sessionId).subscribe({
       next: (response) => {
         if (response.success && response.data) {
@@ -268,5 +296,13 @@ export class CartService {
    */
   getCurrentCart(): Cart | null {
     return this.cartSubject.value;
+  }
+
+  /**
+   * Check if running in browser environment
+   * @returns boolean
+   */
+  isInBrowser(): boolean {
+    return this.isBrowser;
   }
 }

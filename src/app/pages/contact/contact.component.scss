@@ -151,31 +151,13 @@
   @media (min-width: 768px) {
     height: 20rem;
   }
-}
 
-.map-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.5;
-}
-
-.map-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.map-label {
-  background: var(--bg-overlay);
-  backdrop-filter: blur(8px);
-  color: var(--text-primary);
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  font-family: 'Cairo', sans-serif;
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
 }
 
 // Form Section
@@ -336,6 +318,10 @@
   .form-card,
   .map-container {
     padding: 1.5rem;
+  }
+
+  .map-container {
+    padding: 0;
   }
 
   .contact-item {

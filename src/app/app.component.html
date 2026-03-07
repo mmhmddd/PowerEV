@@ -1,3 +1,6 @@
+<!-- Animated Loader - Only shows on first visit -->
+<app-loader [isLoading]="showLoader"></app-loader>
+
 <app-navbar *ngIf="!isAdminRoute"></app-navbar>
 <app-toast></app-toast>
 <router-outlet></router-outlet>
