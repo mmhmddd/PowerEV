@@ -93,7 +93,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     {
       id: 'chargers',
       title: 'شواحن كهربائية',
-      image: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=600',
+      image: '/assets/images/home/charger.jpg',
       categoryId: 'chargers',
       ariaLabel: 'تصفح شواحن كهربائية للسيارات'
     },
@@ -107,14 +107,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     {
       id: 'adapters',
       title: 'محولات وقوابس',
-      image: '/assets/images/home/charger.jpg',
+      image: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=600',
       categoryId: 'adapters',
       ariaLabel: 'تصفح محولات وقوابس الشحن'
     },
     {
       id: 'accessories',
       title: 'اكسسوارات وقطع غيار',
-      image: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=600',
+      image: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=600',
       categoryId: 'accessories',
       ariaLabel: 'تصفح اكسسوارات وقطع الغيار'
     }
@@ -222,7 +222,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 ctaSection = {
   buttonText: 'احجز موعد تركيب',
-  buttonLink: 'https://wa.me/201020216898', 
+  buttonLink: 'https://wa.me/201020216898',
   buttonAriaLabel: 'احجز موعد تركيب عبر واتساب',
   features: [
     'استشارة مجانية',

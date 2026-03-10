@@ -363,6 +363,8 @@ export interface Order {
   notes?: string;
   createdAt: string;
   updatedAt: string;
+  paymentScreenshot?: string | null;
+
 }
 
 export interface OrderResponse {
